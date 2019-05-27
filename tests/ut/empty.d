@@ -4,7 +4,7 @@ module ut.empty;
 import ut;
 
 
+@("empty")
 @safe pure unittest {
-    reflect!"modules.empty".should ==
-        Module();
+    module_!"modules.empty".should == Module();
 }
