@@ -1,0 +1,24 @@
+name "mirror"
+authors "Atila Neves"
+description "Compile and run time reflection"
+license "boost"
+targetType "library"
+targetPath "bin"
+
+
+configuration "library" {
+
+}
+
+
+configuration "unittest" {
+    targetType "executable"
+    targetName "ut"
+
+    mainSourceFile "tests/main.d"
+    sourcePaths "tests"
+    importPaths "tests"
+
+    dflags "-preview=dip1000" "-preview=dip1008"
+    dependency "unit-threaded" version="*"
+}
