@@ -9,9 +9,7 @@ import ut;
     import std.meta: staticMap;
 
     alias mod = ModuleTemplate!"modules.types";
-    enum Name(alias Symbol) = __traits(identifier, Symbol);
-    enum ctNames = staticMap!(Name, mod.Types);
-    string[] names;
-    static foreach(name; ctNames) names ~= name;
-    names.should == ["String"];
+    enum name(alias Symbol) = __traits(identifier, Symbol);
+    enum names = staticMap!(name, mod.Types);
+    [names].should == ["String"];
 }
