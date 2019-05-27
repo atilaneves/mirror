@@ -1,7 +1,13 @@
-module ut.types;
+module ut.ctfe;
 
 
 import ut;
+
+
+@("empty")
+@safe pure unittest {
+    module_!"modules.empty".should == Module();
+}
 
 
 @("types")
