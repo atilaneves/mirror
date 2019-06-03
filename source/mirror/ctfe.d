@@ -4,6 +4,7 @@ module mirror.ctfe;
 Module module_(string moduleName)() {
     import mirror.meta: ModuleTemplate = Module;
     import std.meta: staticMap;
+    import std.traits: ReturnType, Parameters, ParameterIdentifierTuple;
 
     Module ret;
 
@@ -19,7 +20,23 @@ Module module_(string moduleName)() {
     static foreach(var; variables)
         ret.variables ~= var;
 
-    enum toFunction(alias F) = Function(__traits(identifier, F));
+    template toFunction(alias F) {
+
+        import std.range: iota;
+        import std.meta: aliasSeqOf;
+
+        enum toParameter(size_t i) = Parameter(
+            Parameters!F[i].stringof,
+            ParameterIdentifierTuple!F[i],
+        );
+
+        enum toFunction = Function(
+            __traits(identifier, F),
+            ReturnType!F.stringof,
+            [staticMap!(toParameter, aliasSeqOf!(Parameters!F.length.iota))],
+        );
+    }
+
     alias functions = staticMap!(toFunction, module_.Functions);
     static foreach(func; functions)
         ret.functions ~= func;
@@ -47,5 +64,13 @@ struct Variable {
 
 
 struct Function {
+    string name;
+    string returnType;
+    Parameter[] parameters;
+}
+
+
+struct Parameter {
+    string type;
     string name;
 }
