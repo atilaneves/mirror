@@ -7,8 +7,8 @@ template Module(string moduleName) {
     mixin(`import `, moduleName, `;`);
     alias mod = Alias!(mixin(moduleName));
 
-    enum notObject(string name) = name != "object";
-    alias memberNames = Filter!(notObject, __traits(allMembers, mod));
+    enum wanted(string name) = name != "object" && name != "std";
+    alias memberNames = Filter!(wanted, __traits(allMembers, mod));
 
     alias member(string name) = Alias!(mixin(name));
     alias Types = staticMap!(member, memberNames);

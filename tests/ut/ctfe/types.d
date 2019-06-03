@@ -10,6 +10,12 @@ import ut.ctfe;
 }
 
 
+@("imports")
+@safe pure unittest {
+    module_!"modules.imports".should == Module();
+}
+
+
 @("types")
 @safe pure unittest {
     import std.algorithm: map;
