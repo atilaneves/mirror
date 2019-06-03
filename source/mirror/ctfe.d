@@ -12,16 +12,12 @@ struct Type {
 
 
 Module module_(string moduleName)() {
-    import std.meta: Alias, staticMap, Filter;
+    import mirror.meta: ModuleTemplate;
+    import std.meta: staticMap;
 
-    mixin(`import `, moduleName, `;`);
-    alias mod = Alias!(mixin(moduleName));
-
-    enum notObject(string name) = name != "object";
-    alias memberNames = Filter!(notObject, __traits(allMembers, mod));
-
-    enum toType(string name) = Type(name);
-    alias types = staticMap!(toType, memberNames);
+    alias module_ = ModuleTemplate!moduleName;
+    enum toType(T) = Type(__traits(identifier, T));
+    alias types = staticMap!(toType, module_.Types);
 
     Module ret;
 

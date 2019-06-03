@@ -1,11 +1,11 @@
 module mirror.meta;
 
 
-template ModuleTemplate(string name) {
+template ModuleTemplate(string moduleName) {
     import std.meta: Filter, staticMap, Alias;
 
-    mixin(`import `, name, `;`);
-    alias mod = Alias!(mixin(name));
+    mixin(`import `, moduleName, `;`);
+    alias mod = Alias!(mixin(moduleName));
 
     enum notObject(string name) = name != "object";
     alias memberNames = Filter!(notObject, __traits(allMembers, mod));
