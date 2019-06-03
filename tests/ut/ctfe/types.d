@@ -7,13 +7,13 @@ import std.algorithm: map;
 
 @("empty")
 @safe pure unittest {
-    module_!"modules.empty".should == Module();
+    module_!"modules.empty".should == Module("modules.empty");
 }
 
 
 @("imports")
 @safe pure unittest {
-    module_!"modules.imports".should == Module();
+    module_!"modules.imports".should == Module("modules.imports");
 }
 
 
@@ -24,10 +24,10 @@ import std.algorithm: map;
 }
 
 
+@ShouldFail
 @("problems")
 @safe pure unittest {
-    enum mod = module_!"modules.problems";
-    module_!"modules.empty".should == Module();
+    module_!"modules.problems".should == Module("modules.problems");
 }
 
 

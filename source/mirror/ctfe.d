@@ -6,6 +6,7 @@ Module module_(string moduleName)() {
     import std.meta: staticMap;
 
     Module ret;
+    ret.name = moduleName;
 
     alias module_ = ModuleTemplate!moduleName;
 
@@ -47,6 +48,7 @@ Module module_(string moduleName)() {
 
 
 struct Module {
+    string name;
     Type[] types;
     Variable[] variables;
     Function[] functions;
