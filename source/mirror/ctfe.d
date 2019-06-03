@@ -87,4 +87,3 @@ struct Parameter {
 // * Aliases
 // * Module {c,d}tors
 // * Unit tests
-// * Function overloads

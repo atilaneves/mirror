@@ -14,7 +14,15 @@ import ut.ctfe;
                 "int",
                 [
                     Parameter("int", "i"),
-                    Parameter("int", "j")
+                    Parameter("int", "j"),
+                ],
+            ),
+            Function(
+                "add1",
+                "double",
+                [
+                    Parameter("double", "d0"),
+                    Parameter("double", "d1"),
                 ],
             ),
             Function(

@@ -30,7 +30,8 @@ template Module(string moduleName) {
     enum toVariable(alias member) = Variable!(typeof(member))(__traits(identifier, member));
     alias Variables = staticMap!(toVariable, Filter!(isVariable, publicMembers));
 
-    alias Functions = Filter!(isSomeFunction, publicMembers);
+    alias overloads(alias F) = __traits(getOverloads, mod, __traits(identifier, F));
+    alias Functions = staticMap!(overloads, Filter!(isSomeFunction, publicMembers));
 }
 
 

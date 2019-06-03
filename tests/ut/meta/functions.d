@@ -11,7 +11,8 @@ import std.meta: AliasSeq;
     static import modules.functions;
 
     alias expected = AliasSeq!(
-        modules.functions.add1,
+        __traits(getOverloads, modules.functions, "add1")[0],
+        __traits(getOverloads, modules.functions, "add1")[1],
         modules.functions.withDefault,
     );
 
@@ -25,12 +26,5 @@ import std.meta: AliasSeq;
 @("problems")
 @safe pure unittest {
     alias mod = Module!("modules.problems");
-    static import modules.functions;
-
-    alias expected = AliasSeq!(
-        modules.functions.add1,
-        modules.functions.withDefault,
-    );
-
     static assert(mod.Functions.length == 0, mod.Functions.stringof);
 }
