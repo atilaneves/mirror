@@ -20,7 +20,17 @@ import std.algorithm: map;
 @("types")
 @safe pure unittest {
     enum mod = module_!"modules.types";
-    mod.types.map!(a => a.name).shouldBeSameSetAs(["String", "Enum", "Class"]);
+    mod.types.map!(a => a.name).shouldBeSameSetAs(
+        [
+            "String",
+            "Enum",
+            "Class",
+            "Interface",
+            "AbstractClass",
+            "MiddleClass",
+            "LeafClass",
+        ]
+    );
 }
 
 

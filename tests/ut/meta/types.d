@@ -21,7 +21,17 @@ import ut.meta;
 @("types")
 @safe pure unittest {
     alias mod = Module!"modules.types";
-    typeNames!mod.shouldBeSameSetAs(["String", "Enum", "Class"]);
+    typeNames!mod.shouldBeSameSetAs(
+        [
+            "String",
+            "Enum",
+            "Class",
+            "Interface",
+            "AbstractClass",
+            "MiddleClass",
+            "LeafClass",
+        ]
+    );
 }
 
 
