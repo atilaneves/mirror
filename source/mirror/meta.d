@@ -3,6 +3,7 @@ module mirror.meta;
 
 template Module(string moduleName) {
     import std.meta: Filter, staticMap, Alias, AliasSeq;
+    import std.traits: isSomeFunction;
 
     mixin(`import `, moduleName, `;`);
     alias mod = Alias!(mixin(moduleName));
@@ -28,6 +29,8 @@ template Module(string moduleName) {
     enum isVariable(alias member) = is(typeof(member));
     enum toVariable(alias member) = Variable!(typeof(member))(__traits(identifier, member));
     alias Variables = staticMap!(toVariable, Filter!(isVariable, publicMembers));
+
+    alias Functions = Filter!(isSomeFunction, publicMembers);
 }
 
 

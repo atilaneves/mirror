@@ -6,4 +6,5 @@ mixin runTestsMain!(
     "ut.ctfe.types",
     "ut.meta.variables",
     "ut.ctfe.variables",
+    "ut.meta.functions",
 );
