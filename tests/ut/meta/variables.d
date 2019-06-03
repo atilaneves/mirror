@@ -10,37 +10,13 @@ import std.meta: AliasSeq;
     static import modules.variables;
 
     alias mod = Module!("modules.variables");
-
-    variables!mod.shouldBeSameSetAs(
-        [
-            VariableInfo("int", "gInt"),
-            VariableInfo("double", "gDouble"),
-            VariableInfo("Struct", "gStruct"),
-            VariableInfo("int", "CONSTANT"),
-        ]
+    static assert(mod.Variables ==
+                  AliasSeq!(
+                      Variable!int("gInt"),
+                      Variable!double("gDouble"),
+                      Variable!(modules.variables.Struct)("gStruct"),
+                      Variable!int("CONSTANT"),
+                  ),
+                  mod.Variables.stringof,
     );
-
-    static assert(is(mod.Variables[2].Type == modules.variables.Struct));
-}
-
-
-void shouldEqual(alias L, alias R)(in string file = __FILE__, in size_t line = __LINE__) {
-    if(__traits(isSame, L, R))
-        shouldEqual(L.stringof, R.stringof, file, line);
-}
-
-
-private struct VariableInfo {
-    string type;
-    string name;
-}
-
-private VariableInfo[] variables(alias module_)() {
-    VariableInfo[] ret;
-
-    static foreach(var; module_.Variables) {
-        ret ~= VariableInfo(var.Type.stringof, var.name);
-    }
-
-    return ret;
 }
