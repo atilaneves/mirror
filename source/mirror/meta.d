@@ -6,9 +6,9 @@ template Module(string moduleName) {
     import std.traits: isSomeFunction, isType;
 
     mixin(`import `, moduleName, `;`);
-    alias mod = Alias!(mixin(moduleName));
+    private alias mod = Alias!(mixin(moduleName));
 
-    alias memberNames = __traits(allMembers, mod);
+    private alias memberNames = __traits(allMembers, mod);
 
     private template member(string name) {
         import std.meta: Alias, AliasSeq;
@@ -17,16 +17,16 @@ template Module(string moduleName) {
         else
             alias member = AliasSeq!();
     }
-    alias members = staticMap!(member, memberNames);
+    private alias members = staticMap!(member, memberNames);
     private enum notPrivate(alias T) = __traits(getProtection, T) != "private";
-    alias publicMembers = Filter!(notPrivate, members);
+    private alias publicMembers = Filter!(notPrivate, members);
 
     alias Types = Filter!(isType, publicMembers);
-    enum isVariable(alias member) = is(typeof(member));
-    enum toVariable(alias member) = Variable!(typeof(member))(__traits(identifier, member));
+    private enum isVariable(alias member) = is(typeof(member));
+    private enum toVariable(alias member) = Variable!(typeof(member))(__traits(identifier, member));
     alias Variables = staticMap!(toVariable, Filter!(isVariable, publicMembers));
 
-    alias overloads(alias F) = __traits(getOverloads, mod, __traits(identifier, F));
+    private alias overloads(alias F) = __traits(getOverloads, mod, __traits(identifier, F));
     alias Functions = staticMap!(overloads, Filter!(isSomeFunction, publicMembers));
 }
 
