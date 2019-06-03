@@ -3,7 +3,7 @@ module mirror.meta;
 
 template Module(string moduleName) {
     import std.meta: Filter, staticMap, Alias, AliasSeq;
-    import std.traits: isSomeFunction;
+    import std.traits: isSomeFunction, isType;
 
     mixin(`import `, moduleName, `;`);
     alias mod = Alias!(mixin(moduleName));
@@ -20,10 +20,6 @@ template Module(string moduleName) {
     alias members = staticMap!(member, memberNames);
     private enum notPrivate(alias T) = __traits(getProtection, T) != "private";
     alias publicMembers = Filter!(notPrivate, members);
-
-    private template isType(A...) if(A.length == 1) {
-        enum isType = is(A[0]);
-    }
 
     alias Types = Filter!(isType, publicMembers);
     enum isVariable(alias member) = is(typeof(member));
