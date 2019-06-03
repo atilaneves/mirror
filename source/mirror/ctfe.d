@@ -11,14 +11,10 @@ Module module_(string moduleName)() {
     alias module_ = ModuleTemplate!moduleName;
 
     enum toType(T) = Type(__traits(identifier, T));
-    alias types = staticMap!(toType, module_.Types);
-    static foreach(type; types)
-        ret.types ~= type;
+    ret.types = [ staticMap!(toType, module_.Types) ];
 
     enum toVariable(alias V) = Variable(V.Type.stringof, V.name);
-    alias variables = staticMap!(toVariable, module_.Variables);
-    static foreach(var; variables)
-        ret.variables ~= var;
+    ret.variables = [ staticMap!(toVariable, module_.Variables) ];
 
     template toFunction(alias F) {
 
@@ -36,10 +32,7 @@ Module module_(string moduleName)() {
             [staticMap!(toParameter, aliasSeqOf!(Parameters!F.length.iota))],
         );
     }
-
-    alias functions = staticMap!(toFunction, module_.Functions);
-    static foreach(func; functions)
-        ret.functions ~= func;
+    ret.functions = [ staticMap!(toFunction, module_.Functions) ];
 
     return ret;
 }
