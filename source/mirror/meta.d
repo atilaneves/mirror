@@ -1,6 +1,14 @@
+/**
+   This module provides the template metaprogramming variant of compile-time
+   reflection, allowing client code to do type-level computations on the
+   contents of a D module.
+ */
 module mirror.meta;
 
 
+/**
+   Compile-time information on a D module.
+ */
 template Module(string moduleName) {
     import std.meta: Filter, staticMap, Alias, AliasSeq;
     import std.traits: isSomeFunction, isType;
@@ -35,6 +43,9 @@ template Module(string moduleName) {
 }
 
 
+/**
+   A global variable.
+ */
 struct Variable(T) {
     alias Type = T;
     string name;

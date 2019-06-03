@@ -1,6 +1,16 @@
+/**
+   This module provides the CTFE variant of compile-time reflection,
+   allowing client code to use regular D functions (as opposed to
+   template metaprogramming) to operate on the contents of a D module
+   using string mixins.
+ */
+
 module mirror.ctfe;
 
 
+/**
+   Returns compile-time reflection information about a D module.
+ */
 Module module_(string moduleName)() {
     import mirror.meta: ModuleTemplate = Module;
     import std.meta: staticMap;
@@ -47,6 +57,9 @@ Module module_(string moduleName)() {
 }
 
 
+/**
+   A D module.
+ */
 struct Module {
     string name;
     Type[] types;
@@ -55,18 +68,23 @@ struct Module {
 }
 
 
+/**
+   A user-defined type (struct, class, or enum).
+ */
 struct Type {
     string name;
     // attributes?
 }
 
 
+/// A global variable
 struct Variable {
     string type;
     string name;
 }
 
 
+/// A free function
 struct Function {
     string name;
     string returnType;
@@ -76,6 +94,7 @@ struct Function {
 }
 
 
+/// A function parameter
 struct Parameter {
     string type;
     string name;
@@ -87,3 +106,4 @@ struct Parameter {
 // * Aliases
 // * Module {c,d}tors
 // * Unit tests
+// * Class hierachies
