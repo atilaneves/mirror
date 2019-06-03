@@ -19,6 +19,11 @@ Module module_(string moduleName)() {
     static foreach(var; variables)
         ret.variables ~= var;
 
+    enum toFunction(alias F) = Function(__traits(identifier, F));
+    alias functions = staticMap!(toFunction, module_.Functions);
+    static foreach(func; functions)
+        ret.functions ~= func;
+
     return ret;
 }
 
@@ -26,6 +31,7 @@ Module module_(string moduleName)() {
 struct Module {
     Type[] types;
     Variable[] variables;
+    Function[] functions;
 }
 
 
@@ -36,5 +42,10 @@ struct Type {
 
 struct Variable {
     string type;
+    string name;
+}
+
+
+struct Function {
     string name;
 }
