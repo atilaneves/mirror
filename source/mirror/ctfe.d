@@ -4,7 +4,6 @@ module mirror.ctfe;
 Module module_(string moduleName)() {
     import mirror.meta: ModuleTemplate = Module;
     import std.meta: staticMap;
-    import std.traits: ReturnType, Parameters, ParameterIdentifierTuple;
 
     Module ret;
 
@@ -20,10 +19,19 @@ Module module_(string moduleName)() {
 
         import std.range: iota;
         import std.meta: aliasSeqOf;
+        import std.traits: ReturnType, Parameters, ParameterDefaults, ParameterIdentifierTuple;
+
+        template toDefault(size_t i) {
+            static if(is(ParameterDefaults!F[i] == void))
+                enum toDefault = "";
+            else
+                enum toDefault = ParameterDefaults!F[i].stringof;
+        }
 
         enum toParameter(size_t i) = Parameter(
             Parameters!F[i].stringof,
             ParameterIdentifierTuple!F[i],
+            toDefault!i,
         );
 
         enum toFunction = Function(
@@ -66,4 +74,5 @@ struct Function {
 struct Parameter {
     string type;
     string name;
+    string default_;
 }
