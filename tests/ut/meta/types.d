@@ -6,7 +6,7 @@ import ut.meta;
 
 @("empty")
 @safe pure unittest {
-    alias mod = Module!"modules.imports";
+    alias mod = Module!"modules.empty";
     typeNames!mod.should == [];
 }
 
