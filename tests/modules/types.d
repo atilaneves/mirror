@@ -11,3 +11,8 @@ enum Enum {
     bar,
     baz,
 }
+
+class Class {
+    int i;
+    this(int i) { this.i = i; }
+}
