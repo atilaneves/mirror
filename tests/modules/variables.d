@@ -7,4 +7,4 @@ struct Struct {}
 
 Struct gStruct;
 
-//enum CONSTANT = 42;
+enum CONSTANT = 42;

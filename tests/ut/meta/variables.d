@@ -16,6 +16,7 @@ import std.meta: AliasSeq;
             VariableInfo("int", "gInt"),
             VariableInfo("double", "gDouble"),
             VariableInfo("Struct", "gStruct"),
+            VariableInfo("int", "CONSTANT"),
         ]
     );
 
