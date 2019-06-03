@@ -8,3 +8,5 @@ struct Struct {}
 Struct gStruct;
 
 enum CONSTANT = 42;
+
+immutable int gImmutableInt;

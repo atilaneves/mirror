@@ -13,6 +13,7 @@ import ut.ctfe;
             Variable("double", "gDouble"),
             Variable("Struct", "gStruct"),
             Variable("int", "CONSTANT"),
+            Variable("immutable(int)", "gImmutableInt"),
         ]
     );
 }
