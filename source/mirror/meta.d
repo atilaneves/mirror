@@ -21,11 +21,15 @@ template Module(string moduleName) {
     private enum notPrivate(alias T) = __traits(getProtection, T) != "private";
     private alias publicMembers = Filter!(notPrivate, members);
 
+    // User-defined types
     alias Types = Filter!(isType, publicMembers);
+
+    // Global variables
     private enum isVariable(alias member) = is(typeof(member));
     private enum toVariable(alias member) = Variable!(typeof(member))(__traits(identifier, member));
     alias Variables = staticMap!(toVariable, Filter!(isVariable, publicMembers));
 
+    // Function definitions
     private alias overloads(alias F) = __traits(getOverloads, mod, __traits(identifier, F));
     alias Functions = staticMap!(overloads, Filter!(isSomeFunction, publicMembers));
 }
