@@ -22,3 +22,11 @@ import ut.ctfe;
     enum mod = module_!"modules.types";
     mod.types.map!(a => a.name).shouldBeSameSetAs(["String", "Enum", "Class"]);
 }
+
+
+@("problems")
+@safe pure unittest {
+    import std.algorithm: map;
+    enum mod = module_!"modules.problems";
+    module_!"modules.empty".should == Module();
+}

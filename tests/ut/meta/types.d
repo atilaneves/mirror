@@ -25,6 +25,13 @@ import ut.meta;
 }
 
 
+@("problems")
+@safe pure unittest {
+    alias mod = Module!"modules.problems";
+    typeNames!mod.should == [];
+}
+
+
 private string[] typeNames(alias module_)() {
     import std.meta: staticMap;
     enum name(alias Symbol) = __traits(identifier, Symbol);

@@ -17,9 +17,11 @@ template Module(string moduleName) {
             alias member = AliasSeq!();
     }
     alias members = staticMap!(member, memberNames);
+    private enum notPrivate(alias T) = __traits(getProtection, T) != "private";
+    alias publicMembers = Filter!(notPrivate, members);
 
     private template isType(A...) if(A.length == 1) {
         enum isType = is(A[0]);
     }
-    alias Types = Filter!(isType, members);
+    alias Types = Filter!(isType, publicMembers);
 }
