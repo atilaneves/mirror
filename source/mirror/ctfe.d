@@ -12,7 +12,7 @@ struct Type {
 
 
 Module module_(string moduleName)() {
-    import mirror.meta: ModuleTemplate;
+    import mirror.meta: ModuleTemplate = Module;
     import std.meta: staticMap;
 
     alias module_ = ModuleTemplate!moduleName;

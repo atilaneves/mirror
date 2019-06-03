@@ -2,6 +2,6 @@ import unit_threaded;
 
 
 mixin runTestsMain!(
-    "ut.ctfe",
-    "ut.templates",
+    "ut.ctfe.types",
+    "ut.meta.types",
 );

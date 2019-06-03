@@ -1,7 +1,7 @@
 module mirror.meta;
 
 
-template ModuleTemplate(string moduleName) {
+template Module(string moduleName) {
     import std.meta: Filter, staticMap, Alias;
 
     mixin(`import `, moduleName, `;`);
