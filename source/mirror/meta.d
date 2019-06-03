@@ -2,7 +2,7 @@ module mirror.meta;
 
 
 template Module(string moduleName) {
-    import std.meta: Filter, staticMap, Alias;
+    import std.meta: Filter, staticMap, Alias, AliasSeq;
 
     mixin(`import `, moduleName, `;`);
     alias mod = Alias!(mixin(moduleName));
@@ -23,5 +23,15 @@ template Module(string moduleName) {
     private template isType(A...) if(A.length == 1) {
         enum isType = is(A[0]);
     }
+
     alias Types = Filter!(isType, publicMembers);
+    enum isVariable(alias member) = is(typeof(member));
+    enum toVariable(alias member) = Variable!(typeof(member))(__traits(identifier, member));
+    alias Variables = staticMap!(toVariable, Filter!(isVariable, publicMembers));
+}
+
+
+struct Variable(T) {
+    alias Type = T;
+    string name;
 }

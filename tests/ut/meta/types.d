@@ -32,6 +32,13 @@ import ut.meta;
 }
 
 
+@("variables")
+@safe pure unittest {
+    alias mod = Module!"modules.variables";
+    typeNames!mod.should == ["Struct"];
+}
+
+
 private string[] typeNames(alias module_)() {
     import std.meta: staticMap;
     enum name(alias Symbol) = __traits(identifier, Symbol);
