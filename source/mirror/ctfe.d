@@ -57,6 +57,7 @@ struct Module {
 
 struct Type {
     string name;
+    // attributes?
 }
 
 
@@ -70,6 +71,8 @@ struct Function {
     string name;
     string returnType;
     Parameter[] parameters;
+    // attributes?
+    // ref/scope/return scope?
 }
 
 
@@ -78,3 +81,10 @@ struct Parameter {
     string name;
     string default_;
 }
+
+
+// TODO (maybe?):
+// * Aliases
+// * Module {c,d}tors
+// * Unit tests
+// * Function overloads
