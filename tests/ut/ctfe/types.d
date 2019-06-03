@@ -24,7 +24,6 @@ import std.algorithm: map;
 }
 
 
-@ShouldFail
 @("problems")
 @safe pure unittest {
     module_!"modules.problems".should == Module("modules.problems");

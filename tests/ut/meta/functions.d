@@ -20,3 +20,17 @@ import std.meta: AliasSeq;
         static assert(__traits(isSame, mod.Functions[i], expected[i]), __traits(identifier, mod.Functions[i]));
     }
 }
+
+
+@("problems")
+@safe pure unittest {
+    alias mod = Module!("modules.problems");
+    static import modules.functions;
+
+    alias expected = AliasSeq!(
+        modules.functions.add1,
+        modules.functions.withDefault,
+    );
+
+    static assert(mod.Functions.length == 0, mod.Functions.stringof);
+}

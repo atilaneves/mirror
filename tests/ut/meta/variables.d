@@ -20,3 +20,12 @@ import std.meta: AliasSeq;
                   mod.Variables.stringof,
     );
 }
+
+
+@("problems")
+@safe pure unittest {
+    static import modules.variables;
+
+    alias mod = Module!("modules.problems");
+    static assert(mod.Variables.length == 0, mod.Variables.stringof);
+}
