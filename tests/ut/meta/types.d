@@ -52,6 +52,6 @@ import ut.meta;
 private string[] typeNames(alias module_)() {
     import std.meta: staticMap;
     enum name(alias Symbol) = __traits(identifier, Symbol);
-    enum names = staticMap!(name, module_.UserDefinedTypes);
+    enum names = staticMap!(name, module_.Aggregates);
     return [names];
 }

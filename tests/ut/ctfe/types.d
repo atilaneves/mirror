@@ -19,14 +19,14 @@ import ut.ctfe;
 @("types")
 @safe pure unittest {
     enum mod = module_!"modules.types";
-    mod.userDefinedTypes.should == [
-        UserDefinedType("String"),
-        UserDefinedType("Enum"),
-        UserDefinedType("Class"),
-        UserDefinedType("Interface"),
-        UserDefinedType("AbstractClass"),
-        UserDefinedType("MiddleClass"),
-        UserDefinedType("LeafClass"),
+    mod.aggregates.should == [
+        Aggregate("String"),
+        Aggregate("Enum"),
+        Aggregate("Class"),
+        Aggregate("Interface"),
+        Aggregate("AbstractClass"),
+        Aggregate("MiddleClass"),
+        Aggregate("LeafClass"),
     ];
 }
 
@@ -40,5 +40,5 @@ import ut.ctfe;
 @("variables")
 @safe pure unittest {
     enum mod = module_!"modules.variables";
-    mod.userDefinedTypes.should == [UserDefinedType("Struct")];
+    mod.aggregates.should == [Aggregate("Struct")];
 }

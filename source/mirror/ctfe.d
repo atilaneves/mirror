@@ -20,8 +20,8 @@ Module module_(string moduleName)() {
 
     alias module_ = ModuleTemplate!moduleName;
 
-    enum toType(T) = UserDefinedType(__traits(identifier, T));
-    ret.userDefinedTypes = [ staticMap!(toType, module_.UserDefinedTypes) ];
+    enum toType(T) = Aggregate(__traits(identifier, T));
+    ret.aggregates = [ staticMap!(toType, module_.Aggregates) ];
 
     enum toVariable(alias V) = Variable(V.Type.stringof, V.name);
     ret.variables = [ staticMap!(toVariable, module_.Variables) ];
@@ -67,7 +67,7 @@ Module module_(string moduleName)() {
  */
 struct Module {
     string name;
-    UserDefinedType[] userDefinedTypes;
+    Aggregate[] aggregates;
     Variable[] variables;
     Function[] functions;
 }
@@ -76,7 +76,7 @@ struct Module {
 /**
    A user-defined type (struct, class, or enum).
  */
-struct UserDefinedType {
+struct Aggregate {
     string name;
     // members?
     // member functions?
@@ -118,7 +118,8 @@ struct Parameter {
 
 
 // TODO (maybe?):
-// * Aliases
+// * Aggregate members
 // * Module {c,d}tors
 // * Unit tests
 // * Class hierachies
+// * Aliases
