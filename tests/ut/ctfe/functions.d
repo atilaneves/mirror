@@ -6,6 +6,8 @@ import ut.ctfe;
 
 @("functions")
 @safe pure unittest {
+    import std.traits: PSC = ParameterStorageClass;
+
     enum mod = module_!("modules.functions");
     mod.functions.shouldBeSameSetAs(
         [
@@ -37,11 +39,11 @@ import ut.ctfe;
                 "storageClasses",
                 Type("void"),
                 [
-                    Parameter("int", "normal"),
-                    Parameter("int*", "returnScope"),
-                    Parameter("int", "out_"),
-                    Parameter("int", "ref_"),
-                    Parameter("int", "lazy_"),
+                    Parameter("int", "normal", "", PSC.none),
+                    Parameter("int*", "returnScope", "", PSC.return_ | PSC.scope_),
+                    Parameter("int", "out_", "", PSC.out_),
+                    Parameter("int", "ref_", "", PSC.ref_),
+                    Parameter("int", "lazy_", "", PSC.lazy_),
                 ]
             ),
         ]

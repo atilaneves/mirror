@@ -39,11 +39,16 @@ Module module_(string moduleName)() {
                 enum toDefault = ParameterDefaults!F[i].stringof;
         }
 
-        enum toParameter(size_t i) = Parameter(
-            Parameters!F[i].stringof,
-            ParameterIdentifierTuple!F[i],
-            toDefault!i,
-        );
+        template toParameter(size_t i) {
+            import std.traits: ParameterStorageClassTuple;
+
+            enum toParameter = Parameter(
+                Parameters!F[i].stringof,
+                ParameterIdentifierTuple!F[i],
+                toDefault!i,
+                ParameterStorageClassTuple!F[i],
+            );
+        }
 
         enum toFunction = Function(
             __traits(identifier, F),
@@ -96,9 +101,12 @@ struct Function {
 
 /// A function parameter
 struct Parameter {
+    import std.traits: ParameterStorageClass;
+
     string type;
     string name;
     string default_;  /// default value, if any
+    ParameterStorageClass storageClass;
 }
 
 
