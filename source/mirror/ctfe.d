@@ -47,7 +47,7 @@ Module module_(string moduleName)() {
 
         enum toFunction = Function(
             __traits(identifier, F),
-            ReturnType!F.stringof,
+            Type(ReturnType!F.stringof),
             [staticMap!(toParameter, aliasSeqOf!(Parameters!F.length.iota))],
         );
     }
@@ -87,7 +87,7 @@ struct Variable {
 /// A free function
 struct Function {
     string name;
-    string returnType;
+    Type returnType;
     Parameter[] parameters;
     // attributes?
     // ref/scope/return scope?
@@ -98,7 +98,7 @@ struct Function {
 struct Parameter {
     string type;
     string name;
-    string default_;
+    string default_;  /// default value, if any
 }
 
 

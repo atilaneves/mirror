@@ -11,7 +11,7 @@ import ut.ctfe;
         [
             Function(
                 "add1",
-                "int",
+                Type("int"),
                 [
                     Parameter("int", "i"),
                     Parameter("int", "j"),
@@ -19,7 +19,7 @@ import ut.ctfe;
             ),
             Function(
                 "add1",
-                "double",
+                Type("double"),
                 [
                     Parameter("double", "d0"),
                     Parameter("double", "d1"),
@@ -27,7 +27,7 @@ import ut.ctfe;
             ),
             Function(
                 "withDefault",
-                "double",
+                Type("double"),
                 [
                     Parameter("double", "d0"),
                     Parameter("double", "d1", "33.3"),

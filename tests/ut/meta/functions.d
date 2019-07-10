@@ -17,8 +17,10 @@ import std.meta: AliasSeq;
     );
 
     static assert(mod.Functions.length == expected.length, mod.Functions.stringof);
+
     static foreach(i; 0 .. expected.length) {
-        static assert(__traits(isSame, mod.Functions[i], expected[i]), __traits(identifier, mod.Functions[i]));
+        static assert(__traits(isSame, mod.Functions[i], expected[i]),
+                      __traits(identifier, mod.Functions[i]));
     }
 }
 
