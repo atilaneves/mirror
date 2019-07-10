@@ -14,6 +14,7 @@ import std.meta: AliasSeq;
         __traits(getOverloads, modules.functions, "add1")[0],
         __traits(getOverloads, modules.functions, "add1")[1],
         modules.functions.withDefault,
+        modules.functions.storageClasses,
     );
 
     static assert(mod.Functions.length == expected.length, mod.Functions.stringof);

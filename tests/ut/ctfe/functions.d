@@ -33,6 +33,17 @@ import ut.ctfe;
                     Parameter("double", "d1", "33.3"),
                 ],
             ),
+            Function(
+                "storageClasses",
+                Type("void"),
+                [
+                    Parameter("int", "normal"),
+                    Parameter("int*", "returnScope"),
+                    Parameter("int", "out_"),
+                    Parameter("int", "ref_"),
+                    Parameter("int", "lazy_"),
+                ]
+            ),
         ]
     );
 }
