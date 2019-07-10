@@ -30,7 +30,7 @@ template Module(string moduleName) {
     private alias publicMembers = Filter!(notPrivate, members);
 
     // User-defined types
-    alias Types = Filter!(isType, publicMembers);
+    alias UserDefinedTypes = Filter!(isType, publicMembers);
 
     // Global variables
     private enum isVariable(alias member) = is(typeof(member));

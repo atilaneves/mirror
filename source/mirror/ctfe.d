@@ -20,8 +20,8 @@ Module module_(string moduleName)() {
 
     alias module_ = ModuleTemplate!moduleName;
 
-    enum toType(T) = Type(__traits(identifier, T));
-    ret.types = [ staticMap!(toType, module_.Types) ];
+    enum toType(T) = UserDefinedType(__traits(identifier, T));
+    ret.userDefinedTypes = [ staticMap!(toType, module_.UserDefinedTypes) ];
 
     enum toVariable(alias V) = Variable(V.Type.stringof, V.name);
     ret.variables = [ staticMap!(toVariable, module_.Variables) ];
@@ -52,7 +52,7 @@ Module module_(string moduleName)() {
 
         enum toFunction = Function(
             __traits(identifier, F),
-            Type(ReturnType!F.stringof),
+            UserDefinedType(ReturnType!F.stringof),
             [staticMap!(toParameter, aliasSeqOf!(Parameters!F.length.iota))],
         );
     }
@@ -67,7 +67,7 @@ Module module_(string moduleName)() {
  */
 struct Module {
     string name;
-    Type[] types;
+    UserDefinedType[] userDefinedTypes;
     Variable[] variables;
     Function[] functions;
 }
@@ -76,9 +76,11 @@ struct Module {
 /**
    A user-defined type (struct, class, or enum).
  */
-struct Type {
+struct UserDefinedType {
     string name;
-    // children?
+    // members?
+    // member functions?
+    // enums / variables?
     // attributes?
 }
 
@@ -93,7 +95,7 @@ struct Variable {
 /// A free function
 struct Function {
     string name;
-    Type returnType;
+    UserDefinedType returnType;
     Parameter[] parameters;
     // attributes?
     // ref/scope/return scope?
