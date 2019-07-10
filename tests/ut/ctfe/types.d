@@ -40,5 +40,7 @@ import ut.ctfe;
 @("variables")
 @safe pure unittest {
     enum mod = module_!"modules.variables";
-    mod.aggregates.should == [Aggregate("Struct")];
+    mod.aggregates.should == [
+        Aggregate("Struct")
+    ];
 }

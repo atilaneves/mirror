@@ -78,21 +78,21 @@ struct Module {
  */
 struct Aggregate {
     string name;
-    // members?
-    // member functions?
-    // enums / variables?
-    // attributes?
+    Variable[] fields;
+    Function[] functions;
+    // UDAs?
 }
 
 struct Type {
     string name;
-    // attributes?
+    // UDAs?
 }
 
-/// A global variable
+/// A variable
 struct Variable {
     string type;
     string name;
+    // UDAs?
 }
 
 
@@ -101,8 +101,8 @@ struct Function {
     string name;
     Type returnType;
     Parameter[] parameters;
-    // attributes?
-    // ref/scope/return scope?
+    // UDAs?
+    // Function attributes?
 }
 
 
@@ -117,9 +117,8 @@ struct Parameter {
 }
 
 
-// TODO (maybe?):
-// * Aggregate members
+// TODO:
 // * Module {c,d}tors
 // * Unit tests
 // * Class hierachies
-// * Aliases
+// * Aliases?
