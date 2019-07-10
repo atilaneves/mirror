@@ -13,7 +13,7 @@ import ut.ctfe;
         [
             Function(
                 "add1",
-                UserDefinedType("int"),
+                Type("int"),
                 [
                     Parameter("int", "i"),
                     Parameter("int", "j"),
@@ -21,7 +21,7 @@ import ut.ctfe;
             ),
             Function(
                 "add1",
-                UserDefinedType("double"),
+                Type("double"),
                 [
                     Parameter("double", "d0"),
                     Parameter("double", "d1"),
@@ -29,7 +29,7 @@ import ut.ctfe;
             ),
             Function(
                 "withDefault",
-                UserDefinedType("double"),
+                Type("double"),
                 [
                     Parameter("double", "d0"),
                     Parameter("double", "d1", "33.3"),
@@ -37,7 +37,7 @@ import ut.ctfe;
             ),
             Function(
                 "storageClasses",
-                UserDefinedType("void"),
+                Type("void"),
                 [
                     Parameter("int", "normal", "", PSC.none),
                     Parameter("int*", "returnScope", "", PSC.return_ | PSC.scope_),

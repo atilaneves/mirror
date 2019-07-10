@@ -52,7 +52,7 @@ Module module_(string moduleName)() {
 
         enum toFunction = Function(
             __traits(identifier, F),
-            UserDefinedType(ReturnType!F.stringof),
+            Type(ReturnType!F.stringof),
             [staticMap!(toParameter, aliasSeqOf!(Parameters!F.length.iota))],
         );
     }
@@ -84,6 +84,10 @@ struct UserDefinedType {
     // attributes?
 }
 
+struct Type {
+    string name;
+    // attributes?
+}
 
 /// A global variable
 struct Variable {
@@ -95,7 +99,7 @@ struct Variable {
 /// A free function
 struct Function {
     string name;
-    UserDefinedType returnType;
+    Type returnType;
     Parameter[] parameters;
     // attributes?
     // ref/scope/return scope?
