@@ -78,6 +78,7 @@ struct Module {
  */
 struct Type {
     string name;
+    // children?
     // attributes?
 }
 

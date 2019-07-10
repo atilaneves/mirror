@@ -2,7 +2,6 @@ module ut.ctfe.types;
 
 
 import ut.ctfe;
-import std.algorithm: map;
 
 
 @("empty")
@@ -20,17 +19,15 @@ import std.algorithm: map;
 @("types")
 @safe pure unittest {
     enum mod = module_!"modules.types";
-    mod.types.map!(a => a.name).shouldBeSameSetAs(
-        [
-            "String",
-            "Enum",
-            "Class",
-            "Interface",
-            "AbstractClass",
-            "MiddleClass",
-            "LeafClass",
-        ]
-    );
+    mod.types.should == [
+        Type("String"),
+        Type("Enum"),
+        Type("Class"),
+        Type("Interface"),
+        Type("AbstractClass"),
+        Type("MiddleClass"),
+        Type("LeafClass"),
+    ];
 }
 
 
@@ -43,5 +40,5 @@ import std.algorithm: map;
 @("variables")
 @safe pure unittest {
     enum mod = module_!"modules.variables";
-    mod.types.map!(a => a.name).shouldBeSameSetAs(["Struct"]);
+    mod.types.should == [Type("Struct")];
 }
