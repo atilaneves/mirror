@@ -49,6 +49,18 @@ import ut.meta;
 }
 
 
+@("isEnum")
+@safe pure unittest {
+    static import modules.types;
+    import std.meta: Filter, AliasSeq;
+
+    alias mod = Module!"modules.types";
+    alias aggregates = mod.Aggregates;
+    alias enums = Filter!(isEnum, aggregates);
+    static assert(is(enums == AliasSeq!(modules.types.Enum)), enums.stringof);
+}
+
+
 private string[] typeNames(alias module_)() {
     import std.meta: staticMap;
     enum name(alias Symbol) = __traits(identifier, Symbol);

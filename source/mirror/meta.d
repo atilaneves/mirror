@@ -50,3 +50,7 @@ struct Variable(T) {
     alias Type = T;
     string name;
 }
+
+
+/// Usable as a predicate to std.meta.Filter
+enum isEnum(T) = is(T == enum);
