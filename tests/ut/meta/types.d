@@ -103,6 +103,25 @@ import ut.meta;
 }
 
 
+@("isOOP")
+@safe pure unittest {
+    static import modules.types;
+    import std.meta: Filter, AliasSeq;
+
+    alias mod = Module!"modules.types";
+    alias aggregates = mod.Aggregates;
+    alias classes = Filter!(isOOP, aggregates);
+    alias expected = AliasSeq!(
+        modules.types.Class,
+        modules.types.Interface,
+        modules.types.AbstractClass,
+        modules.types.MiddleClass,
+        modules.types.LeafClass,
+    );
+    static assert(is(classes == expected), classes.stringof);
+}
+
+
 private string[] typeNames(alias module_)() {
     import std.meta: staticMap;
     enum name(alias Symbol) = __traits(identifier, Symbol);
