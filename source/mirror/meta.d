@@ -54,3 +54,6 @@ struct Variable(T) {
 
 /// Usable as a predicate to std.meta.Filter
 enum isEnum(T) = is(T == enum);
+
+/// Usable as a predicate to std.meta.Filter
+enum isStruct(T) = is(T == struct);

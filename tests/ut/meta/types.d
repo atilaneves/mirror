@@ -61,6 +61,18 @@ import ut.meta;
 }
 
 
+@("isStruct")
+@safe pure unittest {
+    static import modules.types;
+    import std.meta: Filter, AliasSeq;
+
+    alias mod = Module!"modules.types";
+    alias aggregates = mod.Aggregates;
+    alias structs = Filter!(isStruct, aggregates);
+    static assert(is(structs == AliasSeq!(modules.types.String)), structs.stringof);
+}
+
+
 private string[] typeNames(alias module_)() {
     import std.meta: staticMap;
     enum name(alias Symbol) = __traits(identifier, Symbol);
