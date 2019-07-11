@@ -73,6 +73,18 @@ import ut.meta;
 }
 
 
+@("isInterface")
+@safe pure unittest {
+    static import modules.types;
+    import std.meta: Filter, AliasSeq;
+
+    alias mod = Module!"modules.types";
+    alias aggregates = mod.Aggregates;
+    alias interfaces = Filter!(isInterface, aggregates);
+    static assert(is(interfaces == AliasSeq!(modules.types.Interface)), interfaces.stringof);
+}
+
+
 @("isClass")
 @safe pure unittest {
     static import modules.types;

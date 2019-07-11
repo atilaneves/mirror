@@ -59,4 +59,7 @@ enum isEnum(T) = is(T == enum);
 enum isStruct(T) = is(T == struct);
 
 /// Usable as a predicate to std.meta.Filter
+enum isInterface(T) = is(T == interface);
+
+/// Usable as a predicate to std.meta.Filter
 enum isClass(T) = is(T == class);
