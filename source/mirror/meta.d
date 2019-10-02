@@ -48,20 +48,36 @@ template Module(string moduleName) {
     private alias symbolOf(alias member) = member.symbol;
     alias Aggregates = staticMap!(symbolOf, Filter!(isMemberType, publicMembers));
 
+
     // Global variables
     private enum isVariable(alias member) = is(typeof(member.symbol));
     private enum toVariable(alias member) = Variable!(typeof(member.symbol))(__traits(identifier, member.symbol));
     alias Variables = staticMap!(toVariable, Filter!(isVariable, publicMembers));
 
+
     // Function definitions
-    private alias overloads(alias member) = __traits(getOverloads, mod, member.identifier);
     private template isMemberSomeFunction(alias member) {
         import std.traits: isSomeFunction;
         enum isMemberSomeFunction = isSomeFunction!(member.symbol);
     }
-    private alias functionSymbols = staticMap!(overloads, Filter!(isMemberSomeFunction, publicMembers));
-    private enum toFunction(alias F) = Function!F();
-    alias Functions = staticMap!(toFunction, functionSymbols);
+    private alias functionMembers = Filter!(isMemberSomeFunction, publicMembers);
+
+
+    private template overload(alias S, string I) {
+        alias symbol = S;
+        enum identifier = I;
+    }
+
+    private template memberToOverloads(alias member) {
+        private alias overloadSymbols = __traits(getOverloads, mod, member.identifier);
+        private alias toOverload(alias symbol) = overload!(symbol, member.identifier);
+        alias memberToOverloads = staticMap!(toOverload, overloadSymbols);
+    }
+
+    //private alias functionSymbols = staticMap!(overloads, functionMembers);
+
+    private enum toFunction(alias O) = Function!(O.symbol)(O.identifier);
+    alias Functions = staticMap!(toFunction, staticMap!(memberToOverloads, functionMembers));
 }
 
 
@@ -79,6 +95,8 @@ struct Variable(T) {
  */
 struct Function(alias S) {
     alias symbol = S;
+
+    string identifier = __traits(identifier, symbol);
     string protection = __traits(getProtection, symbol);
     string linkage = __traits(getLinkage, symbol);
 

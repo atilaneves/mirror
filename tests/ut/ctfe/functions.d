@@ -62,7 +62,7 @@ import ut.ctfe;
                 [],
             ),
             Function(
-                "identity",  // FIXME (identityInt?)
+                "identityInt",
                 Type("int"),
                 [Parameter("int", "x", "", PSC.none)],
             ),
