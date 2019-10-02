@@ -40,6 +40,7 @@ template Module(string moduleName) {
 
     private alias publicMembers = Filter!(notPrivate, members);
 
+
     // User-defined types
     private template isMemberType(alias member) {
         import std.traits: isType;
@@ -61,23 +62,8 @@ template Module(string moduleName) {
         enum isMemberSomeFunction = isSomeFunction!(member.symbol);
     }
     private alias functionMembers = Filter!(isMemberSomeFunction, publicMembers);
-
-
-    private template overload(alias S, string I) {
-        alias symbol = S;
-        enum identifier = I;
-    }
-
-    private template memberToOverloads(alias member) {
-        private alias overloadSymbols = __traits(getOverloads, mod, member.identifier);
-        private alias toOverload(alias symbol) = overload!(symbol, member.identifier);
-        alias memberToOverloads = staticMap!(toOverload, overloadSymbols);
-    }
-
-    //private alias functionSymbols = staticMap!(overloads, functionMembers);
-
-    private enum toFunction(alias O) = Function!(O.symbol)(O.identifier);
-    alias Functions = staticMap!(toFunction, staticMap!(memberToOverloads, functionMembers));
+    private enum toFunction(alias member) = Function!(mod, member.symbol, member.identifier)();
+    alias Functions = staticMap!(toFunction, functionMembers);
 }
 
 
@@ -93,10 +79,13 @@ struct Variable(T) {
 /**
    A function.
  */
-struct Function(alias S) {
-    alias symbol = S;
+struct Function(alias M, alias F, string I = __traits(identifier, F)) {
 
-    string identifier = __traits(identifier, symbol);
+    alias module_ = M;
+    alias symbol = F;
+    enum identifier = I;
+    alias overloads = __traits(getOverloads, module_, identifier);
+
     string protection = __traits(getProtection, symbol);
     string linkage = __traits(getLinkage, symbol);
 
