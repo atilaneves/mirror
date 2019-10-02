@@ -39,7 +39,9 @@ template Module(string moduleName) {
 
     // Function definitions
     private alias overloads(alias F) = __traits(getOverloads, mod, __traits(identifier, F));
-    alias Functions = staticMap!(overloads, Filter!(isSomeFunction, publicMembers));
+    private alias functionSymbols = staticMap!(overloads, Filter!(isSomeFunction, publicMembers));
+    private alias function_(alias F) = Function!F;
+    alias Functions = staticMap!(function_, functionSymbols);
 }
 
 
@@ -49,6 +51,14 @@ template Module(string moduleName) {
 struct Variable(T) {
     alias Type = T;
     string name;
+}
+
+
+/**
+   A function.
+ */
+template Function(alias S, ) {
+    alias symbol = S;
 }
 
 

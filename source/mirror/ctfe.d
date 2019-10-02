@@ -33,27 +33,27 @@ Module module_(string moduleName)() {
         import std.traits: ReturnType, Parameters, ParameterDefaults, ParameterIdentifierTuple;
 
         template toDefault(size_t i) {
-            static if(is(ParameterDefaults!F[i] == void))
+            static if(is(ParameterDefaults!(F.symbol)[i] == void))
                 enum toDefault = "";
             else
-                enum toDefault = ParameterDefaults!F[i].stringof;
+                enum toDefault = ParameterDefaults!(F.symbol)[i].stringof;
         }
 
         template toParameter(size_t i) {
             import std.traits: ParameterStorageClassTuple;
 
             enum toParameter = Parameter(
-                Parameters!F[i].stringof,
-                ParameterIdentifierTuple!F[i],
+                Parameters!(F.symbol)[i].stringof,
+                ParameterIdentifierTuple!(F.symbol)[i],
                 toDefault!i,
-                ParameterStorageClassTuple!F[i],
+                ParameterStorageClassTuple!(F.symbol)[i],
             );
         }
 
         enum toFunction = Function(
-            __traits(identifier, F),
-            Type(ReturnType!F.stringof),
-            [staticMap!(toParameter, aliasSeqOf!(Parameters!F.length.iota))],
+            __traits(identifier, F.symbol),
+            Type(ReturnType!(F.symbol).stringof),
+            [staticMap!(toParameter, aliasSeqOf!(Parameters!(F.symbol).length.iota))],
         );
     }
     ret.functions = [ staticMap!(toFunction, module_.Functions) ];
