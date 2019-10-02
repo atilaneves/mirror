@@ -9,7 +9,7 @@ import ut.ctfe;
     import std.traits: PSC = ParameterStorageClass;
 
     enum mod = module_!("modules.functions");
-    mod.functions.shouldBeSameSetAs(
+    mod.functions[].shouldBeSameSetAs(
         [
             Function(
                 "add1",

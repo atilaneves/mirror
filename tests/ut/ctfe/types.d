@@ -19,7 +19,7 @@ import ut.ctfe;
 @("types")
 @safe pure unittest {
     enum mod = module_!"modules.types";
-    mod.aggregates.should == [
+    mod.aggregates[].should == [
         Aggregate("String"),
         Aggregate("Enum"),
         Aggregate("Class"),
@@ -40,7 +40,7 @@ import ut.ctfe;
 @("variables")
 @safe pure unittest {
     enum mod = module_!"modules.variables";
-    mod.aggregates.should == [
+    mod.aggregates[].should == [
         Aggregate("Struct")
     ];
 }
