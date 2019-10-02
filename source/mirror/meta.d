@@ -26,7 +26,16 @@ template Module(string moduleName) {
             alias member = AliasSeq!();
     }
     private alias members = staticMap!(member, memberNames);
-    private enum notPrivate(alias T) = __traits(getProtection, T) != "private";
+
+    private template notPrivate(alias T) {
+        // If a module contains an alias to a basic type, e.g. `alias L = long;`,
+        // then __traits(getProtection, T) fails to compile
+        static if(__traits(compiles, __traits(getProtection, T)))
+            enum notPrivate = __traits(getProtection, T) != "private";
+        else
+            enum notPrivate = false;
+    }
+
     private alias publicMembers = Filter!(notPrivate, members);
 
     // User-defined types
