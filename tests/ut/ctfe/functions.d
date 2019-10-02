@@ -61,6 +61,11 @@ import ut.ctfe;
                 Type("void"),
                 [],
             ),
+            Function(
+                "identity",  // FIXME (identityInt?)
+                Type("int"),
+                [Parameter("int", "x", "", PSC.none)],
+            ),
         ]
     );
 }

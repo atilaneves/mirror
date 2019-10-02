@@ -11,7 +11,6 @@ module mirror.meta;
  */
 template Module(string moduleName) {
     import std.meta: Filter, staticMap, Alias, AliasSeq;
-    import std.traits: isSomeFunction, isType;
 
     mixin(`import `, moduleName, `;`);
     private alias mod = Alias!(mixin(moduleName));
@@ -20,18 +19,21 @@ template Module(string moduleName) {
 
     private template member(string name) {
         import std.meta: Alias, AliasSeq;
+
+        enum identifier = name;
+
         static if(__traits(compiles, Alias!(__traits(getMember, mod, name))))
-            alias member = Alias!(__traits(getMember, mod, name));
+            alias symbol = Alias!(__traits(getMember, mod, name));
         else
-            alias member = AliasSeq!();
+            alias symbol = AliasSeq!();
     }
     private alias members = staticMap!(member, memberNames);
 
-    private template notPrivate(alias T) {
+    private template notPrivate(alias member) {
         // If a module contains an alias to a basic type, e.g. `alias L = long;`,
-        // then __traits(getProtection, T) fails to compile
-        static if(__traits(compiles, __traits(getProtection, T)))
-            enum notPrivate = __traits(getProtection, T) != "private";
+        // then __traits(getProtection, member) fails to compile
+        static if(__traits(compiles, __traits(getProtection, member.symbol)))
+            enum notPrivate = __traits(getProtection, member.symbol) != "private";
         else
             enum notPrivate = false;
     }
@@ -39,18 +41,27 @@ template Module(string moduleName) {
     private alias publicMembers = Filter!(notPrivate, members);
 
     // User-defined types
-    alias Aggregates = Filter!(isType, publicMembers);
+    private template isMemberType(alias member) {
+        import std.traits: isType;
+        enum isMemberType = isType!(member.symbol);
+    }
+    private alias symbolOf(alias member) = member.symbol;
+    alias Aggregates = staticMap!(symbolOf, Filter!(isMemberType, publicMembers));
 
     // Global variables
-    private enum isVariable(alias member) = is(typeof(member));
-    private enum toVariable(alias member) = Variable!(typeof(member))(__traits(identifier, member));
+    private enum isVariable(alias member) = is(typeof(member.symbol));
+    private enum toVariable(alias member) = Variable!(typeof(member.symbol))(__traits(identifier, member.symbol));
     alias Variables = staticMap!(toVariable, Filter!(isVariable, publicMembers));
 
     // Function definitions
-    private alias overloads(alias F) = __traits(getOverloads, mod, __traits(identifier, F));
-    private alias functionSymbols = staticMap!(overloads, Filter!(isSomeFunction, publicMembers));
-    private enum function_(alias F) = Function!F();
-    alias Functions = staticMap!(function_, functionSymbols);
+    private alias overloads(alias member) = __traits(getOverloads, mod, member.identifier);
+    private template isMemberSomeFunction(alias member) {
+        import std.traits: isSomeFunction;
+        enum isMemberSomeFunction = isSomeFunction!(member.symbol);
+    }
+    private alias functionSymbols = staticMap!(overloads, Filter!(isMemberSomeFunction, publicMembers));
+    private enum toFunction(alias F) = Function!F();
+    alias Functions = staticMap!(toFunction, functionSymbols);
 }
 
 
@@ -66,7 +77,7 @@ struct Variable(T) {
 /**
    A function.
  */
-struct Function(alias S, ) {
+struct Function(alias S) {
     alias symbol = S;
     string protection = __traits(getProtection, symbol);
     string linkage = __traits(getLinkage, symbol);

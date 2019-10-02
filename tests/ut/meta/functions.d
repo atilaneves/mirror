@@ -19,6 +19,7 @@ import std.conv: text;
         Function!(modules.functions.exportedFunc)("export", "D"),
         Function!(modules.functions.externC)("public", "C"),
         Function!(modules.functions.externCpp)("public", "C++"),
+        Function!(modules.functions.identityInt)("public", "D"),
     );
 
     static assert(mod.Functions.length == expected.length, mod.Functions.stringof);

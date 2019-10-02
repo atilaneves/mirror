@@ -1,4 +1,5 @@
 module modules.functions;
+static import modules.templates;
 
 
 int add1(int i, int j) {
@@ -33,3 +34,6 @@ export void exportedFunc() {}
 extern(C) void externC() {}
 
 extern(C++) void externCpp() {}
+
+
+alias identityInt = modules.templates.identity!int;
