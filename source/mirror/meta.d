@@ -61,6 +61,12 @@ struct Function(alias S, ) {
     alias symbol = S;
     string protection = __traits(getProtection, symbol);
     string linkage = __traits(getLinkage, symbol);
+
+    string toString() @safe pure nothrow {
+        import std.conv: text;
+        import std.traits: fullyQualifiedName;
+        return text(`Function(`, fullyQualifiedName!symbol, ", ", protection, ", ", linkage, ")");
+    }
 }
 
 
