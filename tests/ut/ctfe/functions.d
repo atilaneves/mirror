@@ -46,6 +46,21 @@ import ut.ctfe;
                     Parameter("int", "lazy_", "", PSC.lazy_),
                 ]
             ),
+            Function(
+                "exportedFunc",
+                Type("void"),
+                [],
+            ),
+            Function(
+                "externC",
+                Type("void"),
+                [],
+            ),
+            Function(
+                "externCpp",
+                Type("void"),
+                [],
+            ),
         ]
     );
 }

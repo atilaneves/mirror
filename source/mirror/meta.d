@@ -40,7 +40,7 @@ template Module(string moduleName) {
     // Function definitions
     private alias overloads(alias F) = __traits(getOverloads, mod, __traits(identifier, F));
     private alias functionSymbols = staticMap!(overloads, Filter!(isSomeFunction, publicMembers));
-    private alias function_(alias F) = Function!F;
+    private enum function_(alias F) = Function!F();
     alias Functions = staticMap!(function_, functionSymbols);
 }
 
@@ -57,8 +57,10 @@ struct Variable(T) {
 /**
    A function.
  */
-template Function(alias S, ) {
+struct Function(alias S, ) {
     alias symbol = S;
+    string protection = __traits(getProtection, symbol);
+    string linkage = __traits(getLinkage, symbol);
 }
 
 

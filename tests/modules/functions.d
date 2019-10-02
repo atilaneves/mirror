@@ -26,3 +26,10 @@ void storageClasses(
 {
 
 }
+
+
+export void exportedFunc() {}
+
+extern(C) void externC() {}
+
+extern(C++) void externCpp() {}
