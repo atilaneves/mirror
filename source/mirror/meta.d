@@ -13,6 +13,7 @@ import mirror.traits: moduleOf;
    Compile-time information on a D module.
  */
 template Module(string moduleName) {
+    import mirror.traits: isPrivate;
     import std.meta: Filter, staticMap, Alias, AliasSeq;
 
     mixin(`import `, moduleName, `;`);
@@ -32,17 +33,8 @@ template Module(string moduleName) {
     }
     private alias members = staticMap!(member, memberNames);
 
-    private template notPrivate(alias member) {
-        // If a module contains an alias to a basic type, e.g. `alias L = long;`,
-        // then __traits(getProtection, member) fails to compile
-        static if(__traits(compiles, __traits(getProtection, member.symbol)))
-            enum notPrivate = __traits(getProtection, member.symbol) != "private";
-        else
-            enum notPrivate = false;
-    }
-
+    enum notPrivate(alias member) = !isPrivate!(member.symbol);
     private alias publicMembers = Filter!(notPrivate, members);
-
 
     // User-defined types
     private template isMemberType(alias member) {

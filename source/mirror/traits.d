@@ -29,3 +29,13 @@ template moduleOf(alias T) {
     mixin(`import `, moduleName!T, `;`);
     mixin(`alias moduleOf = `, moduleName!T, `;`);
 }
+
+
+template isPrivate(alias symbol) {
+    // If a module contains an alias to a basic type, e.g. `alias L = long;`,
+    // then __traits(getProtection, member) fails to compile
+    static if(__traits(compiles, __traits(getProtection, symbol)))
+        enum isPrivate = __traits(getProtection, symbol) == "private";
+    else
+        enum isPrivate = true;  // if it doesn't compile, treat it as private
+}
