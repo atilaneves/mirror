@@ -37,12 +37,12 @@ template Module(string moduleName) {
     private alias publicMembers = Filter!(notPrivate, members);
 
     // User-defined types
-    private template isMemberType(alias member) {
+    private template memberIsType(alias member) {
         import std.traits: isType;
-        enum isMemberType = isType!(member.symbol);
+        enum memberIsType = isType!(member.symbol);
     }
     private alias symbolOf(alias member) = member.symbol;
-    alias Aggregates = staticMap!(symbolOf, Filter!(isMemberType, publicMembers));
+    alias Aggregates = staticMap!(symbolOf, Filter!(memberIsType, publicMembers));
 
 
     // Global variables
@@ -52,11 +52,11 @@ template Module(string moduleName) {
 
 
     // Function definitions
-    private template isMemberSomeFunction(alias member) {
+    private template memberIsSomeFunction(alias member) {
         import std.traits: isSomeFunction;
-        enum isMemberSomeFunction = isSomeFunction!(member.symbol);
+        enum memberIsSomeFunction = isSomeFunction!(member.symbol);
     }
-    private alias functionMembers = Filter!(isMemberSomeFunction, publicMembers);
+    private alias functionMembers = Filter!(memberIsSomeFunction, publicMembers);
     private alias toFunction(alias member) = Function!(
         member.symbol,
         __traits(getProtection, member.symbol).toProtection,
