@@ -56,7 +56,8 @@ Module module_(string moduleName)() {
             [staticMap!(toParameter, aliasSeqOf!(Parameters!(F.symbol).length.iota))],
         );
     }
-    ret.functions = [ staticMap!(toFunction, module_.Functions) ];
+
+    ret.functions = [ staticMap!(toFunction, module_.FunctionsBySymbol) ];
 
     return ret;
 }

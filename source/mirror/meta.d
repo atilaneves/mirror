@@ -35,7 +35,7 @@ template Module(string moduleName) {
 
     alias Aggregates = aggregates!publicMembers;
     alias Variables = variables!publicMembers;
-    alias Functions = functions!(mod, publicMembers);
+    alias FunctionsBySymbol = functionsBySymbol!(mod, publicMembers);
     alias FunctionsByOverload = functionsByOverload!(mod, publicMembers);
 }
 
@@ -73,7 +73,7 @@ template Variable(T, string N) {
 }
 
 
-private template functions(alias mod, publicMembers...) {
+private template functionsBySymbol(alias mod, publicMembers...) {
 
     import std.meta: Filter, staticMap;
 
@@ -84,7 +84,7 @@ private template functions(alias mod, publicMembers...) {
 
     private alias functionMembers = Filter!(memberIsSomeFunction, publicMembers);
 
-    private alias toFunction(alias member) = Function!(
+    private alias toFunction(alias member) = FunctionSymbol!(
         member.symbol,
         __traits(getProtection, member.symbol).toProtection,
         __traits(getLinkage, member.symbol).toLinkage,
@@ -92,13 +92,13 @@ private template functions(alias mod, publicMembers...) {
         mod,
         );
 
-    alias functions = staticMap!(toFunction, functionMembers);
+    alias functionsBySymbol = staticMap!(toFunction, functionMembers);
 }
 
 /**
-   A function.
+   A function symbol with nested overloads.
  */
-template Function(
+template FunctionSymbol(
     alias F,
     Protection P = __traits(getProtection, F).toProtection,
     Linkage L = __traits(getLinkage, F).toLinkage,

@@ -11,20 +11,20 @@ import std.meta: AliasSeq;
     import modules.functions;
 
     alias expected = AliasSeq!(
-        Function!(add1, Protection.public_, Linkage.D),
-        Function!(withDefault, Protection.public_, Linkage.D),
-        Function!(storageClasses, Protection.public_, Linkage.D),
-        Function!(exportedFunc, Protection.export_, Linkage.D),
-        Function!(externC, Protection.public_, Linkage.C),
-        Function!(externCpp, Protection.public_, Linkage.Cpp),
-        Function!(identityInt, Protection.public_, Linkage.D, "identityInt", modules.functions),
+        FunctionSymbol!(add1, Protection.public_, Linkage.D),
+        FunctionSymbol!(withDefault, Protection.public_, Linkage.D),
+        FunctionSymbol!(storageClasses, Protection.public_, Linkage.D),
+        FunctionSymbol!(exportedFunc, Protection.export_, Linkage.D),
+        FunctionSymbol!(externC, Protection.public_, Linkage.C),
+        FunctionSymbol!(externCpp, Protection.public_, Linkage.Cpp),
+        FunctionSymbol!(identityInt, Protection.public_, Linkage.D, "identityInt", modules.functions),
     );
 
-    shouldEqual!(mod.Functions, expected);
+    shouldEqual!(mod.FunctionsBySymbol, expected);
 
-    static assert(mod.Functions[0].overloads.length == 2); // add1
+    static assert(mod.FunctionsBySymbol[0].overloads.length == 2); // add1
     static foreach(i; 1..expected.length)
-        static assert(mod.Functions[i].overloads.length == 1); // everything else
+        static assert(mod.FunctionsBySymbol[i].overloads.length == 1); // everything else
 }
 
 
@@ -54,7 +54,7 @@ import std.meta: AliasSeq;
 @("problems")
 @safe pure unittest {
     alias mod = Module!("modules.problems");
-    static assert(mod.Functions.length == 0, mod.Functions.stringof);
+    static assert(mod.FunctionsBySymbol.length == 0, mod.FunctionsBySymbol.stringof);
 }
 
 
@@ -62,7 +62,7 @@ import std.meta: AliasSeq;
 @safe pure unittest {
     import modules.functions;
 
-    alias func = Function!add1;
+    alias func = FunctionSymbol!add1;
     alias parameters = AliasSeq!(func.parameters);
 
     alias expected = AliasSeq!(
@@ -76,18 +76,28 @@ import std.meta: AliasSeq;
 
 @("parameters.add1.bySymbol")
 @safe pure unittest {
-    import modules.functions;
-
     alias mod = Module!("modules.functions");
-    alias func = mod.Functions[0];
-    alias parameters = AliasSeq!(func.parameters);
+    alias add1Int = mod.FunctionsBySymbol[0];
+    alias storageClasses = mod.FunctionsBySymbol[2];
 
-    alias expected = AliasSeq!(
-        Parameter!(int, void, "i"),
-        Parameter!(int, void, "j"),
+    shouldEqual!(
+        add1Int.parameters,
+        AliasSeq!(
+            Parameter!(int, void, "i"),
+            Parameter!(int, void, "j"),
+        )
     );
 
-    shouldEqual!(parameters, expected);
+    shouldEqual!(
+        storageClasses.parameters,
+        AliasSeq!(
+            Parameter!(int, void, "normal"),
+            Parameter!(int*, void, "returnScope"),
+            Parameter!(int, void, "out_"),
+            Parameter!(int, void, "ref_"),
+            Parameter!(int, void, "lazy_"),
+        )
+    );
 }
 
 
@@ -122,7 +132,7 @@ import std.meta: AliasSeq;
 
     alias mod = Module!("modules.functions");
     alias return_(alias F) = F.ReturnType;
-    alias returnTypes = staticMap!(return_, mod.Functions);
+    alias returnTypes = staticMap!(return_, mod.FunctionsBySymbol);
 
     shouldEqual!(
         returnTypes,

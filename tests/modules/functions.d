@@ -12,8 +12,8 @@ double add1(double d0, double d1) {
 }
 
 
-double withDefault(double d0, double d1 = 33.3) {
-    return d0 + d1;
+double withDefault(double fst, double snd = 33.3) {
+    return fst + snd;
 }
 
 
