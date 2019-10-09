@@ -87,7 +87,7 @@ struct Function(alias M, alias F, string I = __traits(identifier, F)) {
     alias overloads = __traits(getOverloads, module_, identifier);
 
     Protection protection = __traits(getProtection, symbol).toProtection;
-    string linkage = __traits(getLinkage, symbol);
+    Linkage linkage = __traits(getLinkage, symbol).toLinkage;
 
     string toString() @safe pure {
         import std.conv: text;
@@ -112,6 +112,23 @@ Protection toProtection(in string str) @safe pure {
     return (str ~ "_").to!Protection;
 }
 
+
+///
+enum Linkage {
+    D,
+    C,
+    Cpp,
+    Windows,
+    ObjectiveC,
+    System,
+}
+
+
+Linkage toLinkage(in string str) @safe pure {
+    import std.conv: to;
+    if(str == "C++") return Linkage.Cpp;
+    return str.to!Linkage;
+}
 
 
 /// Usable as a predicate to std.meta.Filter

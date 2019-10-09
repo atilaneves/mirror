@@ -12,13 +12,13 @@ import std.conv: text;
     import modules.functions;
 
     alias expected = AliasSeq!(
-        Function!(modules.functions, add1)(Protection.public_, "D"),
-        Function!(modules.functions, withDefault)(Protection.public_, "D"),
-        Function!(modules.functions, storageClasses)(Protection.public_, "D"),
-        Function!(modules.functions, exportedFunc)(Protection.export_, "D"),
-        Function!(modules.functions, externC)(Protection.public_, "C"),
-        Function!(modules.functions, externCpp)(Protection.public_, "C++"),
-        Function!(modules.functions, identityInt, "identityInt")(Protection.public_, "D"),
+        Function!(modules.functions, add1)(Protection.public_, Linkage.D),
+        Function!(modules.functions, withDefault)(Protection.public_, Linkage.D),
+        Function!(modules.functions, storageClasses)(Protection.public_, Linkage.D),
+        Function!(modules.functions, exportedFunc)(Protection.export_, Linkage.D),
+        Function!(modules.functions, externC)(Protection.public_, Linkage.C),
+        Function!(modules.functions, externCpp)(Protection.public_, Linkage.Cpp),
+        Function!(modules.functions, identityInt, "identityInt")(Protection.public_, Linkage.D),
     );
 
     static assert(mod.Functions.length == expected.length, mod.Functions.stringof);
