@@ -49,16 +49,17 @@ import std.conv: text;
 @safe pure unittest {
     import modules.functions;
 
-    const func = Function!add1();
+    enum func = Function!add1();
+    alias parameters = AliasSeq!(func.parameters);
 
     alias expected = AliasSeq!(
         Parameter!(int, void, "i"),
         Parameter!(int, void, "j"),
     );
 
-    static assert(func.parameters.length == expected.length, func.parameters.length.text);
+    static assert(parameters.length == expected.length, parameters.length.text);
 
     static foreach(i; 0 .. expected.length) {
-        static assert(__traits(isSame, func.parameters[i], expected[i]), func.parameters[i].stringof);
+        static assert(__traits(isSame, parameters[i], expected[i]), parameters[i].stringof);
     }
 }
