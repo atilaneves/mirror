@@ -62,7 +62,13 @@ template Module(string moduleName) {
         enum isMemberSomeFunction = isSomeFunction!(member.symbol);
     }
     private alias functionMembers = Filter!(isMemberSomeFunction, publicMembers);
-    private enum toFunction(alias member) = Function!(member.symbol, member.identifier, mod)();
+    private alias toFunction(alias member) = Function!(
+        member.symbol,
+        __traits(getProtection, member.symbol).toProtection,
+        __traits(getLinkage, member.symbol).toLinkage,
+        member.identifier,
+        mod,
+    );
     alias Functions = staticMap!(toFunction, functionMembers);
 }
 
@@ -79,18 +85,24 @@ struct Variable(T) {
 /**
    A function.
  */
-struct Function(alias F, string I = __traits(identifier, F), alias M = moduleOf!F) {
-
+template Function(
+    alias F,
+    Protection P = __traits(getProtection, F).toProtection,
+    Linkage L = __traits(getLinkage, F).toLinkage,
+    string I = __traits(identifier, F),
+    alias M = moduleOf!F
+)
+{
     import std.traits: RT = ReturnType;
 
     alias symbol = F;
+    alias protection = P;
+    alias linkage = L;
     enum identifier = I;
     alias module_ = M;
+
     alias overloads = __traits(getOverloads, module_, identifier);
     alias ReturnType = RT!symbol;
-
-    Protection protection = __traits(getProtection, symbol).toProtection;
-    Linkage linkage = __traits(getLinkage, symbol).toLinkage;
 
     template parametersImpl() {
         import std.traits: Parameters, ParameterIdentifierTuple, ParameterDefaults;
@@ -112,7 +124,7 @@ struct Function(alias F, string I = __traits(identifier, F), alias M = moduleOf!
 }
 
 
-private template moduleOf(alias T) {
+template moduleOf(alias T) {
     import std.traits: moduleName;
     mixin(`import `, moduleName!T, `;`);
     mixin(`alias moduleOf = `, moduleName!T, `;`);

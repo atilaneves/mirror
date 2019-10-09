@@ -12,13 +12,13 @@ import std.conv: text;
     import modules.functions;
 
     alias expected = AliasSeq!(
-        Function!(add1)(Protection.public_, Linkage.D),
-        Function!(withDefault)(Protection.public_, Linkage.D),
-        Function!(storageClasses)(Protection.public_, Linkage.D),
-        Function!(exportedFunc)(Protection.export_, Linkage.D),
-        Function!(externC)(Protection.public_, Linkage.C),
-        Function!(externCpp)(Protection.public_, Linkage.Cpp),
-        Function!(identityInt, "identityInt", modules.functions)(Protection.public_, Linkage.D),
+        Function!(add1, Protection.public_, Linkage.D),
+        Function!(withDefault, Protection.public_, Linkage.D),
+        Function!(storageClasses, Protection.public_, Linkage.D),
+        Function!(exportedFunc, Protection.export_, Linkage.D),
+        Function!(externC, Protection.public_, Linkage.C),
+        Function!(externCpp, Protection.public_, Linkage.Cpp),
+        Function!(identityInt, Protection.public_, Linkage.D, "identityInt", modules.functions),
     );
 
     static assert(mod.Functions.length == expected.length, mod.Functions.stringof);
@@ -49,7 +49,7 @@ import std.conv: text;
 @safe pure unittest {
     import modules.functions;
 
-    enum func = Function!add1();
+    alias func = Function!add1;
     alias parameters = AliasSeq!(func.parameters);
 
     alias expected = AliasSeq!(
