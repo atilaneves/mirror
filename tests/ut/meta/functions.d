@@ -63,3 +63,15 @@ import std.conv: text;
         static assert(__traits(isSame, parameters[i], expected[i]), parameters[i].stringof);
     }
 }
+
+
+@("return")
+@safe pure unittest {
+    import modules.functions;
+    static assert(is(Function!add1.ReturnType == int));
+    static assert(is(Function!withDefault.ReturnType == double));
+    static assert(is(Function!storageClasses.ReturnType == void));
+    static assert(is(Function!exportedFunc.ReturnType == void));
+    static assert(is(Function!externC.ReturnType == void));
+    static assert(is(Function!identityInt.ReturnType == int));
+}

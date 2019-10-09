@@ -81,10 +81,13 @@ struct Variable(T) {
  */
 struct Function(alias F, string I = __traits(identifier, F), alias M = moduleOf!F) {
 
+    import std.traits: RT = ReturnType;
+
     alias symbol = F;
     enum identifier = I;
     alias module_ = M;
     alias overloads = __traits(getOverloads, module_, identifier);
+    alias ReturnType = RT!symbol;
 
     Protection protection = __traits(getProtection, symbol).toProtection;
     Linkage linkage = __traits(getLinkage, symbol).toLinkage;
