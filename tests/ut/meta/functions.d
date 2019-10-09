@@ -58,27 +58,14 @@ import std.meta: AliasSeq;
 }
 
 
-@("parameters.add1.bySymbol")
-@safe pure unittest {
-    import modules.functions;
-
-    alias func = FunctionSymbol!add1;
-    alias parameters = AliasSeq!(func.parameters);
-
-    alias expected = AliasSeq!(
-        Parameter!(int, void, "i"),
-        Parameter!(int, void, "j"),
-    );
-
-    shouldEqual!(parameters, expected);
-}
-
 
 @("parameters.add1.bySymbol")
 @safe pure unittest {
+
     alias mod = Module!("modules.functions");
-    alias add1Int = mod.FunctionsBySymbol[0];
-    alias storageClasses = mod.FunctionsBySymbol[2];
+    alias add1Int = mod.FunctionsBySymbol[0].overloads[0];
+    alias add1Double = mod.FunctionsBySymbol[0].overloads[1];
+    alias withDefaults = mod.FunctionsBySymbol[1].overloads[0];
 
     shouldEqual!(
         add1Int.parameters,
@@ -89,13 +76,18 @@ import std.meta: AliasSeq;
     );
 
     shouldEqual!(
-        storageClasses.parameters,
+        add1Double.parameters,
         AliasSeq!(
-            Parameter!(int, void, "normal"),
-            Parameter!(int*, void, "returnScope"),
-            Parameter!(int, void, "out_"),
-            Parameter!(int, void, "ref_"),
-            Parameter!(int, void, "lazy_"),
+            Parameter!(double, void, "d0"),
+            Parameter!(double, void, "d1"),
+        )
+    );
+
+    shouldEqual!(
+        withDefaults.parameters,
+        AliasSeq!(
+            Parameter!(double, void, "fst"),
+            Parameter!(double, 33.3, "snd"),
         )
     );
 }
@@ -131,16 +123,12 @@ import std.meta: AliasSeq;
     import std.meta: staticMap;
 
     alias mod = Module!("modules.functions");
-    alias return_(alias F) = F.ReturnType;
-    alias returnTypes = staticMap!(return_, mod.FunctionsBySymbol);
+    alias functions = mod.FunctionsBySymbol;
 
-    shouldEqual!(
-        returnTypes,
-        AliasSeq!(
-            // misses the add1 double overload
-            int, double, void, void, void, void, int,
-        ),
-    );
+    static assert(is(functions[0].overloads[0].ReturnType == int));
+    static assert(is(functions[0].overloads[1].ReturnType == double));
+    static assert(is(functions[1].overloads[0].ReturnType == double));
+    static assert(is(functions[2].overloads[0].ReturnType == void));
 }
 
 

@@ -106,33 +106,25 @@ template FunctionSymbol(
     alias M = moduleOf!F
 )
 {
-    import std.traits: RT = ReturnType;
+    import std.meta: staticMap;
 
     alias symbol = F;
-    alias protection = P;
-    alias linkage = L;
     enum identifier = I;
     alias module_ = M;
 
-    alias overloads = __traits(getOverloads, module_, identifier);
-    alias ReturnType = RT!symbol;
+    private alias toOverload(alias symbol) = FunctionOverload!(
+        symbol,
+        __traits(getProtection, symbol).toProtection,
+        __traits(getLinkage, symbol).toLinkage,
+        identifier,
+        module_,
+    );
 
-    template parametersImpl() {
-        import std.traits: Parameters, ParameterIdentifierTuple, ParameterDefaults;
-        import std.meta: staticMap, aliasSeqOf;
-        import std.range: iota;
-
-        alias parameter(size_t i) =
-            Parameter!(Parameters!symbol[i], ParameterDefaults!symbol[i], ParameterIdentifierTuple!symbol[i]);
-        alias parametersImpl = staticMap!(parameter, aliasSeqOf!(Parameters!F.length.iota));
-    }
-
-    alias parameters = parametersImpl!();
+    alias overloads = staticMap!(toOverload, __traits(getOverloads, module_, identifier));
 
     string toString() @safe pure {
         import std.conv: text;
-        import std.traits: fullyQualifiedName;
-        return text(`Function(`, fullyQualifiedName!symbol, ", ", protection, ", ", linkage, ")");
+        return text(`Function(`, overloads.stringof, ")");
     }
 }
 
