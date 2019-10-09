@@ -89,11 +89,30 @@ struct Function(alias M, alias F, string I = __traits(identifier, F)) {
     Protection protection = __traits(getProtection, symbol).toProtection;
     Linkage linkage = __traits(getLinkage, symbol).toLinkage;
 
+    template parametersImpl() {
+        import std.traits: Parameters, ParameterIdentifierTuple, ParameterDefaults;
+        import std.meta: staticMap, aliasSeqOf;
+        import std.range: iota;
+
+        alias parameter(size_t i) =
+            Parameter!(Parameters!symbol[i], ParameterDefaults!symbol[i], ParameterIdentifierTuple!symbol[i]);
+        alias parametersImpl = staticMap!(parameter, aliasSeqOf!(Parameters!F.length.iota));
+    }
+
+    alias parameters = parametersImpl!();
+
     string toString() @safe pure {
         import std.conv: text;
         import std.traits: fullyQualifiedName;
         return text(`Function(`, fullyQualifiedName!symbol, ", ", protection, ", ", linkage, ")");
     }
+}
+
+
+template Parameter(T, alias D, string I) {
+    alias Type = T;
+    alias Default = D;
+    enum identifier = I;
 }
 
 

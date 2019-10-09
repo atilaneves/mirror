@@ -43,3 +43,22 @@ import std.conv: text;
     alias mod = Module!("modules.problems");
     static assert(mod.Functions.length == 0, mod.Functions.stringof);
 }
+
+
+@("parameters.add1")
+@safe pure unittest {
+    import modules.functions;
+
+    const func = Function!(modules.functions, add1)();
+
+    alias expected = AliasSeq!(
+        Parameter!(int, void, "i"),
+        Parameter!(int, void, "j"),
+    );
+
+    static assert(func.parameters.length == expected.length, func.parameters.length.text);
+
+    static foreach(i; 0 .. expected.length) {
+        static assert(__traits(isSame, func.parameters[i], expected[i]), func.parameters[i].stringof);
+    }
+}
