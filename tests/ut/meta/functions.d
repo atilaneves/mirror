@@ -12,13 +12,13 @@ import std.conv: text;
     import modules.functions;
 
     alias expected = AliasSeq!(
-        Function!(modules.functions, add1)(Protection.public_, Linkage.D),
-        Function!(modules.functions, withDefault)(Protection.public_, Linkage.D),
-        Function!(modules.functions, storageClasses)(Protection.public_, Linkage.D),
-        Function!(modules.functions, exportedFunc)(Protection.export_, Linkage.D),
-        Function!(modules.functions, externC)(Protection.public_, Linkage.C),
-        Function!(modules.functions, externCpp)(Protection.public_, Linkage.Cpp),
-        Function!(modules.functions, identityInt, "identityInt")(Protection.public_, Linkage.D),
+        Function!(add1)(Protection.public_, Linkage.D),
+        Function!(withDefault)(Protection.public_, Linkage.D),
+        Function!(storageClasses)(Protection.public_, Linkage.D),
+        Function!(exportedFunc)(Protection.export_, Linkage.D),
+        Function!(externC)(Protection.public_, Linkage.C),
+        Function!(externCpp)(Protection.public_, Linkage.Cpp),
+        Function!(identityInt, "identityInt", modules.functions)(Protection.public_, Linkage.D),
     );
 
     static assert(mod.Functions.length == expected.length, mod.Functions.stringof);
@@ -49,7 +49,7 @@ import std.conv: text;
 @safe pure unittest {
     import modules.functions;
 
-    const func = Function!(modules.functions, add1)();
+    const func = Function!add1();
 
     alias expected = AliasSeq!(
         Parameter!(int, void, "i"),

@@ -62,7 +62,7 @@ template Module(string moduleName) {
         enum isMemberSomeFunction = isSomeFunction!(member.symbol);
     }
     private alias functionMembers = Filter!(isMemberSomeFunction, publicMembers);
-    private enum toFunction(alias member) = Function!(mod, member.symbol, member.identifier)();
+    private enum toFunction(alias member) = Function!(member.symbol, member.identifier, mod)();
     alias Functions = staticMap!(toFunction, functionMembers);
 }
 
@@ -79,11 +79,11 @@ struct Variable(T) {
 /**
    A function.
  */
-struct Function(alias M, alias F, string I = __traits(identifier, F)) {
+struct Function(alias F, string I = __traits(identifier, F), alias M = moduleOf!F) {
 
-    alias module_ = M;
     alias symbol = F;
     enum identifier = I;
+    alias module_ = M;
     alias overloads = __traits(getOverloads, module_, identifier);
 
     Protection protection = __traits(getProtection, symbol).toProtection;
@@ -106,6 +106,13 @@ struct Function(alias M, alias F, string I = __traits(identifier, F)) {
         import std.traits: fullyQualifiedName;
         return text(`Function(`, fullyQualifiedName!symbol, ", ", protection, ", ", linkage, ")");
     }
+}
+
+
+private template moduleOf(alias T) {
+    import std.traits: moduleName;
+    mixin(`import `, moduleName!T, `;`);
+    mixin(`alias moduleOf = `, moduleName!T, `;`);
 }
 
 
