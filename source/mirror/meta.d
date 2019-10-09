@@ -52,7 +52,7 @@ template Module(string moduleName) {
 
     // Global variables
     private enum isVariable(alias member) = is(typeof(member.symbol));
-    private enum toVariable(alias member) = Variable!(typeof(member.symbol))(__traits(identifier, member.symbol));
+    private alias toVariable(alias member) = Variable!(typeof(member.symbol), __traits(identifier, member.symbol));
     alias Variables = staticMap!(toVariable, Filter!(isVariable, publicMembers));
 
 
@@ -76,9 +76,9 @@ template Module(string moduleName) {
 /**
    A global variable.
  */
-struct Variable(T) {
+template Variable(T, string N) {
     alias Type = T;
-    string name;
+    enum name = N;
 }
 
 

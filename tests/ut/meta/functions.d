@@ -3,7 +3,6 @@ module ut.meta.functions;
 
 import ut.meta;
 import std.meta: AliasSeq;
-import std.conv: text;
 
 
 @("functions")
@@ -21,16 +20,7 @@ import std.conv: text;
         Function!(identityInt, Protection.public_, Linkage.D, "identityInt", modules.functions),
     );
 
-    static assert(mod.Functions.length == expected.length, mod.Functions.stringof);
-
-    static foreach(i; 0 .. expected.length) {
-        static assert(__traits(isSame, mod.Functions[i].symbol, expected[i].symbol),
-                      __traits(identifier, mod.Functions[i]));
-        static assert(mod.Functions[i].protection == expected[i].protection,
-                      text(mod.Functions[i].stringof, " is not ", expected[i].protection));
-        static assert(mod.Functions[i].linkage == expected[i].linkage,
-                      text(mod.Functions[i].stringof, " is not ", expected[i].linkage));
-    }
+    shouldEqual!(mod.Functions, expected);
 
     static assert(mod.Functions[0].overloads.length == 2); // add1
     static foreach(i; 1..expected.length)
@@ -57,11 +47,7 @@ import std.conv: text;
         Parameter!(int, void, "j"),
     );
 
-    static assert(parameters.length == expected.length, parameters.length.text);
-
-    static foreach(i; 0 .. expected.length) {
-        static assert(__traits(isSame, parameters[i], expected[i]), parameters[i].stringof);
-    }
+    shouldEqual!(parameters, expected);
 }
 
 

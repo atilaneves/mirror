@@ -10,15 +10,15 @@ import std.meta: AliasSeq;
     static import modules.variables;
 
     alias mod = Module!("modules.variables");
-    static assert(mod.Variables ==
-                  AliasSeq!(
-                      Variable!int("gInt"),
-                      Variable!double("gDouble"),
-                      Variable!(modules.variables.Struct)("gStruct"),
-                      Variable!int("CONSTANT"),
-                      Variable!(immutable int)("gImmutableInt"),
-                  ),
-                  mod.Variables.stringof,
+    shouldEqual!(
+        mod.Variables,
+        AliasSeq!(
+            Variable!(int, "gInt"),
+            Variable!(double, "gDouble"),
+            Variable!(modules.variables.Struct, "gStruct"),
+            Variable!(int, "CONSTANT"),
+            Variable!(immutable int, "gImmutableInt"),
+        )
     );
 }
 
