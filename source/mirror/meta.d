@@ -86,15 +86,32 @@ struct Function(alias M, alias F, string I = __traits(identifier, F)) {
     enum identifier = I;
     alias overloads = __traits(getOverloads, module_, identifier);
 
-    string protection = __traits(getProtection, symbol);
+    Protection protection = __traits(getProtection, symbol).toProtection;
     string linkage = __traits(getLinkage, symbol);
 
-    string toString() @safe pure nothrow {
+    string toString() @safe pure {
         import std.conv: text;
         import std.traits: fullyQualifiedName;
         return text(`Function(`, fullyQualifiedName!symbol, ", ", protection, ", ", linkage, ")");
     }
 }
+
+
+/// Visibilty/protection
+enum Protection {
+    private_,
+    protected_,
+    public_,
+    export_,
+    package_,
+}
+
+
+Protection toProtection(in string str) @safe pure {
+    import std.conv: to;
+    return (str ~ "_").to!Protection;
+}
+
 
 
 /// Usable as a predicate to std.meta.Filter
