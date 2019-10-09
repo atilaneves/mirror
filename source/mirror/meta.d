@@ -19,10 +19,7 @@ template Module(string moduleName) {
     mixin(`import `, moduleName, `;`);
     private alias mod = Alias!(mixin(moduleName));
 
-    private alias memberNames = __traits(allMembers, mod);
-
     private template member(string name) {
-        import std.meta: Alias, AliasSeq;
 
         enum identifier = name;
 
@@ -31,42 +28,40 @@ template Module(string moduleName) {
         else
             alias symbol = AliasSeq!();
     }
-    private alias members = staticMap!(member, memberNames);
 
+    private alias members = staticMap!(member, __traits(allMembers, mod));
     enum notPrivate(alias member) = !isPrivate!(member.symbol);
     private alias publicMembers = Filter!(notPrivate, members);
 
-    // User-defined types
+    alias Aggregates = aggregates!publicMembers;
+    alias Variables = variables!publicMembers;
+    alias Functions = functions!(mod, publicMembers);
+}
+
+
+// User-defined types
+private template aggregates(publicMembers...) {
+
+    import std.meta: staticMap, Filter;
+
     private template memberIsType(alias member) {
         import std.traits: isType;
         enum memberIsType = isType!(member.symbol);
     }
+
     private alias symbolOf(alias member) = member.symbol;
-    alias Aggregates = staticMap!(symbolOf, Filter!(memberIsType, publicMembers));
 
-
-    // Global variables
-    private enum isVariable(alias member) = is(typeof(member.symbol));
-    private alias toVariable(alias member) = Variable!(typeof(member.symbol), __traits(identifier, member.symbol));
-    alias Variables = staticMap!(toVariable, Filter!(isVariable, publicMembers));
-
-
-    // Function definitions
-    private template memberIsSomeFunction(alias member) {
-        import std.traits: isSomeFunction;
-        enum memberIsSomeFunction = isSomeFunction!(member.symbol);
-    }
-    private alias functionMembers = Filter!(memberIsSomeFunction, publicMembers);
-    private alias toFunction(alias member) = Function!(
-        member.symbol,
-        __traits(getProtection, member.symbol).toProtection,
-        __traits(getLinkage, member.symbol).toLinkage,
-        member.identifier,
-        mod,
-    );
-    alias Functions = staticMap!(toFunction, functionMembers);
+    alias aggregates = staticMap!(symbolOf, Filter!(memberIsType, publicMembers));
 }
 
+// Global variables
+private template variables(publicMembers...) {
+    import std.meta: staticMap, Filter;
+
+    private enum isVariable(alias member) = is(typeof(member.symbol));
+    private alias toVariable(alias member) = Variable!(typeof(member.symbol), __traits(identifier, member.symbol));
+    alias variables = staticMap!(toVariable, Filter!(isVariable, publicMembers));
+}
 
 /**
    A global variable.
@@ -76,6 +71,28 @@ template Variable(T, string N) {
     enum name = N;
 }
 
+
+private template functions(alias mod, publicMembers...) {
+
+    import std.meta: Filter, staticMap;
+
+    private template memberIsSomeFunction(alias member) {
+        import std.traits: isSomeFunction;
+        enum memberIsSomeFunction = isSomeFunction!(member.symbol);
+    }
+
+    private alias functionMembers = Filter!(memberIsSomeFunction, publicMembers);
+
+    private alias toFunction(alias member) = Function!(
+        member.symbol,
+        __traits(getProtection, member.symbol).toProtection,
+        __traits(getLinkage, member.symbol).toLinkage,
+        member.identifier,
+        mod,
+        );
+
+    alias functions = staticMap!(toFunction, functionMembers);
+}
 
 /**
    A function.
