@@ -39,3 +39,38 @@ template isPrivate(alias symbol) {
     else
         enum isPrivate = true;  // if it doesn't compile, treat it as private
 }
+
+
+/**
+   Retrieves the "fundamental type" of a type T.  For most types, this
+   will be exactly the same as T itself.  For arrays or pointers, it
+   removes as many "layers" of array or pointer indirections to get to
+   the most basic atomic type possible.  Examples of inputs and
+   outputs:
+
+   * T -> T
+   * T[] -> T
+   * T[][] -> T
+   * T* -> T
+
+ */
+template FundamentalType(T) {
+
+    import std.traits: isArray, isPointer, PointerTarget;
+    import std.range: ElementEncodingType;
+
+    static if(isArray!T)
+        alias removeOneIndirection = ElementEncodingType!T;
+    else static if(isPointer!T)
+        alias removeOneIndirection = PointerTarget!T;
+
+    private enum isArrayOrPointer(U) = isArray!U || isPointer!U;
+
+    static if(isArrayOrPointer!T) {
+        static if(isArrayOrPointer!removeOneIndirection)
+            alias FundamentalType = FundamentalType!removeOneIndirection;
+        else
+            alias FundamentalType = removeOneIndirection;
+    } else
+        alias FundamentalType = T;
+}

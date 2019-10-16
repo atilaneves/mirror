@@ -77,3 +77,48 @@ import mirror.traits;
     );
     static assert(is(classes == expected), classes.stringof);
 }
+
+
+@("FundamentalType.scalar")
+@safe pure unittest {
+    static assert(is(FundamentalType!int == int));
+    static assert(is(FundamentalType!double == double));
+    static struct Foo { }
+    static assert(is(FundamentalType!Foo == Foo));
+}
+
+
+@("FundamentalType.array")
+@safe pure unittest {
+    static assert(is(FundamentalType!(int[]) == int));
+    static assert(is(FundamentalType!(int[][]) == int));
+    static assert(is(FundamentalType!(int[][][]) == int));
+
+    static assert(is(FundamentalType!(double[]) == double));
+    static assert(is(FundamentalType!(double[][]) == double));
+
+    static assert(is(FundamentalType!string == immutable char));
+    static assert(is(FundamentalType!(string[]) == immutable char));
+
+    static struct Foo { }
+    static assert(is(FundamentalType!(Foo[]) == Foo));
+    static assert(is(FundamentalType!(Foo[][]) == Foo));
+}
+
+
+@("FundamentalType.pointer")
+@safe pure unittest {
+    static assert(is(FundamentalType!(int*) == int));
+    static assert(is(FundamentalType!(int**) == int));
+    static assert(is(FundamentalType!(int***) == int));
+
+    static assert(is(FundamentalType!(double*) == double));
+    static assert(is(FundamentalType!(double**) == double));
+
+    static assert(is(FundamentalType!(string*) == immutable char));
+    static assert(is(FundamentalType!(string**) == immutable char));
+
+    static struct Foo { }
+    static assert(is(FundamentalType!(Foo*) == Foo));
+    static assert(is(FundamentalType!(Foo**) == Foo));
+}
