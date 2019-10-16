@@ -13,26 +13,12 @@ import mirror.traits: moduleOf;
    Compile-time information on a D module.
  */
 template Module(string moduleName) {
-    import mirror.traits: isPrivate;
-    import std.meta: Filter, staticMap, Alias, AliasSeq;
+    import std.meta: Alias;
 
     mixin(`import `, moduleName, `;`);
     private alias mod = Alias!(mixin(moduleName));
 
-    private template member(string name) {
-
-        enum identifier = name;
-
-        static if(__traits(compiles, Alias!(__traits(getMember, mod, name))))
-            alias symbol = Alias!(__traits(getMember, mod, name));
-        else
-            alias symbol = AliasSeq!();
-    }
-
-    private alias members = staticMap!(member, __traits(allMembers, mod));
-    enum notPrivate(alias member) = !isPrivate!(member.symbol);
-    private alias publicMembers = Filter!(notPrivate, members);
-
+    private alias publicMembers = PublicMembers!mod;
     alias Aggregates = aggregates!publicMembers;
     alias Variables = variables!publicMembers;
     alias FunctionsBySymbol = functionsBySymbol!(mod, publicMembers);
@@ -40,8 +26,28 @@ template Module(string moduleName) {
 }
 
 
+package template PublicMembers(alias A) {
+    import mirror.traits: isPrivate;
+    import std.meta: Filter, staticMap, Alias, AliasSeq;
+
+    private template member(string name) {
+
+        enum identifier = name;
+
+        static if(__traits(compiles, Alias!(__traits(getMember, A, name))))
+            alias symbol = Alias!(__traits(getMember, A, name));
+        else
+            alias symbol = AliasSeq!();
+    }
+
+    private alias members = staticMap!(member, __traits(allMembers, A));
+    enum notPrivate(alias member) = !isPrivate!(member.symbol);
+    alias PublicMembers = Filter!(notPrivate, members);
+}
+
+
 // User-defined types
-private template aggregates(publicMembers...) {
+package template aggregates(publicMembers...) {
 
     import std.meta: staticMap, Filter;
 
