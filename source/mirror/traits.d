@@ -79,15 +79,23 @@ template FundamentalType(T) {
 template RecursiveFieldTypes(T) {
 
     import mirror.meta: PublicMembers;
-    import std.meta: staticMap;
+    import mirror.traits: isStruct, isClass;
+    import std.meta: staticMap, AliasSeq, NoDuplicates;
 
-    enum isStructOrClass = isStruct!T || isClass!T;
+    enum isStructOrClass(U) = isStruct!U || isClass!U;
 
-    static if(isStructOrClass) {
-        alias members = PublicMembers!T;
-        alias type(alias member) = member.Type;
-        alias types = staticMap!(type, members);
-        alias RecursiveFieldTypes = types;
+    static if(isStructOrClass!T) {
+        private alias members = PublicMembers!T;
+        private alias type(alias member) = member.Type;
+        private alias types = staticMap!(type, members);
+        private template recurse(U) {
+            static if(isStructOrClass!U)
+                alias recurse = AliasSeq!(U, RecursiveFieldTypes!U);
+            else
+                alias recurse = U;
+        }
+
+        alias RecursiveFieldTypes = NoDuplicates!(staticMap!(recurse, types));
     } else
         alias RecursiveFieldTypes = T;
 }

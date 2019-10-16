@@ -142,3 +142,31 @@ import std.meta: AliasSeq;
 
     shouldEqual!(RecursiveFieldTypes!Foo, AliasSeq!(int, double));
 }
+
+
+@("RecursiveAggregates.udt.nested")
+@safe pure unittest {
+
+    static struct Inner0 {
+        int i;
+        double d;
+    }
+
+    static struct Inner1 {
+        double d;
+        string s;
+    }
+
+    static struct Mid {
+        Inner0 inner0;
+        Inner1 inner1;
+    }
+
+    static struct Outer {
+        Mid mid;
+        byte b;
+    }
+
+    shouldEqual!(RecursiveFieldTypes!Outer,
+                 AliasSeq!(Mid, Inner0, int, double, Inner1, string, byte));
+}
