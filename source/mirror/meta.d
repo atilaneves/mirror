@@ -30,13 +30,22 @@ package template PublicMembers(alias A) {
     import mirror.traits: isPrivate;
     import std.meta: Filter, staticMap, Alias, AliasSeq;
 
-    private template member(string name) {
+    package template member(string name) {
 
         enum identifier = name;
 
-        static if(__traits(compiles, Alias!(__traits(getMember, A, name))))
+        static if(__traits(compiles, Alias!(__traits(getMember, A, name)))) {
+
             alias symbol = Alias!(__traits(getMember, A, name));
-        else
+
+            static if(is(symbol))
+                alias Type = symbol;
+            else static if(is(typeof(symbol)))
+                alias Type = typeof(symbol);
+            else
+                alias Type = void;
+
+        } else
             alias symbol = AliasSeq!();
     }
 

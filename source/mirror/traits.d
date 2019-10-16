@@ -74,3 +74,20 @@ template FundamentalType(T) {
     } else
         alias FundamentalType = T;
 }
+
+
+template RecursiveFieldTypes(T) {
+
+    import mirror.meta: PublicMembers;
+    import std.meta: staticMap;
+
+    enum isStructOrClass = isStruct!T || isClass!T;
+
+    static if(isStructOrClass) {
+        alias members = PublicMembers!T;
+        alias type(alias member) = member.Type;
+        alias types = staticMap!(type, members);
+        alias RecursiveFieldTypes = types;
+    } else
+        alias RecursiveFieldTypes = T;
+}

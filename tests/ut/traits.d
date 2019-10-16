@@ -4,6 +4,7 @@ module ut.traits;
 import ut;
 import mirror.meta;
 import mirror.traits;
+import std.meta: AliasSeq;
 
 
 @("isEnum")
@@ -121,4 +122,23 @@ import mirror.traits;
     static struct Foo { }
     static assert(is(FundamentalType!(Foo*) == Foo));
     static assert(is(FundamentalType!(Foo**) == Foo));
+}
+
+
+@("RecursiveFieldTypes.scalar")
+@safe pure unittest {
+    static assert(is(RecursiveFieldTypes!int == int));
+    static assert(is(RecursiveFieldTypes!double == double));
+}
+
+
+@("RecursiveFieldTypes.udt.flat")
+@safe pure unittest {
+
+    static struct Foo {
+        int i;
+        double d;
+    }
+
+    shouldEqual!(RecursiveFieldTypes!Foo, AliasSeq!(int, double));
 }
