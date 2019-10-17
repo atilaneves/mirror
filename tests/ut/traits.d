@@ -166,8 +166,26 @@ import std.meta: AliasSeq;
         Mid mid;
         byte b;
         float func(float, float);
+
+        @property static Outer max() @safe pure nothrow @nogc {
+            return Outer();
+        }
     }
 
     shouldEqual!(RecursiveFieldTypes!Outer,
                  AliasSeq!(Mid, Inner0, int, double, Inner1, string, byte));
+}
+
+
+@("RecursiveAggregates.udt.Date")
+@safe pure unittest {
+
+    import std.datetime: Date, Month;
+
+    static struct Struct {
+        int i;
+        Date date;
+    }
+
+    shouldEqual!(RecursiveFieldTypes!Struct, AliasSeq!(int, Date, short, Month, ubyte));
 }

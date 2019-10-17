@@ -84,16 +84,15 @@ template RecursiveFieldTypes(T) {
 
     import mirror.meta: PublicMembers;
     import mirror.traits: isStruct, isClass;
-    import std.meta: staticMap, AliasSeq, NoDuplicates, Filter;
+    import std.meta: staticMap, AliasSeq, NoDuplicates, Filter, templateNot;
 
     enum isStructOrClass(U) = isStruct!U || isClass!U;
 
     static if(isStructOrClass!T) {
 
-        private alias members = PublicMembers!T;
-        private enum memberIsType(alias member) = is(typeof({ member.Type _; }));
-        private alias fields = Filter!(memberIsType, members);
-        private alias type(alias symbol) = symbol.Type;
+        private alias fields = AliasSeq!(T.tupleof);
+        private alias publicFields = Filter!(templateNot!isPrivate, fields);
+        private alias type(alias symbol) = typeof(symbol);
         private alias types = staticMap!(type, fields);
 
         private template recurse(U) {
