@@ -165,6 +165,7 @@ import std.meta: AliasSeq;
     static struct Outer {
         Mid mid;
         byte b;
+        float func(float, float);
     }
 
     shouldEqual!(RecursiveFieldTypes!Outer,

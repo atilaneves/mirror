@@ -43,3 +43,9 @@ class LeafClass: MiddleClass, Interface {
         return s ~ "_baz";
     }
 }
+
+
+// just to test this gets ignored
+int func(string s, double d) {
+    return 42;
+}
