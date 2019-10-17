@@ -189,3 +189,18 @@ import std.meta: AliasSeq;
 
     shouldEqual!(RecursiveFieldTypes!Struct, AliasSeq!(int, Date, short, Month, ubyte));
 }
+
+
+@("RecursiveAggregates.udt.DateTime")
+@safe pure unittest {
+
+    import std.datetime: Date, DateTime, Month, TimeOfDay;
+
+    static struct Struct {
+        int i;
+        DateTime date;
+    }
+
+    pragma(msg, RecursiveFieldTypes!Struct);
+    shouldEqual!(RecursiveFieldTypes!Struct, AliasSeq!(int, DateTime, Date, short, Month, ubyte, TimeOfDay));
+}
