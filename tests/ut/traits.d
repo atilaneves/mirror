@@ -187,7 +187,8 @@ import std.meta: AliasSeq;
         Date date;
     }
 
-    shouldEqual!(RecursiveFieldTypes!Struct, AliasSeq!(int, Date, short, Month, ubyte));
+    shouldEqual!(RecursiveFieldTypes!Struct,
+                 AliasSeq!(int, Date, short, Month, ubyte));
 }
 
 
@@ -201,7 +202,8 @@ import std.meta: AliasSeq;
         DateTime date;
     }
 
-    shouldEqual!(RecursiveFieldTypes!Struct, AliasSeq!(int, DateTime, Date, short, Month, ubyte, TimeOfDay));
+    shouldEqual!(RecursiveFieldTypes!Struct,
+                 AliasSeq!(int, DateTime, Date, short, Month, ubyte, TimeOfDay));
 }
 
 
