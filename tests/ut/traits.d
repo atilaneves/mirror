@@ -144,7 +144,7 @@ import std.meta: AliasSeq;
 }
 
 
-@("RecursiveAggregates.udt.nested")
+@("RecursiveFieldTypes.udt.nested")
 @safe pure unittest {
 
     static struct Inner0 {
@@ -177,7 +177,7 @@ import std.meta: AliasSeq;
 }
 
 
-@("RecursiveAggregates.udt.Date")
+@("RecursiveFieldTypes.udt.Date")
 @safe pure unittest {
 
     import std.datetime: Date, Month;
@@ -191,7 +191,7 @@ import std.meta: AliasSeq;
 }
 
 
-@("RecursiveAggregates.udt.DateTime")
+@("RecursiveFieldTypes.udt.DateTime")
 @safe pure unittest {
 
     import std.datetime: Date, DateTime, Month, TimeOfDay;
@@ -206,7 +206,7 @@ import std.meta: AliasSeq;
 }
 
 
-@("RecursiveAggregates.udt.composite.struct")
+@("RecursiveFieldTypes.udt.composite.struct")
 @safe pure unittest {
 
     static struct Struct {
@@ -217,12 +217,12 @@ import std.meta: AliasSeq;
 }
 
 
-@("RecursiveAggregates.udt.composite.class")
+@("RecursiveFieldTypes.udt.composite.class")
 @safe pure unittest {
 
     static class Class {
         Class child;
     }
 
-    pragma(msg, RecursiveFieldTypes!Class);
+    shouldEqual!(RecursiveFieldTypes!Class, Class);
 }
