@@ -201,7 +201,6 @@ import std.meta: AliasSeq;
         DateTime date;
     }
 
-    pragma(msg, RecursiveFieldTypes!Struct);
     shouldEqual!(RecursiveFieldTypes!Struct, AliasSeq!(int, DateTime, Date, short, Month, ubyte, TimeOfDay));
 }
 
