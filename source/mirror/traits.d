@@ -96,7 +96,7 @@ template RecursiveFieldTypes(T) {
         private alias types = staticMap!(type, fields);
 
         private template recurse(U) {
-            static if(isStructOrClass!U)
+            static if(isStructOrClass!U && !is(T == U))
                 alias recurse = AliasSeq!(U, RecursiveFieldTypes!U);
             else
                 alias recurse = U;

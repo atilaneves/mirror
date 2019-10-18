@@ -204,3 +204,25 @@ import std.meta: AliasSeq;
     pragma(msg, RecursiveFieldTypes!Struct);
     shouldEqual!(RecursiveFieldTypes!Struct, AliasSeq!(int, DateTime, Date, short, Month, ubyte, TimeOfDay));
 }
+
+
+@("RecursiveAggregates.udt.composite.struct")
+@safe pure unittest {
+
+    static struct Struct {
+        Struct* child;
+    }
+
+    shouldEqual!(RecursiveFieldTypes!Struct, Struct*);
+}
+
+
+@("RecursiveAggregates.udt.composite.class")
+@safe pure unittest {
+
+    static class Class {
+        Class child;
+    }
+
+    pragma(msg, RecursiveFieldTypes!Class);
+}
