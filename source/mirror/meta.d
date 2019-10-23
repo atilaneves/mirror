@@ -13,16 +13,64 @@ import mirror.traits: moduleOf;
    Compile-time information on a D module.
  */
 template Module(string moduleName) {
+
+    import mirror.traits: RecursiveTypeTree, RecursiveFieldTypes, FundamentalType;
     import std.meta: Alias;
 
     mixin(`import `, moduleName, `;`);
     private alias mod = Alias!(mixin(moduleName));
 
     private alias publicMembers = PublicMembers!mod;
+
+    /// User-defined structs/classes
     alias Aggregates = aggregates!publicMembers;
+
+    /// User-defined structs/classes and all types contained in them
+    alias AggregatesTree = RecursiveTypeTree!Aggregates;
+
+    /// Global variables/enums
     alias Variables = variables!publicMembers;
+
+    /// List of functions by symbol - contains overloads for each entry
     alias FunctionsBySymbol = functionsBySymbol!(mod, publicMembers);
+
+    /// List of functions by overload - each overload is a separate entry
     alias FunctionsByOverload = functionsByOverload!(mod, publicMembers);
+
+    alias AllFunctionReturnTypes = allFunctionReturnTypes!FunctionsByOverload;
+    alias AllFunctionReturnTypesTree = RecursiveTypeTree!AllFunctionReturnTypes;
+
+    alias AllFunctionParameterTypes = allFunctionParameterTypes!FunctionsByOverload;
+    alias AllFunctionParameterTypesTree = RecursiveTypeTree!AllFunctionParameterTypes;
+}
+
+
+package template allFunctionReturnTypes(functions...) {
+
+    import mirror.traits: FundamentalType;
+    import std.traits: ReturnType;
+    import std.meta: staticMap, NoDuplicates;
+
+    private alias symbol(alias F) = F.symbol;
+
+    alias allFunctionReturnTypes =
+        NoDuplicates!(staticMap!(FundamentalType,
+                                 staticMap!(ReturnType,
+                                            staticMap!(symbol, functions))));
+}
+
+package template allFunctionParameterTypes(functions...) {
+
+    import mirror.traits: FundamentalType;
+    import std.traits: Parameters;
+    import std.meta: staticMap, NoDuplicates;
+
+    private alias symbol(alias F) = F.symbol;
+
+    alias allFunctionParameterTypes =
+        NoDuplicates!(staticMap!(FundamentalType,
+                                 staticMap!(Parameters,
+                                            staticMap!(symbol, functions))));
 }
 
 
