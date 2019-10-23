@@ -218,7 +218,7 @@ import std.meta: AliasSeq;
 }
 
 
-@("RecursiveFieldTypes.udt.composite.class")
+@("RecursiveFieldTypes.udt.composite.class.simple")
 @safe pure unittest {
 
     static class Class {
@@ -226,4 +226,25 @@ import std.meta: AliasSeq;
     }
 
     shouldEqual!(RecursiveFieldTypes!Class, Class);
+}
+
+
+@("RecursiveFieldTypes.udt.composite.class.multiple")
+@safe pure unittest {
+
+    shouldEqual!(RecursiveFieldTypes!RecursiveClass0,
+                 AliasSeq!(RecursiveClass1, RecursiveClass2));
+}
+
+
+private class RecursiveClass0 {
+    RecursiveClass1 child;
+}
+
+private class RecursiveClass1 {
+    RecursiveClass2 child;
+}
+
+private class RecursiveClass2 {
+    RecursiveClass0 child;
 }
