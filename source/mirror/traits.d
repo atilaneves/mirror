@@ -80,7 +80,10 @@ template FundamentalType(T) {
    Returns an AliasSeq of all field types of `T`, depth-first
    recursively.
  */
-template RecursiveFieldTypes(T, alreadySeen...) {
+alias RecursiveFieldTypes(T) = RecursiveFieldTypesImpl!T;
+
+
+private template RecursiveFieldTypesImpl(T, alreadySeen...) {
 
     import mirror.meta: PublicMembers;
     import mirror.traits: isStruct, isClass;
@@ -105,14 +108,14 @@ template RecursiveFieldTypes(T, alreadySeen...) {
                 enum shouldRecurse = staticIndexOf!(U, alreadySeen) == -1;
 
                 static if(shouldRecurse)
-                    alias recurse = AliasSeq!(U, RecursiveFieldTypes!(U, NoDuplicates!(T, types, alreadySeen)));
+                    alias recurse = AliasSeq!(U, RecursiveFieldTypesImpl!(U, NoDuplicates!(T, types, alreadySeen)));
                 else
                     alias recurse = AliasSeq!();
             } else
                 alias recurse = U;
         }
 
-        alias RecursiveFieldTypes = NoDuplicates!(staticMap!(recurse, types));
+        alias RecursiveFieldTypesImpl = NoDuplicates!(staticMap!(recurse, types));
     } else
-        alias RecursiveFieldTypes = T;
+        alias RecursiveFieldTypesImpl = T;
 }
