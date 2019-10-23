@@ -90,7 +90,7 @@ private template RecursiveFieldTypesImpl(T, alreadySeen...) {
     import std.meta: staticMap, AliasSeq, NoDuplicates, Filter,
         templateNot, staticIndexOf;
 
-    enum isStructOrClass(U) = isStruct!U || isClass!U;
+    enum isStructOrClass(U) = isStruct!(FundamentalType!U) || isClass!(FundamentalType!U);
 
     static if(isStructOrClass!T) {
 
@@ -101,14 +101,14 @@ private template RecursiveFieldTypesImpl(T, alreadySeen...) {
 
         private template recurse(U) {
 
-            static if(isStructOrClass!U && !is(T == U)) {
+            static if(isStructOrClass!U) {
 
                 // only recurse if the type hasn't been seen yet to
                 // prevent infinite recursion
                 enum shouldRecurse = staticIndexOf!(U, alreadySeen) == -1;
 
                 static if(shouldRecurse)
-                    alias recurse = AliasSeq!(U, RecursiveFieldTypesImpl!(U, NoDuplicates!(T, types, alreadySeen)));
+                    alias recurse = AliasSeq!(U, RecursiveFieldTypesImpl!(FundamentalType!U, NoDuplicates!(T, types, alreadySeen)));
                 else
                     alias recurse = AliasSeq!();
             } else

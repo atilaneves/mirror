@@ -248,3 +248,34 @@ private class RecursiveClass1 {
 private class RecursiveClass2 {
     RecursiveClass0 child;
 }
+
+
+@("RecursiveFieldTypes.udt.composite.array")
+@safe pure unittest {
+
+    static struct Point(T) {
+        T x, y;
+    }
+
+    struct Inner1(T) {
+        Point!T point;
+        T value;
+    }
+
+    struct EvenInner(T) {
+        T value;
+    }
+
+    struct Inner2(T) {
+        EvenInner!T evenInner;
+    }
+
+    static struct Outer(T) {
+        Inner1!T[] inner1s;
+        Inner2!T inner2;
+    }
+
+    // pragma(msg, RecursiveFieldTypes!(Outer!double));
+    shouldEqual!(RecursiveFieldTypes!(Outer!double),
+                 AliasSeq!(Inner1!double[], Point!double, double, Inner2!double, EvenInner!double));
+}
