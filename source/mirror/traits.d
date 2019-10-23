@@ -119,3 +119,13 @@ private template RecursiveFieldTypesImpl(T, alreadySeen...) {
     } else
         alias RecursiveFieldTypesImpl = T;
 }
+
+
+/**
+   An std.meta.AliasSeq of `T` and all its recursive
+   subtypes.
+ */
+template RecursiveTypeTree(T...) {
+    import std.meta: staticMap, NoDuplicates;
+    alias RecursiveTypeTree = NoDuplicates!(T, staticMap!(RecursiveFieldTypes, T));
+}
