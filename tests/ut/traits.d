@@ -279,3 +279,19 @@ private class RecursiveClass2 {
     shouldEqual!(RecursiveFieldTypes!(Outer!double),
                  AliasSeq!(Inner1!double[], Point!double, double, Inner2!double, EvenInner!double));
 }
+
+
+@("isProperty.struct")
+@safe @nogc pure unittest {
+
+    static struct Struct {
+        int _i;
+        @property int i();
+        @property void i(int i);
+        int foo(double d);
+    }
+
+    static assert(isProperty!(__traits(getOverloads, Struct, "i")[1]));
+    static assert(isProperty!(__traits(getOverloads, Struct, "i")[1]));
+    static assert(!isProperty!(Struct.foo));
+}

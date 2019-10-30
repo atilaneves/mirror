@@ -129,3 +129,12 @@ template RecursiveTypeTree(T...) {
     import std.meta: staticMap, NoDuplicates;
     alias RecursiveTypeTree = NoDuplicates!(T, staticMap!(RecursiveFieldTypes, T));
 }
+
+
+/**
+   Whether or not `F` is a property function
+ */
+template isProperty(alias F) {
+    import std.traits: functionAttributes, FunctionAttribute;
+    enum isProperty = functionAttributes!F & FunctionAttribute.property;
+}
