@@ -138,3 +138,53 @@ template isProperty(alias F) {
     import std.traits: functionAttributes, FunctionAttribute;
     enum isProperty = functionAttributes!F & FunctionAttribute.property;
 }
+
+
+/**
+   All member function symbols in T with overloads represented
+   separately.
+ */
+template MemberFunctions(T) if(isStruct!T || isClass!T || isInterface!T)
+{
+    import mirror.meta: functionsByOverload, PublicMembers, Protection;
+    import std.meta: Filter, staticMap;
+
+    private enum isPublic(alias F) = F.protection != Protection.private_;
+    private alias symbolOf(alias S) = S.symbol;
+
+    alias MemberFunctions = Filter!(isMemberFunction,
+                                    staticMap!(symbolOf,
+                                               Filter!(isPublic,
+                                                       functionsByOverload!(T, PublicMembers!T))));
+}
+
+
+// must be a global template
+private template isMemberFunction(alias F) {
+    import std.algorithm: startsWith;
+
+    static if(__traits(compiles, __traits(identifier, F))) {
+        enum name = __traits(identifier, F);
+        alias parent = __traits(parent, F);
+
+        static if(isOOP!parent) {
+            private static bool isWantedFunction(string name) {
+                import std.algorithm: among;
+                return
+                    !name.among("toString", "toHash", "opCmp", "opEquals", "factory")
+                    && !name.startsWith("__")
+                    ;
+            }
+        } else {
+            bool isWantedFunction(string name) { return true; }
+        }
+        private bool isOperator(string name) {
+            return name.startsWith("op") && name.length > 2 && name[2] >= 'A';
+        }
+
+        enum isOp = isOperator(name);
+        enum isMemberFunction = isWantedFunction(name) && !isOperator(name);
+
+    } else
+        enum isMemberFunction = false;
+}

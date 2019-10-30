@@ -311,3 +311,53 @@ private class RecursiveClass2 {
     static assert(isProperty!(__traits(getOverloads, Class, "i")[1]));
     static assert(!isProperty!(Class.foo));
 }
+
+
+@("MemberFunctions.struct")
+@safe @nogc pure unittest {
+
+    static struct Struct {
+        private int _i;
+        @property int i();
+        @property void i(int i);
+        int foo(double d);
+        string bar(int i);
+    }
+
+    //pragma(msg, "MemberFunctions.struct: ", MemberFunctions!Struct.stringof);
+
+    shouldEqual!(
+        MemberFunctions!Struct,
+        AliasSeq!(
+            __traits(getOverloads, Struct, "i")[0],
+            __traits(getOverloads, Struct, "i")[1],
+            Struct.foo,
+            Struct.bar,
+        )
+    );
+}
+
+
+@("MemberFunctions.class")
+@safe @nogc pure unittest {
+
+    static class Class {
+        private int _i;
+        @property int i() { return _i; }
+        @property void i(int i) { _i = i; }
+        int foo(double d) { return cast(int) (d * 2); }
+        string bar(int i) { return "foobar"; }
+    }
+
+    //pragma(msg, "MemberFunctions.class: ", MemberFunctions!Class.stringof);
+
+    shouldEqual!(
+        MemberFunctions!Class,
+        AliasSeq!(
+            __traits(getOverloads, Class, "i")[0],
+            __traits(getOverloads, Class, "i")[1],
+            Class.foo,
+            Class.bar,
+        )
+    );
+}

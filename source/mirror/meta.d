@@ -166,24 +166,24 @@ template FunctionSymbol(
     Protection P = __traits(getProtection, F).toProtection,
     Linkage L = __traits(getLinkage, F).toLinkage,
     string I = __traits(identifier, F),
-    alias M = moduleOf!F
+    alias Parent = moduleOf!F
 )
 {
     import std.meta: staticMap;
 
     alias symbol = F;
     enum identifier = I;
-    alias module_ = M;
+    alias parent = Parent;
 
     private alias toOverload(alias symbol) = FunctionOverload!(
         symbol,
         __traits(getProtection, symbol).toProtection,
         __traits(getLinkage, symbol).toLinkage,
         identifier,
-        module_,
+        parent,
     );
 
-    alias overloads = staticMap!(toOverload, __traits(getOverloads, module_, identifier));
+    alias overloads = staticMap!(toOverload, __traits(getOverloads, parent, identifier));
 
     string toString() @safe pure {
         import std.conv: text;
@@ -192,7 +192,7 @@ template FunctionSymbol(
 }
 
 
-private template functionsByOverload(alias mod, publicMembers...) {
+package template functionsByOverload(alias parent, publicMembers...) {
 
     import std.meta: Filter, staticMap;
 
@@ -209,7 +209,7 @@ private template functionsByOverload(alias mod, publicMembers...) {
     }
 
     private template memberToOverloads(alias member) {
-        private alias overloadSymbols = __traits(getOverloads, mod, member.identifier);
+        private alias overloadSymbols = __traits(getOverloads, parent, member.identifier);
         private alias toOverload(alias symbol) = overload!(symbol, member.identifier);
         alias memberToOverloads = staticMap!(toOverload, overloadSymbols);
     }
@@ -219,7 +219,7 @@ private template functionsByOverload(alias mod, publicMembers...) {
         __traits(getProtection, overload.symbol).toProtection,
         __traits(getLinkage, overload.symbol).toLinkage,
         overload.identifier,
-        mod,
+        parent,
     );
 
     alias functionsByOverload = staticMap!(toFunction, staticMap!(memberToOverloads, functionMembers));
@@ -236,7 +236,7 @@ template FunctionOverload(
     Protection P = __traits(getProtection, F).toProtection,
     Linkage L = __traits(getLinkage, F).toLinkage,
     string I = __traits(identifier, F),
-    alias M = moduleOf!F
+    alias Parent = moduleOf!F
 )
 {
     import std.traits: RT = ReturnType;
@@ -245,7 +245,7 @@ template FunctionOverload(
     alias protection = P;
     alias linkage = L;
     enum identifier = I;
-    alias module_ = M;
+    alias parent = Parent;
 
     alias ReturnType = RT!symbol;
 
