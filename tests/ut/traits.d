@@ -295,3 +295,19 @@ private class RecursiveClass2 {
     static assert(isProperty!(__traits(getOverloads, Struct, "i")[1]));
     static assert(!isProperty!(Struct.foo));
 }
+
+
+@("isProperty.class")
+@safe @nogc pure unittest {
+
+    static class Class {
+        int _i;
+        @property int i() { return _i; }
+        @property void i(int i) { _i = i; }
+        int foo(double d) { return i * 2; }
+    }
+
+    static assert(isProperty!(__traits(getOverloads, Class, "i")[1]));
+    static assert(isProperty!(__traits(getOverloads, Class, "i")[1]));
+    static assert(!isProperty!(Class.foo));
+}
