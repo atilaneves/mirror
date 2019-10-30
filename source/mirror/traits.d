@@ -85,7 +85,6 @@ alias RecursiveFieldTypes(T) = RecursiveFieldTypesImpl!T;
 
 private template RecursiveFieldTypesImpl(T, alreadySeen...) {
 
-    import mirror.meta: PublicMembers;
     import mirror.traits: isStruct, isClass;
     import std.meta: staticMap, AliasSeq, NoDuplicates, Filter,
         templateNot, staticIndexOf;
@@ -146,7 +145,7 @@ template isProperty(alias F) {
  */
 template MemberFunctions(T) if(isStruct!T || isClass!T || isInterface!T)
 {
-    import mirror.meta: functionsByOverload, PublicMembers, Protection;
+    import mirror.meta: functionsByOverload, Protection;
     import std.meta: Filter, staticMap;
 
     private enum isPublic(alias F) = F.protection != Protection.private_;
@@ -187,4 +186,33 @@ private template isMemberFunction(alias F) {
 
     } else
         enum isMemberFunction = false;
+}
+
+
+template PublicMembers(alias A) {
+    import mirror.traits: isPrivate;
+    import std.meta: Filter, staticMap, Alias, AliasSeq;
+
+    package template member(string name) {
+
+        enum identifier = name;
+
+        static if(__traits(compiles, Alias!(__traits(getMember, A, name)))) {
+
+            alias symbol = Alias!(__traits(getMember, A, name));
+
+            static if(is(symbol))
+                alias Type = symbol;
+            else static if(is(typeof(symbol)))
+                alias Type = typeof(symbol);
+            else
+                alias Type = void;
+
+        } else
+            alias symbol = AliasSeq!();
+    }
+
+    private alias members = staticMap!(member, __traits(allMembers, A));
+    enum notPrivate(alias member) = !isPrivate!(member.symbol);
+    alias PublicMembers = Filter!(notPrivate, members);
 }

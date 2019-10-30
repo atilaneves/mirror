@@ -14,7 +14,7 @@ import mirror.traits: moduleOf;
  */
 template Module(string moduleName) {
 
-    import mirror.traits: RecursiveTypeTree, RecursiveFieldTypes, FundamentalType;
+    import mirror.traits: RecursiveTypeTree, RecursiveFieldTypes, FundamentalType, PublicMembers;
     import std.meta: Alias;
 
     mixin(`import `, moduleName, `;`);
@@ -71,35 +71,6 @@ package template allFunctionParameterTypes(functions...) {
         NoDuplicates!(staticMap!(FundamentalType,
                                  staticMap!(Parameters,
                                             staticMap!(symbol, functions))));
-}
-
-
-package template PublicMembers(alias A) {
-    import mirror.traits: isPrivate;
-    import std.meta: Filter, staticMap, Alias, AliasSeq;
-
-    package template member(string name) {
-
-        enum identifier = name;
-
-        static if(__traits(compiles, Alias!(__traits(getMember, A, name)))) {
-
-            alias symbol = Alias!(__traits(getMember, A, name));
-
-            static if(is(symbol))
-                alias Type = symbol;
-            else static if(is(typeof(symbol)))
-                alias Type = typeof(symbol);
-            else
-                alias Type = void;
-
-        } else
-            alias symbol = AliasSeq!();
-    }
-
-    private alias members = staticMap!(member, __traits(allMembers, A));
-    enum notPrivate(alias member) = !isPrivate!(member.symbol);
-    alias PublicMembers = Filter!(notPrivate, members);
 }
 
 
