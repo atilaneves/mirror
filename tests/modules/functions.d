@@ -37,3 +37,11 @@ extern(C++) void externCpp() {}
 
 
 alias identityInt = modules.templates.identity!int;
+
+
+shared static this() { }
+
+static this() { }
+
+
+unittest {}

@@ -20,6 +20,7 @@ import std.meta: AliasSeq;
         FunctionSymbol!(identityInt, Protection.public_, Linkage.D, "identityInt", modules.functions),
     );
 
+    // pragma(msg, "\n", mod.FunctionsBySymbol.stringof, "\n");
     shouldEqual!(mod.FunctionsBySymbol, expected);
 
     static assert(mod.FunctionsBySymbol[0].overloads.length == 2); // add1
@@ -47,6 +48,7 @@ import std.meta: AliasSeq;
         FunctionOverload!(identityInt, Protection.public_, Linkage.D, "identityInt", modules.functions),
     );
 
+    // pragma(msg, "\n", mod.FunctionsByOverload.stringof, "\n");
     shouldEqual!(mod.FunctionsByOverload, expected);
 }
 

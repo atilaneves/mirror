@@ -116,7 +116,7 @@ private template functionsBySymbol(alias mod, publicMembers...) {
         enum memberIsSomeFunction = isSomeFunction!(member.symbol);
     }
 
-    private alias functionMembers = Filter!(memberIsSomeFunction, publicMembers);
+    private alias functionMembers = Filter!(isRegularFunction, Filter!(memberIsSomeFunction, publicMembers));
 
     private alias toFunction(alias member) = FunctionSymbol!(
         member.symbol,
@@ -128,6 +128,16 @@ private template functionsBySymbol(alias mod, publicMembers...) {
 
     alias functionsBySymbol = staticMap!(toFunction, functionMembers);
 }
+
+
+private template isRegularFunction(alias member) {
+    import std.algorithm: startsWith;
+    enum isRegularFunction =
+        !member.identifier.startsWith("_sharedStaticCtor")
+        && !member.identifier.startsWith("_staticCtor")
+    ;
+}
+
 
 /**
    A function symbol with nested overloads.
@@ -172,7 +182,7 @@ package template functionsByOverload(alias parent, publicMembers...) {
         enum memberIsSomeFunction = isSomeFunction!(member.symbol);
     }
 
-    private alias functionMembers = Filter!(memberIsSomeFunction, publicMembers);
+    private alias functionMembers = Filter!(isRegularFunction, Filter!(memberIsSomeFunction, publicMembers));
 
     private template overload(alias S, string I) {
         alias symbol = S;
