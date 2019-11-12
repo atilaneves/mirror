@@ -281,6 +281,15 @@ private class RecursiveClass2 {
 }
 
 
+@("RecursiveFieldTypes.SocketOSException")
+@safe @nogc pure unittest {
+    import std.socket: SocketOSException;
+    alias types = RecursiveFieldTypes!SocketOSException;
+    //pragma(msg, types);
+    shouldEqual!(types, AliasSeq!int);
+}
+
+
 @("isProperty.struct")
 @safe @nogc pure unittest {
 
