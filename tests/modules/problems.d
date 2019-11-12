@@ -14,3 +14,6 @@ private int sub1(int i, int j) {
 
 
 alias MyLong = long;
+
+
+version = OopsVersion;

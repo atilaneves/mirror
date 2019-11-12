@@ -213,6 +213,16 @@ template PublicMembers(alias A) {
     }
 
     private alias members = staticMap!(member, __traits(allMembers, A));
-    enum notPrivate(alias member) = !isPrivate!(member.symbol);
-    alias PublicMembers = Filter!(notPrivate, members);
+
+    // In the `member` template above, if it's not possible to get a member from `A`,
+    // then the symbol is an empty AliasSeq. An example of such a situation can be
+    // found in `modules.problems` from the tests directory, where this causes things
+    // to not compile: `version = OopsVersion;`.
+    // So we filter out such members.
+    private enum hasSymbol(alias member) = !__traits(compiles, member.symbol.length);
+    private alias goodMembers = Filter!(hasSymbol, members);
+
+    private enum notPrivate(alias member) = !isPrivate!(member.symbol);
+
+    alias PublicMembers = Filter!(notPrivate, goodMembers);
 }
