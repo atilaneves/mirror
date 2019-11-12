@@ -4,7 +4,7 @@ module ut.ctfe.functions;
 import ut.ctfe;
 
 
-@ShouldFail("Not caught up with meta implemenation wrt overloads yet")
+@ShouldFail("Not caught up with meta implementation wrt overloads yet")
 @("functions")
 @safe pure unittest {
     import std.traits: PSC = ParameterStorageClass;
