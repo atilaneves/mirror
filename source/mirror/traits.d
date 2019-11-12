@@ -209,7 +209,7 @@ template PublicMembers(alias A) {
                 alias Type = void;
 
         } else
-            alias symbol = AliasSeq!();
+            alias symbol = void;
     }
 
     private alias members = staticMap!(member, __traits(allMembers, A));
@@ -219,7 +219,7 @@ template PublicMembers(alias A) {
     // found in `modules.problems` from the tests directory, where this causes things
     // to not compile: `version = OopsVersion;`.
     // So we filter out such members.
-    private enum hasSymbol(alias member) = !__traits(compiles, member.symbol.length);
+    private enum hasSymbol(alias member) = !is(member == void);
     private alias goodMembers = Filter!(hasSymbol, members);
 
     private enum notPrivate(alias member) = !isPrivate!(member.symbol);

@@ -17,3 +17,6 @@ alias MyLong = long;
 
 
 version = OopsVersion;
+
+
+int[] gInts;

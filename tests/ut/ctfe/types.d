@@ -33,7 +33,13 @@ import ut.ctfe;
 
 @("problems")
 @safe pure unittest {
-    module_!"modules.problems".should == Module("modules.problems");
+    module_!"modules.problems".should ==
+        Module(
+            "modules.problems",
+            [],
+            [Variable("int[]", "gInts")],
+            []
+        );
 }
 
 

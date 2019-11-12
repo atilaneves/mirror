@@ -28,5 +28,13 @@ import std.meta: AliasSeq;
     static import modules.variables;
 
     alias mod = Module!("modules.problems");
-    static assert(mod.Variables.length == 0, mod.Variables.stringof);
+
+    static assert(mod.Variables.length == 1, mod.Variables.stringof);
+
+    shouldEqual!(
+        mod.Variables,
+        AliasSeq!(
+            Variable!(int[], "gInts"),
+        )
+    );
 }
