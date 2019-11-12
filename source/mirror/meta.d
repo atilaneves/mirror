@@ -109,14 +109,10 @@ template Variable(T, string N) {
 
 private template functionsBySymbol(alias mod, publicMembers...) {
 
+    import mirror.traits: memberIsRegularFunction;
     import std.meta: Filter, staticMap;
 
-    private template memberIsSomeFunction(alias member) {
-        import std.traits: isSomeFunction;
-        enum memberIsSomeFunction = isSomeFunction!(member.symbol);
-    }
-
-    private alias functionMembers = Filter!(isRegularFunction, Filter!(memberIsSomeFunction, publicMembers));
+    private alias functionMembers = Filter!(memberIsRegularFunction, publicMembers);
 
     private alias toFunction(alias member) = FunctionSymbol!(
         member.symbol,
@@ -127,15 +123,6 @@ private template functionsBySymbol(alias mod, publicMembers...) {
         );
 
     alias functionsBySymbol = staticMap!(toFunction, functionMembers);
-}
-
-
-private template isRegularFunction(alias member) {
-    import std.algorithm: startsWith;
-    enum isRegularFunction =
-        !member.identifier.startsWith("_sharedStaticCtor")
-        && !member.identifier.startsWith("_staticCtor")
-    ;
 }
 
 
@@ -175,14 +162,10 @@ template FunctionSymbol(
 
 package template functionsByOverload(alias parent, publicMembers...) {
 
+    import mirror.traits: memberIsRegularFunction;
     import std.meta: Filter, staticMap;
 
-    private template memberIsSomeFunction(alias member) {
-        import std.traits: isSomeFunction;
-        enum memberIsSomeFunction = isSomeFunction!(member.symbol);
-    }
-
-    private alias functionMembers = Filter!(isRegularFunction, Filter!(memberIsSomeFunction, publicMembers));
+    private alias functionMembers = Filter!(memberIsRegularFunction, publicMembers);
 
     private template overload(alias S, string I) {
         alias symbol = S;

@@ -226,3 +226,21 @@ template PublicMembers(alias A) {
 
     alias PublicMembers = Filter!(notPrivate, goodMembers);
 }
+
+
+package template memberIsSomeFunction(alias member) {
+    import std.traits: isSomeFunction;
+    enum memberIsSomeFunction = isSomeFunction!(member.symbol);
+}
+
+
+package template memberIsRegularFunction(alias member) {
+    static if(memberIsSomeFunction!member) {
+        import std.algorithm: startsWith;
+        enum memberIsRegularFunction =
+            !member.identifier.startsWith("_sharedStaticCtor")
+            && !member.identifier.startsWith("_staticCtor")
+            ;
+    } else
+        enum memberIsRegularFunction = false;
+}
