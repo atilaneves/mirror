@@ -370,3 +370,10 @@ private class RecursiveClass2 {
         )
     );
 }
+
+
+@("PublicMembers.std.socket")
+@safe @nogc pure unittest {
+    import std.socket;
+    alias members = PublicMembers!(std.socket);
+}
