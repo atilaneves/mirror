@@ -425,3 +425,15 @@ static void staticGlobalFunc() {
         ]
     );
 }
+
+
+@("UnaryOperators")
+@safe pure unittest {
+
+    static struct Struct {
+        int opUnary(string op)() if(op == "+") { return 42; }
+        int opUnary(string op)() if(op == "~") { return 33; }
+    }
+
+    static assert([UnaryOperators!Struct] == ["+", "~"]);
+}

@@ -334,3 +334,12 @@ string functionName(BinOpDir dir) {
     }
     assert(0);
 }
+
+
+template UnaryOperators(T) {
+    import std.meta: AliasSeq, Filter;
+
+    alias overloadable = AliasSeq!("-", "+", "~", "*", "++", "--");
+    enum hasOperator(string op) = is(typeof(probeOperator!(T, "opUnary", op)));
+    alias UnaryOperators = Filter!(hasOperator, overloadable);
+}
