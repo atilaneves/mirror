@@ -257,3 +257,80 @@ template isStaticMemberFunction(alias F) {
     else
         enum isStaticMemberFunction = false;
 }
+
+
+/**
+   An AliasSeq of BinaryOperator structs for type T, one for each binary operator.
+ */
+template BinaryOperators(T) {
+    import std.meta: staticMap, Filter, AliasSeq;
+    import std.traits: hasMember;
+
+    // See https://dlang.org/spec/operatoroverloading.html#binary
+    private alias overloadable = AliasSeq!(
+        "+", "-",  "*",  "/",  "%", "^^",  "&",
+        "|", "^", "<<", ">>", ">>>", "~", "in",
+    );
+
+    static if(hasMember!(T, "opBinary") || hasMember!(T, "opBinaryRight")) {
+
+        private enum hasOperatorDir(BinOpDir dir, string op) = is(typeof(probeOperator!(T, functionName(dir), op)));
+        private enum hasOperator(string op) =
+            hasOperatorDir!(BinOpDir.left, op)
+            || hasOperatorDir!(BinOpDir.right, op);
+
+        alias ops = Filter!(hasOperator, overloadable);
+
+        template toBinOp(string op) {
+            enum hasLeft  = hasOperatorDir!(BinOpDir.left, op);
+            enum hasRight = hasOperatorDir!(BinOpDir.right, op);
+
+            static if(hasLeft && hasRight)
+                enum toBinOp = BinaryOperator(op, BinOpDir.left | BinOpDir.right);
+            else static if(hasLeft)
+                enum toBinOp = BinaryOperator(op, BinOpDir.left);
+            else static if(hasRight)
+                enum toBinOp = BinaryOperator(op, BinOpDir.right);
+            else
+                static assert(false);
+        }
+
+        alias BinaryOperators = staticMap!(toBinOp, ops);
+    } else
+        alias BinaryOperators = AliasSeq!();
+}
+
+
+/**
+   Tests if T has a template function named `funcName`
+   with a string template parameter `op`.
+ */
+private auto probeOperator(T, string funcName, string op)() {
+    import std.traits: Parameters;
+
+    mixin(`alias func = T.` ~ funcName ~ `;`);
+    alias P = Parameters!(func!op);
+
+    mixin(`return T.init.` ~ funcName ~ `!op(P.init);`);
+}
+
+
+struct BinaryOperator {
+    string op;
+    BinOpDir dirs;  /// left, right, or both
+}
+
+
+enum BinOpDir {
+    left = 1,
+    right = 2,
+}
+
+
+string functionName(BinOpDir dir) {
+    final switch(dir) with(BinOpDir) {
+        case left: return "opBinary";
+        case right: return "opBinaryRight";
+    }
+    assert(0);
+}

@@ -399,3 +399,29 @@ private class RecursiveClass2 {
 static void staticGlobalFunc() {
 
 }
+
+
+@("BinaryOperators")
+@safe @nogc pure unittest {
+
+    static struct Number {
+        int i;
+        Number opBinary(string op)(Number other) if(op == "+") {
+            return Number(i + other.i);
+        }
+        Number opBinary(string op)(Number other) if(op == "-") {
+            return Number(i - other.i);
+        }
+        Number opBinaryRight(string op)(int other) if(op == "+") {
+            return Number(i + other);
+        }
+    }
+
+    static assert(
+        [BinaryOperators!Number] ==
+        [
+            BinaryOperator("+", BinOpDir.left | BinOpDir.right),
+            BinaryOperator("-", BinOpDir.left),
+        ]
+    );
+}
