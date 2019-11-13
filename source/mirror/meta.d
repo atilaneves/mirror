@@ -233,10 +233,22 @@ template FunctionOverload(
 }
 
 
+/**
+   Information on a function's parameter
+ */
 template Parameter(T, alias D, string I) {
     alias Type = T;
     alias Default = D;
     enum identifier = I;
+}
+
+
+/**
+   If the passed in template `T` is `Parameter`
+ */
+template isParameter(alias T) {
+    import std.traits: TemplateOf;
+    enum isParameter = __traits(isSame, TemplateOf!T, Parameter);
 }
 
 
