@@ -2,6 +2,7 @@ module ut.meta.functions;
 
 
 import ut.meta;
+import mirror.traits: Parameter;
 import std.meta: AliasSeq;
 
 

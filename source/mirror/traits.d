@@ -380,3 +380,38 @@ template NumRequiredParameters(A...) if(A.length == 1) {
     static assert(isCallable!F);
     enum NumRequiredParameters = Parameters!F.length - NumDefaultParameters!F;
 }
+
+
+/**
+   AliasSeq of `Parameter` templates with all information on function `F`'s
+   parameters.
+ */
+template Parameters(alias F) {
+    import mirror.traits: Parameter;
+    import std.traits: StdParameters = Parameters, ParameterIdentifierTuple, ParameterDefaults;
+    import std.meta: staticMap, aliasSeqOf;
+    import std.range: iota;
+
+    alias parameter(size_t i) =
+        Parameter!(StdParameters!F[i], ParameterDefaults!F[i], ParameterIdentifierTuple!F[i]);
+
+    alias Parameters = staticMap!(parameter, aliasSeqOf!(StdParameters!F.length.iota));
+}
+
+/**
+   Information on a function's parameter
+ */
+template Parameter(T, alias D, string I) {
+    alias Type = T;
+    alias Default = D;
+    enum identifier = I;
+}
+
+
+/**
+   If the passed in template `T` is `Parameter`
+ */
+template isParameter(alias T) {
+    import std.traits: TemplateOf;
+    enum isParameter = __traits(isSame, TemplateOf!T, Parameter);
+}

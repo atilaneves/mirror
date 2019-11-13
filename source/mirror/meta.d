@@ -203,6 +203,7 @@ template FunctionOverload(
     alias Parent = moduleOf!F
 )
 {
+    import mirror.traits: Parameters;
     import std.traits: RT = ReturnType;
 
     alias symbol = F;
@@ -212,18 +213,7 @@ template FunctionOverload(
     alias parent = Parent;
 
     alias ReturnType = RT!symbol;
-
-    private template parametersImpl() {
-        import std.traits: Parameters, ParameterIdentifierTuple, ParameterDefaults;
-        import std.meta: staticMap, aliasSeqOf;
-        import std.range: iota;
-
-        alias parameter(size_t i) =
-            Parameter!(Parameters!symbol[i], ParameterDefaults!symbol[i], ParameterIdentifierTuple!symbol[i]);
-        alias parametersImpl = staticMap!(parameter, aliasSeqOf!(Parameters!F.length.iota));
-    }
-
-    alias parameters = parametersImpl!();
+    alias parameters = Parameters!F;
 
     string toString() @safe pure {
         import std.conv: text;
@@ -232,24 +222,6 @@ template FunctionOverload(
     }
 }
 
-
-/**
-   Information on a function's parameter
- */
-template Parameter(T, alias D, string I) {
-    alias Type = T;
-    alias Default = D;
-    enum identifier = I;
-}
-
-
-/**
-   If the passed in template `T` is `Parameter`
- */
-template isParameter(alias T) {
-    import std.traits: TemplateOf;
-    enum isParameter = __traits(isSame, TemplateOf!T, Parameter);
-}
 
 
 /// Visibilty/protection
