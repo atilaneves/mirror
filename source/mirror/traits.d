@@ -372,3 +372,11 @@ template NumDefaultParameters(A...) if(A.length == 1) {
 
     enum NumDefaultParameters = Filter!(notVoid, ParameterDefaults!F).length;
 }
+
+
+template NumRequiredParameters(A...) if(A.length == 1) {
+    import std.traits: isCallable, Parameters;
+    alias F = A[0];
+    static assert(isCallable!F);
+    enum NumRequiredParameters = Parameters!F.length - NumDefaultParameters!F;
+}

@@ -470,4 +470,24 @@ static void staticGlobalFunc() {
 
     static void one(int i, double d = 33.3);
     static assert(NumDefaultParameters!one == 1);
+
+    static void two(int i, double d = 33.3, int j = 42);
+    static assert(NumDefaultParameters!two == 2);
+}
+
+
+@("NumRequiredParameters")
+@safe pure unittest {
+
+    static void none();
+    static assert(NumRequiredParameters!none == 0);
+
+    static void one0(int i, double d = 33.3);
+    static assert(NumRequiredParameters!one0 == 1);
+
+    static void one1(int i, double d = 33.3, int j = 42);
+    static assert(NumRequiredParameters!one1 == 1);
+
+    static void two(int i, string s, double d = 33.3, int j = 42);
+    static assert(NumRequiredParameters!two == 2);
 }
