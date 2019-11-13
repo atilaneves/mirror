@@ -244,3 +244,16 @@ package template memberIsRegularFunction(alias member) {
     } else
         enum memberIsRegularFunction = false;
 }
+
+
+/**
+   If a function is static member function
+ */
+template isStaticMemberFunction(alias F) {
+    import std.traits: hasStaticMember;
+
+    static if(__traits(compiles, hasStaticMember!(__traits(parent, F), __traits(identifier, F))))
+        enum isStaticMemberFunction = hasStaticMember!(__traits(parent, F), __traits(identifier, F));
+    else
+        enum isStaticMemberFunction = false;
+}

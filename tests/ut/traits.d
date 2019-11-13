@@ -377,3 +377,25 @@ private class RecursiveClass2 {
     import std.socket;
     alias members = PublicMembers!(std.socket);
 }
+
+
+
+@("isStaticMemberFunction")
+@safe @nogc pure unittest {
+    static struct Struct {
+        int foo();
+        static int bar();
+    }
+
+    static void fun() {}
+
+    static assert(!isStaticMemberFunction!(Struct.foo));
+    static assert( isStaticMemberFunction!(Struct.bar));
+    static assert(!isStaticMemberFunction!fun);
+    static assert(!isStaticMemberFunction!staticGlobalFunc);
+}
+
+
+static void staticGlobalFunc() {
+
+}
