@@ -457,3 +457,17 @@ static void staticGlobalFunc() {
 
     static assert([AssignOperators!Number] == ["+", "-"]);
 }
+
+
+@("NumDefaultParameters")
+@safe pure unittest {
+
+    static void none0();
+    static assert(NumDefaultParameters!none0 == 0);
+
+    static void none1(int i);
+    static assert(NumDefaultParameters!none1 == 0);
+
+    static void one(int i, double d = 33.3);
+    static assert(NumDefaultParameters!one == 1);
+}

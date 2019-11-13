@@ -357,3 +357,18 @@ template AssignOperators(T) {
     private enum hasOperator(string op) = is(typeof(probeOperator!(T, "opOpAssign", op)));
     alias AssignOperators = Filter!(hasOperator, overloadable);
 }
+
+
+template NumDefaultParameters(A...) if(A.length == 1) {
+    import std.traits: isCallable, ParameterDefaults;
+    import std.meta: Filter;
+
+    alias F = A[0];
+    static assert(isCallable!F);
+
+    private template notVoid(T...) if(T.length == 1) {
+        enum notVoid = !is(T[0] == void);
+    }
+
+    enum NumDefaultParameters = Filter!(notVoid, ParameterDefaults!F).length;
+}
