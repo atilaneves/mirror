@@ -415,3 +415,12 @@ template isParameter(alias T) {
     import std.traits: TemplateOf;
     enum isParameter = __traits(isSame, TemplateOf!T, Parameter);
 }
+
+
+template PublicFieldNames(T) {
+    import std.meta: Filter, AliasSeq;
+    import std.traits: FieldNameTuple;
+
+    enum isPublic(string fieldName) = __traits(getProtection, __traits(getMember, T, fieldName)) == "public";
+    alias PublicFieldNames = Filter!(isPublic, FieldNameTuple!T);
+}
