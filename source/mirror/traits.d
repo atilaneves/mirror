@@ -343,3 +343,17 @@ template UnaryOperators(T) {
     enum hasOperator(string op) = is(typeof(probeOperator!(T, "opUnary", op)));
     alias UnaryOperators = Filter!(hasOperator, overloadable);
 }
+
+
+template AssignOperators(T) {
+    import std.meta: AliasSeq, Filter;
+
+    // See https://dlang.org/spec/operatoroverloading.html#op-assign
+    private alias overloadable = AliasSeq!(
+        "+", "-",  "*",  "/",  "%", "^^",  "&",
+        "|", "^", "<<", ">>", ">>>", "~",
+    );
+
+    private enum hasOperator(string op) = is(typeof(probeOperator!(T, "opOpAssign", op)));
+    alias AssignOperators = Filter!(hasOperator, overloadable);
+}

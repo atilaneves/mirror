@@ -437,3 +437,23 @@ static void staticGlobalFunc() {
 
     static assert([UnaryOperators!Struct] == ["+", "~"]);
 }
+
+
+@("AssignOperators")
+@safe pure unittest {
+
+    static struct Number {
+        int i;
+        Number opOpAssign(string op)(Number other) if(op == "+") {
+            return Number(i + other.i);
+        }
+        Number opOpAssign(string op)(Number other) if(op == "-") {
+            return Number(i - other.i);
+        }
+        Number opOpAssignRight(string op)(int other) if(op == "+") {
+            return Number(i + other);
+        }
+    }
+
+    static assert([AssignOperators!Number] == ["+", "-"]);
+}
