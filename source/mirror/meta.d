@@ -113,7 +113,7 @@ template Variable(T, string N) {
 }
 
 
-private template functionsBySymbol(alias mod, publicMembers...) {
+private template functionsBySymbol(alias parent, publicMembers...) {
 
     import mirror.traits: memberIsRegularFunction;
     import std.meta: Filter, staticMap;
@@ -125,7 +125,7 @@ private template functionsBySymbol(alias mod, publicMembers...) {
         __traits(getProtection, member.symbol).toProtection,
         __traits(getLinkage, member.symbol).toLinkage,
         member.identifier,
-        mod,
+        parent,
         );
 
     alias functionsBySymbol = staticMap!(toFunction, functionMembers);
