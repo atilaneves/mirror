@@ -6,7 +6,7 @@
 module mirror.meta;
 
 
-import mirror.traits: moduleOf;
+import std.meta: Alias;
 
 
 /**
@@ -140,7 +140,7 @@ template FunctionSymbol(
     Protection P = __traits(getProtection, F).toProtection,
     Linkage L = __traits(getLinkage, F).toLinkage,
     string I = __traits(identifier, F),
-    alias Parent = moduleOf!F
+    alias Parent = Alias!(__traits(parent, F)),
 )
 {
     import std.meta: staticMap;
@@ -206,7 +206,7 @@ template FunctionOverload(
     Protection P = __traits(getProtection, F).toProtection,
     Linkage L = __traits(getLinkage, F).toLinkage,
     string I = __traits(identifier, F),
-    alias Parent = moduleOf!F
+    alias Parent = Alias!(__traits(parent, F)),
 )
 {
     import mirror.traits: Parameters;
