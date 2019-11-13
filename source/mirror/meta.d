@@ -15,7 +15,7 @@ import mirror.traits: moduleOf;
 template Module(string moduleName) {
 
     import mirror.traits: RecursiveTypeTree, RecursiveFieldTypes, FundamentalType, PublicMembers;
-    import std.meta: Alias;
+    import std.meta: Alias, NoDuplicates;
 
     mixin(`import `, moduleName, `;`);
     private alias mod = Alias!(mixin(moduleName));
@@ -42,6 +42,12 @@ template Module(string moduleName) {
 
     alias AllFunctionParameterTypes = allFunctionParameterTypes!FunctionsByOverload;
     alias AllFunctionParameterTypesTree = RecursiveTypeTree!AllFunctionParameterTypes;
+
+    /**
+       All aggregates, including explicitly defined and appearing in
+       function signatures
+    */
+    alias AllAggregates = NoDuplicates!(AggregatesTree, AllFunctionReturnTypesTree, AllFunctionParameterTypesTree);
 }
 
 
