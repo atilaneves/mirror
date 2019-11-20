@@ -49,3 +49,30 @@ class LeafClass: MiddleClass, Interface {
 int func(string s, double d) {
     return 42;
 }
+
+
+struct Point {
+    double x, y;
+}
+
+
+struct Inner1 {
+    Point point;
+    double value;
+}
+
+
+struct EvenInner {
+    double value;
+}
+
+
+struct Inner2 {
+    EvenInner evenInner;
+}
+
+
+struct Outer {
+    Inner1[] inner1s;
+    Inner2 inner2;
+}

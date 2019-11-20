@@ -27,7 +27,13 @@ import std.meta: AliasSeq;
     alias mod = Module!"modules.types";
     alias aggregates = mod.Aggregates;
     alias structs = Filter!(isStruct, aggregates);
-    static assert(is(structs == AliasSeq!(modules.types.String)), structs.stringof);
+    static assert(is(structs == AliasSeq!(modules.types.String,
+                                          modules.types.Point,
+                                          modules.types.Inner1,
+                                          modules.types.EvenInner,
+                                          modules.types.Inner2,
+                                          modules.types.Outer)),
+                  structs.stringof);
 }
 
 

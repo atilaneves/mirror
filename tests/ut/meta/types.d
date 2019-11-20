@@ -30,6 +30,11 @@ import ut.meta;
             "AbstractClass",
             "MiddleClass",
             "LeafClass",
+            "Point",
+            "Inner1",
+            "EvenInner",
+            "Inner2",
+            "Outer",
         ]
     );
 }

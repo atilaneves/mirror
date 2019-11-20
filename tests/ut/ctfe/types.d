@@ -27,6 +27,11 @@ import ut.ctfe;
         Aggregate("AbstractClass", Aggregate.Kind.class_),
         Aggregate("MiddleClass", Aggregate.Kind.class_),
         Aggregate("LeafClass", Aggregate.Kind.class_),
+        Aggregate("Point", Aggregate.Kind.struct_),
+        Aggregate("Inner1", Aggregate.Kind.struct_),
+        Aggregate("EvenInner", Aggregate.Kind.struct_),
+        Aggregate("Inner2", Aggregate.Kind.struct_),
+        Aggregate("Outer", Aggregate.Kind.struct_),
     ];
 }
 
