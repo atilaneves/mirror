@@ -4,13 +4,12 @@ module ut.ctfe.functions;
 import ut.ctfe;
 
 
-@ShouldFail("Not caught up with meta implementation wrt overloads yet")
 @("functions")
 @safe pure unittest {
     import std.traits: PSC = ParameterStorageClass;
 
-    enum mod = module_!("modules.functions");
-    mod.functions[].shouldBeSameSetAs(
+    enum mod = module_!"modules.functions";
+    mod.functionsByOverload[].shouldBeSameSetAs(
         [
             Function(
                 "add1",
@@ -32,8 +31,8 @@ import ut.ctfe;
                 "withDefault",
                 Type("double"),
                 [
-                    Parameter("double", "d0"),
-                    Parameter("double", "d1", "33.3"),
+                    Parameter("double", "fst"),
+                    Parameter("double", "snd", "33.3"),
                 ],
             ),
             Function(

@@ -57,7 +57,7 @@ Module module_(string moduleName)() {
         );
     }
 
-    ret.functions = [ staticMap!(toFunction, module_.FunctionsBySymbol) ];
+    ret.functionsByOverload = [ staticMap!(toFunction, module_.FunctionsByOverload) ];
 
     return ret;
 }
@@ -70,7 +70,7 @@ struct Module {
     string name;
     Aggregate[] aggregates;
     Variable[] variables;
-    Function[] functions;
+    Function[] functionsByOverload;
 }
 
 
