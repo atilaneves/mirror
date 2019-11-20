@@ -20,7 +20,20 @@ Module module_(string moduleName)() {
 
     alias module_ = ModuleTemplate!moduleName;
 
-    enum toType(T) = Aggregate(__traits(identifier, T));
+    template toKind(T) {
+        static if(is(T == enum))
+            enum toKind = Aggregate.Kind.enum_;
+        else static if(is(T == struct))
+            enum toKind = Aggregate.Kind.struct_;
+        else static if(is(T == class))
+            enum toKind = Aggregate.Kind.class_;
+        else static if(is(T == interface))
+            enum toKind = Aggregate.Kind.interface_;
+        else
+            static assert(false);
+    }
+
+    enum toType(T) = Aggregate(__traits(identifier, T), toKind!T);
     ret.aggregates = [ staticMap!(toType, module_.Aggregates) ];
 
     enum toVariable(alias V) = Variable(V.Type.stringof, V.name);
@@ -88,7 +101,16 @@ struct Module {
    A user-defined type (struct, class, or enum).
  */
 struct Aggregate {
+
+    enum Kind {
+        enum_,
+        struct_,
+        class_,
+        interface_,
+    }
+
     string name;
+    Kind kind;
     Variable[] fields;
     Function[] functions;
     // UDAs?
