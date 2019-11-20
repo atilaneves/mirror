@@ -19,6 +19,7 @@ import std.meta: AliasSeq;
         FunctionSymbol!(externC, Protection.public_, Linkage.C),
         FunctionSymbol!(externCpp, Protection.public_, Linkage.Cpp),
         FunctionSymbol!(identityInt, Protection.public_, Linkage.D, "identityInt", modules.functions),
+        FunctionSymbol!(voldermort, Protection.public_, Linkage.D),
     );
 
     // pragma(msg, "\n", mod.FunctionsBySymbol.stringof, "\n");
@@ -47,6 +48,7 @@ import std.meta: AliasSeq;
         FunctionOverload!(externC, Protection.public_, Linkage.C),
         FunctionOverload!(externCpp, Protection.public_, Linkage.Cpp),
         FunctionOverload!(identityInt, Protection.public_, Linkage.D, "identityInt", modules.functions),
+        FunctionOverload!(voldermort, Protection.public_, Linkage.D),
     );
 
     // pragma(msg, "\n", mod.FunctionsByOverload.stringof, "\n");
@@ -138,6 +140,8 @@ import std.meta: AliasSeq;
 @("return.byOverload")
 @safe pure unittest {
     import std.meta: staticMap;
+    import std.traits: ReturnType;
+    static import modules.functions;
 
     alias mod = Module!("modules.functions");
     alias return_(alias F) = F.ReturnType;
@@ -146,7 +150,7 @@ import std.meta: AliasSeq;
     shouldEqual!(
         returnTypes,
         AliasSeq!(
-            int, double, double, void, void, void, void, int,
+            int, double, double, void, void, void, void, int, ReturnType!(modules.functions.voldermort),
         ),
     );
 }

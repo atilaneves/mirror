@@ -45,3 +45,12 @@ static this() { }
 
 
 unittest {}
+
+
+auto voldermort(int i) {
+    static struct Voldermort {
+        int i;
+    }
+
+    return Voldermort(i);
+}

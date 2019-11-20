@@ -48,7 +48,13 @@ template Module(string moduleName) {
        All aggregates, including explicitly defined and appearing in
        function signatures
     */
-    alias AllAggregates = NoDuplicates!(AggregatesTree, AllFunctionReturnTypesTree, AllFunctionParameterTypesTree);
+    alias AllAggregates = Filter!(isAggregate,
+                                  NoDuplicates!(
+                                      AggregatesTree,
+                                      AllFunctionReturnTypesTree,
+                                      AllFunctionParameterTypesTree,
+                                  )
+        );
 }
 
 

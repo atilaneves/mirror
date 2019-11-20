@@ -66,6 +66,11 @@ import ut.ctfe;
                 Type("int"),
                 [Parameter("int", "x", "", PSC.none)],
             ),
+            Function(
+                "voldermort",
+                Type("Voldermort"),
+                [Parameter("int", "i", "", PSC.none)],
+            ),
         ]
     );
 }
@@ -168,6 +173,29 @@ import ut.ctfe;
                     ),
                 ]
             ),
+            FunctionSymbol(
+                "voldermort",
+                [
+                    Function(
+                        "voldermort",
+                        Type("Voldermort"),
+                        [Parameter("int", "i", "", PSC.none)],
+                    ),
+                ]
+            ),
+        ]
+    );
+}
+
+
+@("functions.allAggregates")
+@safe pure unittest {
+    import std.traits: PSC = ParameterStorageClass;
+
+    enum mod = module_!"modules.functions";
+    mod.allAggregates[].shouldBeSameSetAs(
+        [
+            Aggregate("Voldermort", Aggregate.Kind.struct_),
         ]
     );
 }

@@ -35,7 +35,7 @@ import ut.ctfe;
         Aggregate("Outer", Aggregate.Kind.struct_),
     ];
 
-    mod.aggregatesTree[].should == [
+    mod.allAggregates[].should == [
         Aggregate("String", Aggregate.Kind.struct_),
         Aggregate("Enum", Aggregate.Kind.enum_),
         Aggregate("Class", Aggregate.Kind.class_),
