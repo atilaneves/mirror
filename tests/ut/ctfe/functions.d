@@ -4,7 +4,7 @@ module ut.ctfe.functions;
 import ut.ctfe;
 
 
-@("functions")
+@("functions.byOverload")
 @safe pure unittest {
     import std.traits: PSC = ParameterStorageClass;
 
@@ -65,6 +65,108 @@ import ut.ctfe;
                 "identityInt",
                 Type("int"),
                 [Parameter("int", "x", "", PSC.none)],
+            ),
+        ]
+    );
+}
+
+
+@("functions.bySymbol")
+@safe pure unittest {
+    import std.traits: PSC = ParameterStorageClass;
+
+    enum mod = module_!"modules.functions";
+    mod.functionsBySymbol[].shouldBeSameSetAs(
+        [
+            OverloadedFunction(
+                "add1",
+                [
+                    Function(
+                        "add1",
+                        Type("int"),
+                        [
+                            Parameter("int", "i"),
+                            Parameter("int", "j"),
+                        ],
+                    ),
+                    Function(
+                        "add1",
+                        Type("double"),
+                        [
+                            Parameter("double", "d0"),
+                            Parameter("double", "d1"),
+                        ],
+                    ),
+                ]
+            ),
+            OverloadedFunction(
+                "withDefault",
+                [
+                    Function(
+                        "withDefault",
+                        Type("double"),
+                        [
+                            Parameter("double", "fst"),
+                            Parameter("double", "snd", "33.3"),
+                        ],
+                    ),
+                ]
+            ),
+            OverloadedFunction(
+                "storageClasses",
+                [
+                    Function(
+                        "storageClasses",
+                        Type("void"),
+                        [
+                            Parameter("int", "normal", "", PSC.none),
+                            Parameter("int*", "returnScope", "", PSC.return_ | PSC.scope_),
+                            Parameter("int", "out_", "", PSC.out_),
+                            Parameter("int", "ref_", "", PSC.ref_),
+                            Parameter("int", "lazy_", "", PSC.lazy_),
+                        ]
+                    ),
+                ]
+            ),
+            OverloadedFunction(
+                "exportedFunc",
+                [
+                    Function(
+                        "exportedFunc",
+                        Type("void"),
+                        [],
+                    ),
+                ]
+            ),
+            OverloadedFunction(
+                "externC",
+                [
+                    Function(
+                        "externC",
+                        Type("void"),
+                        [],
+                        ),
+                ]
+            ),
+            OverloadedFunction(
+                "externCpp",
+                [
+                    Function(
+                        "externCpp",
+                        Type("void"),
+                        [],
+                        ),
+                ]
+            ),
+            OverloadedFunction(
+                "identityInt",
+                [
+                    Function(
+                        "identityInt",
+                        Type("int"),
+                        [Parameter("int", "x", "", PSC.none)],
+                    ),
+                ]
             ),
         ]
     );
