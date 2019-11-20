@@ -35,6 +35,7 @@ Module module_(string moduleName)() {
 
     enum toAggregate(T) = Aggregate(__traits(identifier, T), toKind!T);
     ret.aggregates = [ staticMap!(toAggregate, module_.Aggregates) ];
+    ret.aggregatesTree = [ staticMap!(toAggregate, module_.AggregatesTree) ];
 
     enum toVariable(alias V) = Variable(V.Type.stringof, V.name);
     ret.variables = [ staticMap!(toVariable, module_.Variables) ];
@@ -91,6 +92,7 @@ Module module_(string moduleName)() {
 struct Module {
     string identifier;
     Aggregate[] aggregates;
+    Aggregate[] aggregatesTree;
     Variable[] variables;
     Function[] functionsByOverload;
     FunctionSymbol[] functionsBySymbol;
