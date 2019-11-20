@@ -33,8 +33,8 @@ Module module_(string moduleName)() {
             static assert(false);
     }
 
-    enum toType(T) = Aggregate(__traits(identifier, T), toKind!T);
-    ret.aggregates = [ staticMap!(toType, module_.Aggregates) ];
+    enum toAggregate(T) = Aggregate(__traits(identifier, T), toKind!T);
+    ret.aggregates = [ staticMap!(toAggregate, module_.Aggregates) ];
 
     enum toVariable(alias V) = Variable(V.Type.stringof, V.name);
     ret.variables = [ staticMap!(toVariable, module_.Variables) ];
@@ -73,7 +73,7 @@ Module module_(string moduleName)() {
     ret.functionsByOverload = [ staticMap!(toFunction, module_.FunctionsByOverload) ];
 
     template toOverloaded(alias F) {
-        enum toOverloaded = OverloadedFunction(
+        enum toOverloaded = FunctionSymbol(
             F.identifier,
             [ staticMap!(toFunction, F.overloads) ]
         );
@@ -93,7 +93,7 @@ struct Module {
     Aggregate[] aggregates;
     Variable[] variables;
     Function[] functionsByOverload;
-    OverloadedFunction[] functionsBySymbol;
+    FunctionSymbol[] functionsBySymbol;
 }
 
 
@@ -130,7 +130,7 @@ struct Variable {
 
 
 /// A set of function overloads
-struct OverloadedFunction {
+struct FunctionSymbol {
     string identifier;
     Function[] overloads;
 }
