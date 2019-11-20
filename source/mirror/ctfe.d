@@ -16,7 +16,7 @@ Module module_(string moduleName)() {
     import std.meta: staticMap;
 
     Module ret;
-    ret.name = moduleName;
+    ret.identifier = moduleName;
 
     alias module_ = ModuleTemplate!moduleName;
 
@@ -89,7 +89,7 @@ Module module_(string moduleName)() {
    A D module.
  */
 struct Module {
-    string name;
+    string identifier;
     Aggregate[] aggregates;
     Variable[] variables;
     Function[] functionsByOverload;
@@ -109,7 +109,7 @@ struct Aggregate {
         interface_,
     }
 
-    string name;
+    string identifier;
     Kind kind;
     Variable[] fields;
     Function[] functions;
@@ -117,27 +117,27 @@ struct Aggregate {
 }
 
 struct Type {
-    string name;
+    string identifier;
     // UDAs?
 }
 
 /// A variable
 struct Variable {
     string type;
-    string name;
+    string identifier;
     // UDAs?
 }
 
 
 /// A set of function overloads
 struct OverloadedFunction {
-    string name;
+    string identifier;
     Function[] overloads;
 }
 
 /// A function
 struct Function {
-    string name;
+    string identifier;
     Type returnType;
     Parameter[] parameters;
     // UDAs?
@@ -150,7 +150,7 @@ struct Parameter {
     import std.traits: ParameterStorageClass;
 
     string type;
-    string name;
+    string identifier;
     string default_;  /// default value, if any
     ParameterStorageClass storageClass;
 }
