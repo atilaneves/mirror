@@ -395,7 +395,16 @@ template Parameters(alias F) {
     alias parameter(size_t i) =
         Parameter!(StdParameters!F[i], ParameterDefaults!F[i], ParameterIdentifierTuple!F[i]);
 
-    alias Parameters = staticMap!(parameter, aliasSeqOf!(StdParameters!F.length.iota));
+    // When a default value is a function pointer, things get... weird
+    alias parameterFallback(size_t i) =
+        Parameter!(StdParameters!F[i], void, ParameterIdentifierTuple!F[i]);
+
+    static if(__traits(compiles, staticMap!(parameter, aliasSeqOf!(StdParameters!F.length.iota))))
+        alias Parameters = staticMap!(parameter, aliasSeqOf!(StdParameters!F.length.iota));
+    else {
+        pragma(msg, "WARNING: Cannot get parameter defaults for `", __traits(identifier, F), "`");
+        alias Parameters = staticMap!(parameterFallback, aliasSeqOf!(StdParameters!F.length.iota));
+    }
 }
 
 /**

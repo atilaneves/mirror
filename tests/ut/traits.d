@@ -497,3 +497,11 @@ static void staticGlobalFunc() {
     static void two(int i, string s, double d = 33.3, int j = 42);
     static assert(NumRequiredParameters!two == 2);
 }
+
+
+@("Parameters.default.function.ptr")
+@safe pure unittest {
+    static string defaultFormatter(int) { return "oops"; }
+    static void func(string function(int) @trusted errorFormatter = &defaultFormatter);
+    alias params = Parameters!func;
+}
