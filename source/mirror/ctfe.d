@@ -74,7 +74,7 @@ Module module_(string moduleName)() {
     ret.functionsByOverload = [ staticMap!(toFunction, module_.FunctionsByOverload) ];
 
     template toOverloaded(alias F) {
-        enum toOverloaded = FunctionSymbol(
+        enum toOverloaded = OverloadSet(
             F.identifier,
             [ staticMap!(toFunction, F.overloads) ]
         );
@@ -95,7 +95,7 @@ struct Module {
     Aggregate[] allAggregates;  // includes all function return types
     Variable[] variables;
     Function[] functionsByOverload;
-    FunctionSymbol[] functionsBySymbol;
+    OverloadSet[] functionsBySymbol;
 }
 
 
@@ -132,7 +132,7 @@ struct Variable {
 
 
 /// A set of function overloads
-struct FunctionSymbol {
+struct OverloadSet {
     string identifier;
     Function[] overloads;
 }
