@@ -15,7 +15,7 @@ import std.meta: Alias;
 template Module(string moduleName) {
 
     import mirror.traits: RecursiveTypeTree, RecursiveFieldTypes, FundamentalType, PublicMembers;
-    import std.meta: Alias, NoDuplicates, Filter;
+    import std.meta: Alias, NoDuplicates, Filter, staticMap;
 
     mixin(`import `, moduleName, `;`);
     private alias mod = Alias!(mixin(moduleName));
@@ -25,7 +25,11 @@ template Module(string moduleName) {
     /// User-defined structs/classes
     alias Aggregates = aggregates!publicMembers;
 
-    private enum isAggregate(T) = is(T == enum) || is(T == struct) || is(T == class) || is(T == interface);
+    private template isAggregate(T) {
+        alias U = FundamentalType!T;
+        enum isAggregate = is(U == enum) || is(U == struct) || is(U == class) || is(U == interface);
+    }
+
     /// User-defined structs/classes and all types contained in them
     alias AggregatesTree = Filter!(isAggregate, RecursiveTypeTree!Aggregates);
 
@@ -48,13 +52,13 @@ template Module(string moduleName) {
        All aggregates, including explicitly defined and appearing in
        function signatures
     */
-    alias AllAggregates = Filter!(isAggregate,
-                                  NoDuplicates!(
-                                      AggregatesTree,
-                                      AllFunctionReturnTypesTree,
-                                      AllFunctionParameterTypesTree,
-                                  )
-        );
+    alias AllAggregates =
+        NoDuplicates!(
+            staticMap!(FundamentalType,
+                       Filter!(isAggregate,
+                               AggregatesTree, AllFunctionReturnTypesTree, AllFunctionParameterTypesTree)
+        )
+    );
 }
 
 

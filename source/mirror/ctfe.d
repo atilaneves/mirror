@@ -21,19 +21,21 @@ Module module_(string moduleName)() {
     alias module_ = ModuleTemplate!moduleName;
 
     template toKind(T) {
-        static if(is(T == enum))
+        import mirror.traits: FundamentalType;
+        alias U = FundamentalType!T;
+        static if(is(U == enum))
             enum toKind = Aggregate.Kind.enum_;
-        else static if(is(T == struct))
+        else static if(is(U == struct))
             enum toKind = Aggregate.Kind.struct_;
-        else static if(is(T == class))
+        else static if(is(U == class))
             enum toKind = Aggregate.Kind.class_;
-        else static if(is(T == interface))
+        else static if(is(U == interface))
             enum toKind = Aggregate.Kind.interface_;
         else
-            static assert(false);
+            static assert(false, "Unknown kind " ~ T.stringof);
     }
 
-    enum toAggregate(T) = Aggregate(__traits(identifier, T), toKind!T);
+    enum toAggregate(T) = Aggregate(T.stringof, toKind!T);
     ret.aggregates = [ staticMap!(toAggregate, module_.Aggregates) ];
     ret.allAggregates = [ staticMap!(toAggregate, module_.AllAggregates) ];
 

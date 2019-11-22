@@ -20,6 +20,7 @@ import std.meta: AliasSeq;
         FunctionSymbol!(externCpp, Protection.public_, Linkage.Cpp),
         FunctionSymbol!(identityInt, Protection.public_, Linkage.D, "identityInt", modules.functions),
         FunctionSymbol!(voldermort, Protection.public_, Linkage.D),
+        FunctionSymbol!(voldermortArray, Protection.public_, Linkage.D),
     );
 
     // pragma(msg, "\n", mod.FunctionsBySymbol.stringof, "\n");
@@ -49,6 +50,7 @@ import std.meta: AliasSeq;
         FunctionOverload!(externCpp, Protection.public_, Linkage.Cpp),
         FunctionOverload!(identityInt, Protection.public_, Linkage.D, "identityInt", modules.functions),
         FunctionOverload!(voldermort, Protection.public_, Linkage.D),
+        FunctionOverload!(voldermortArray, Protection.public_, Linkage.D),
     );
 
     // pragma(msg, "\n", mod.FunctionsByOverload.stringof, "\n");
@@ -150,7 +152,9 @@ import std.meta: AliasSeq;
     shouldEqual!(
         returnTypes,
         AliasSeq!(
-            int, double, double, void, void, void, void, int, ReturnType!(modules.functions.voldermort),
+            int, double, double, void, void, void, void, int,
+            ReturnType!(modules.functions.voldermort),
+            ReturnType!(modules.functions.voldermortArray),
         ),
     );
 }

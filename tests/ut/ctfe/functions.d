@@ -71,6 +71,11 @@ import ut.ctfe;
                 Type("Voldermort"),
                 [Parameter("int", "i", "", PSC.none)],
             ),
+            Function(
+                "voldermortArray",
+                Type("DasVoldermort[]"),
+                [Parameter("int", "i", "", PSC.none)],
+            ),
         ]
     );
 }
@@ -183,6 +188,16 @@ import ut.ctfe;
                     ),
                 ]
             ),
+            OverloadSet(
+                "voldermortArray",
+                [
+                    Function(
+                        "voldermortArray",
+                        Type("DasVoldermort[]"),
+                        [Parameter("int", "i", "", PSC.none)],
+                    ),
+                ]
+            ),
         ]
     );
 }
@@ -196,6 +211,7 @@ import ut.ctfe;
     mod.allAggregates[].shouldBeSameSetAs(
         [
             Aggregate("Voldermort", Aggregate.Kind.struct_),
+            Aggregate("DasVoldermort", Aggregate.Kind.struct_),
         ]
     );
 }

@@ -54,3 +54,13 @@ auto voldermort(int i) {
 
     return Voldermort(i);
 }
+
+
+auto voldermortArray(int i) {
+
+    static struct DasVoldermort {
+        int i;
+    }
+
+    return [DasVoldermort(i)];
+}
