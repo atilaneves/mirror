@@ -83,7 +83,7 @@ import ut.ctfe;
     enum mod = module_!"modules.functions";
     mod.functionsBySymbol[].shouldBeSameSetAs(
         [
-            FunctionSymbol(
+            OverloadSet(
                 "add1",
                 [
                     Function(
@@ -104,7 +104,7 @@ import ut.ctfe;
                     ),
                 ]
             ),
-            FunctionSymbol(
+            OverloadSet(
                 "withDefault",
                 [
                     Function(
@@ -117,7 +117,7 @@ import ut.ctfe;
                     ),
                 ]
             ),
-            FunctionSymbol(
+            OverloadSet(
                 "storageClasses",
                 [
                     Function(
@@ -133,7 +133,7 @@ import ut.ctfe;
                     ),
                 ]
             ),
-            FunctionSymbol(
+            OverloadSet(
                 "exportedFunc",
                 [
                     Function(
@@ -143,7 +143,7 @@ import ut.ctfe;
                     ),
                 ]
             ),
-            FunctionSymbol(
+            OverloadSet(
                 "externC",
                 [
                     Function(
@@ -153,7 +153,7 @@ import ut.ctfe;
                         ),
                 ]
             ),
-            FunctionSymbol(
+            OverloadSet(
                 "externCpp",
                 [
                     Function(
@@ -163,7 +163,7 @@ import ut.ctfe;
                         ),
                 ]
             ),
-            FunctionSymbol(
+            OverloadSet(
                 "identityInt",
                 [
                     Function(
@@ -173,7 +173,7 @@ import ut.ctfe;
                     ),
                 ]
             ),
-            FunctionSymbol(
+            OverloadSet(
                 "voldermort",
                 [
                     Function(
