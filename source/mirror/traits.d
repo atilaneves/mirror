@@ -402,7 +402,8 @@ template Parameters(alias F) {
     static if(__traits(compiles, staticMap!(parameter, aliasSeqOf!(StdParameters!F.length.iota))))
         alias Parameters = staticMap!(parameter, aliasSeqOf!(StdParameters!F.length.iota));
     else {
-        pragma(msg, "WARNING: Cannot get parameter defaults for `", __traits(identifier, F), "`");
+        import std.traits: fullyQualifiedName;
+        pragma(msg, "WARNING: Cannot get parameter defaults for `", fullyQualifiedName!F, "`");
         alias Parameters = staticMap!(parameterFallback, aliasSeqOf!(StdParameters!F.length.iota));
     }
 }
