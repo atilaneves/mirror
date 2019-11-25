@@ -328,7 +328,7 @@ private class RecursiveClass2 {
 }
 
 
-@("MemberFunctions.struct")
+@("MemberFunctionsByOverload.struct")
 @safe @nogc pure unittest {
 
     static struct Struct {
@@ -339,10 +339,10 @@ private class RecursiveClass2 {
         string bar(int i);
     }
 
-    //pragma(msg, "MemberFunctions.struct: ", MemberFunctions!Struct.stringof);
+    //pragma(msg, "MemberFunctionsByOverload.struct: ", MemberFunctionsByOverload!Struct.stringof);
 
     shouldEqual!(
-        MemberFunctions!Struct,
+        MemberFunctionsByOverload!Struct,
         AliasSeq!(
             __traits(getOverloads, Struct, "i")[0],
             __traits(getOverloads, Struct, "i")[1],
@@ -353,7 +353,7 @@ private class RecursiveClass2 {
 }
 
 
-@("MemberFunctions.class")
+@("MemberFunctionsByOverload.class")
 @safe @nogc pure unittest {
 
     static class Class {
@@ -364,10 +364,10 @@ private class RecursiveClass2 {
         string bar(int i) { return "foobar"; }
     }
 
-    //pragma(msg, "MemberFunctions.class: ", MemberFunctions!Class.stringof);
+    //pragma(msg, "MemberFunctionsByOverload.class: ", MemberFunctionsByOverload!Class.stringof);
 
     shouldEqual!(
-        MemberFunctions!Class,
+        MemberFunctionsByOverload!Class,
         AliasSeq!(
             __traits(getOverloads, Class, "i")[0],
             __traits(getOverloads, Class, "i")[1],

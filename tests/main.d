@@ -2,6 +2,7 @@ import unit_threaded;
 
 
 mixin runTestsMain!(
+    "ut.issues",
     "ut.traits",
     "ut.meta.types",
     "ut.ctfe.types",

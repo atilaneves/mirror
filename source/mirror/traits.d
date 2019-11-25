@@ -143,7 +143,7 @@ template isProperty(alias F) {
    All member function symbols in T with overloads represented
    separately.
  */
-template MemberFunctions(T) if(isStruct!T || isClass!T || isInterface!T)
+template MemberFunctionsByOverload(T) if(isStruct!T || isClass!T || isInterface!T)
 {
     import mirror.meta: functionsByOverload, Protection;
     import std.meta: Filter, staticMap;
@@ -151,10 +151,11 @@ template MemberFunctions(T) if(isStruct!T || isClass!T || isInterface!T)
     private enum isPublic(alias F) = F.protection != Protection.private_;
     private alias symbolOf(alias S) = S.symbol;
 
-    alias MemberFunctions = Filter!(isMemberFunction,
-                                    staticMap!(symbolOf,
-                                               Filter!(isPublic,
-                                                       functionsByOverload!(T, PublicMembers!T))));
+    alias MemberFunctionsByOverload =
+        Filter!(isMemberFunction,
+                staticMap!(symbolOf,
+                           Filter!(isPublic,
+                                   functionsByOverload!(T, PublicMembers!T))));
 }
 
 

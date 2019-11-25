@@ -14,8 +14,9 @@ import std.meta: Alias;
  */
 template Module(string moduleName) {
 
-    import mirror.traits: RecursiveTypeTree, RecursiveFieldTypes, FundamentalType, PublicMembers;
-    import std.meta: Alias, NoDuplicates, Filter, staticMap;
+    import mirror.traits: RecursiveTypeTree, RecursiveFieldTypes, FundamentalType, PublicMembers,
+        MemberFunctionsByOverload;
+    import std.meta: Alias, NoDuplicates, Filter, staticMap, templateNot;
 
     mixin(`import `, moduleName, `;`);
     private alias mod = Alias!(mixin(moduleName));
@@ -24,6 +25,10 @@ template Module(string moduleName) {
 
     /// User-defined structs/classes
     alias Aggregates = aggregates!publicMembers;
+    private enum isEnum(T) = is(T == enum);
+    private alias memberFunctions =
+        staticMap!(MemberFunctionsByOverload,
+                   Filter!(templateNot!isEnum, Aggregates));
 
     private template isAggregate(T) {
         alias U = FundamentalType!T;
@@ -42,10 +47,10 @@ template Module(string moduleName) {
     /// List of functions by overload - each overload is a separate entry
     alias FunctionsByOverload = functionsByOverload!(mod, publicMembers);
 
-    alias AllFunctionReturnTypes = allFunctionReturnTypes!FunctionsByOverload;
+    alias AllFunctionReturnTypes = NoDuplicates!(returnTypes!FunctionsByOverload, returnTypes!memberFunctions);
     alias AllFunctionReturnTypesTree = RecursiveTypeTree!AllFunctionReturnTypes;
 
-    alias AllFunctionParameterTypes = allFunctionParameterTypes!FunctionsByOverload;
+    alias AllFunctionParameterTypes = NoDuplicates!(parameterTypes!FunctionsByOverload, parameterTypes!memberFunctions);
     alias AllFunctionParameterTypesTree = RecursiveTypeTree!AllFunctionParameterTypes;
 
     /**
@@ -62,29 +67,41 @@ template Module(string moduleName) {
 }
 
 
-package template allFunctionReturnTypes(functions...) {
+private template returnTypes(functions...) {
 
     import mirror.traits: FundamentalType;
     import std.traits: ReturnType;
     import std.meta: staticMap, NoDuplicates;
 
-    private alias symbol(alias F) = F.symbol;
+    private template symbol(alias F) {
+        import std.traits: isSomeFunction;
+        static if(isSomeFunction!F)
+            alias symbol = F;
+        else
+            alias symbol = F.symbol;
+    }
 
-    alias allFunctionReturnTypes =
+    alias returnTypes =
         NoDuplicates!(staticMap!(FundamentalType,
                                  staticMap!(ReturnType,
                                             staticMap!(symbol, functions))));
 }
 
-package template allFunctionParameterTypes(functions...) {
+private template parameterTypes(functions...) {
 
     import mirror.traits: FundamentalType;
     import std.traits: Parameters;
     import std.meta: staticMap, NoDuplicates;
 
-    private alias symbol(alias F) = F.symbol;
+    private template symbol(alias F) {
+        import std.traits: isSomeFunction;
+        static if(isSomeFunction!F)
+            alias symbol = F;
+        else
+            alias symbol = F.symbol;
+    }
 
-    alias allFunctionParameterTypes =
+    alias parameterTypes =
         NoDuplicates!(staticMap!(FundamentalType,
                                  staticMap!(Parameters,
                                             staticMap!(symbol, functions))));
