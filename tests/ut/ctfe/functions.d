@@ -4,14 +4,53 @@ module ut.ctfe.functions;
 import ut.ctfe;
 
 
+@("pointerMixin.add1")
+unittest {
+    static import modules.functions;
+    import std.traits: Unqual;
+
+    enum mod = module_!"modules.functions";
+    enum add1 = mod.functionsByOverload[0];
+    static assert(add1.identifier == "add1");
+
+    auto add1Ptr = mixin(pointerMixin("add1"));
+    static assert(is(Unqual!(typeof(add1Ptr)) ==
+                     typeof(&__traits(getOverloads, modules.functions, "add1")[0])));
+
+    add1Ptr(1, 2).should == 4;
+    add1Ptr(2, 3).should == 6;
+}
+
+
+@("pointerMixin.withDefault")
+unittest {
+    static import modules.functions;
+    import std.traits: Unqual;
+
+    enum mod = module_!"modules.functions";
+    enum withDefault = mod.functionsByOverload[2];
+    static assert(withDefault.identifier == "withDefault");
+
+    auto withDefaultPtr = mixin(pointerMixin("withDefault"));
+    static assert(is(Unqual!(typeof(withDefaultPtr)) == typeof(&modules.functions.withDefault)));
+
+    withDefaultPtr(1.1, 2.2).should ~ 3.3;
+    // FIXME
+    // pointerSignature doesn't take default arguments or function attributes into account
+    // withDefaultPtr(1.1).should ~ 34.4;
+}
+
+
 @("functions.byOverload")
 @safe pure unittest {
+    static import modules.functions;
     import std.traits: PSC = ParameterStorageClass;
 
     enum mod = module_!"modules.functions";
     mod.functionsByOverload[].shouldBeSameSetAs(
         [
             Function(
+                &__traits(getOverloads, modules.functions, "add1")[0],
                 "add1",
                 Type("int"),
                 [
@@ -20,6 +59,7 @@ import ut.ctfe;
                 ],
             ),
             Function(
+                &__traits(getOverloads, modules.functions, "add1")[1],
                 "add1",
                 Type("double"),
                 [
@@ -28,6 +68,7 @@ import ut.ctfe;
                 ],
             ),
             Function(
+                &modules.functions.withDefault,
                 "withDefault",
                 Type("double"),
                 [
@@ -36,6 +77,7 @@ import ut.ctfe;
                 ],
             ),
             Function(
+                &modules.functions.storageClasses,
                 "storageClasses",
                 Type("void"),
                 [
@@ -47,31 +89,37 @@ import ut.ctfe;
                 ]
             ),
             Function(
+                &modules.functions.exportedFunc,
                 "exportedFunc",
                 Type("void"),
                 [],
             ),
             Function(
+                &modules.functions.externC,
                 "externC",
                 Type("void"),
                 [],
             ),
             Function(
+                &modules.functions.externCpp,
                 "externCpp",
                 Type("void"),
                 [],
             ),
             Function(
+                &modules.functions.identityInt,
                 "identityInt",
                 Type("int"),
                 [Parameter("int", "x", "", PSC.none)],
             ),
             Function(
+                &modules.functions.voldermort,
                 "voldermort",
                 Type("Voldermort"),
                 [Parameter("int", "i", "", PSC.none)],
             ),
             Function(
+                &modules.functions.voldermortArray,
                 "voldermortArray",
                 Type("DasVoldermort[]"),
                 [Parameter("int", "i", "", PSC.none)],
@@ -83,6 +131,7 @@ import ut.ctfe;
 
 @("functions.bySymbol")
 @safe pure unittest {
+    static import modules.functions;
     import std.traits: PSC = ParameterStorageClass;
 
     enum mod = module_!"modules.functions";
@@ -92,6 +141,7 @@ import ut.ctfe;
                 "add1",
                 [
                     Function(
+                        &__traits(getOverloads, modules.functions, "add1")[0],
                         "add1",
                         Type("int"),
                         [
@@ -100,6 +150,7 @@ import ut.ctfe;
                         ],
                     ),
                     Function(
+                        &__traits(getOverloads, modules.functions, "add1")[1],
                         "add1",
                         Type("double"),
                         [
@@ -113,6 +164,7 @@ import ut.ctfe;
                 "withDefault",
                 [
                     Function(
+                        &modules.functions.withDefault,
                         "withDefault",
                         Type("double"),
                         [
@@ -126,6 +178,7 @@ import ut.ctfe;
                 "storageClasses",
                 [
                     Function(
+                        &modules.functions.storageClasses,
                         "storageClasses",
                         Type("void"),
                         [
@@ -142,6 +195,7 @@ import ut.ctfe;
                 "exportedFunc",
                 [
                     Function(
+                        &modules.functions.exportedFunc,
                         "exportedFunc",
                         Type("void"),
                         [],
@@ -152,6 +206,7 @@ import ut.ctfe;
                 "externC",
                 [
                     Function(
+                        &modules.functions.externC,
                         "externC",
                         Type("void"),
                         [],
@@ -162,6 +217,7 @@ import ut.ctfe;
                 "externCpp",
                 [
                     Function(
+                        &modules.functions.externCpp,
                         "externCpp",
                         Type("void"),
                         [],
@@ -172,6 +228,7 @@ import ut.ctfe;
                 "identityInt",
                 [
                     Function(
+                        &modules.functions.identityInt,
                         "identityInt",
                         Type("int"),
                         [Parameter("int", "x", "", PSC.none)],
@@ -182,6 +239,7 @@ import ut.ctfe;
                 "voldermort",
                 [
                     Function(
+                        &modules.functions.voldermort,
                         "voldermort",
                         Type("Voldermort"),
                         [Parameter("int", "i", "", PSC.none)],
@@ -192,6 +250,7 @@ import ut.ctfe;
                 "voldermortArray",
                 [
                     Function(
+                        &modules.functions.voldermortArray,
                         "voldermortArray",
                         Type("DasVoldermort[]"),
                         [Parameter("int", "i", "", PSC.none)],

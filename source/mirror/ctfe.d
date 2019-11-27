@@ -67,6 +67,7 @@ Module module_(string moduleName)() {
         }
 
         enum toFunction = Function(
+            &F.symbol,
             F.identifier,
             Type(ReturnType!(F.symbol).stringof),
             [staticMap!(toParameter, aliasSeqOf!(Parameters!(F.symbol).length.iota))],
@@ -123,6 +124,9 @@ struct Aggregate {
 struct Type {
     string identifier;
     // UDAs?
+    string toString() @safe @nogc pure nothrow const {
+        return identifier;
+    }
 }
 
 /// A variable
@@ -141,11 +145,12 @@ struct OverloadSet {
 
 /// A function
 struct Function {
+    void *untypedPointer;
     string identifier;
     Type returnType;
     Parameter[] parameters;
-    // UDAs?
-    // Function attributes?
+    // TODO: @safe, pure, nothrow, etc.
+    // TODO: UDAs
 }
 
 
@@ -165,3 +170,33 @@ struct Parameter {
 // * Unit tests
 // * Class hierachies
 // * Aliases?
+
+
+string pointerMixin(in string varName) @safe pure {
+    return `mixin(pointerMixin(` ~ varName ~ `, "` ~ varName ~ `"))`;
+}
+
+
+string pointerMixin(in Function function_, in string functionVarName) @safe pure {
+    import std.conv: text;
+    return `() @trusted { return ` ~ function_.pointerCastMixin ~ functionVarName ~ `.untypedPointer; }()`;
+}
+
+
+string pointerCastMixin(in Function function_) @safe pure {
+    import std.conv: text;
+    return text(`cast(`, function_.pointerSignature, `) `);
+}
+
+
+string pointerSignature(in Function function_) @safe pure {
+    import std.conv: text;
+    import std.algorithm: map, joiner;
+
+    return text(
+        function_.returnType,
+        " function(",
+        function_.parameters.map!(p => p.type.text).joiner(", "),
+        ")",
+    );
+}
