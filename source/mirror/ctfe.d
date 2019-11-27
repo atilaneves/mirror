@@ -67,6 +67,7 @@ Module module_(string moduleName)() {
         }
 
         enum toFunction = Function(
+            null,
             F.identifier,
             Type(ReturnType!(F.symbol).stringof),
             [staticMap!(toParameter, aliasSeqOf!(Parameters!(F.symbol).length.iota))],
@@ -141,6 +142,7 @@ struct OverloadSet {
 
 /// A function
 struct Function {
+    void *ptr;
     string identifier;
     Type returnType;
     Parameter[] parameters;

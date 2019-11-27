@@ -6,12 +6,14 @@ import ut.ctfe;
 
 @("functions.byOverload")
 @safe pure unittest {
+    static import modules.functions;
     import std.traits: PSC = ParameterStorageClass;
 
     enum mod = module_!"modules.functions";
     mod.functionsByOverload[].shouldBeSameSetAs(
         [
             Function(
+                null,
                 "add1",
                 Type("int"),
                 [
@@ -20,6 +22,7 @@ import ut.ctfe;
                 ],
             ),
             Function(
+                null,
                 "add1",
                 Type("double"),
                 [
@@ -28,6 +31,7 @@ import ut.ctfe;
                 ],
             ),
             Function(
+                null,
                 "withDefault",
                 Type("double"),
                 [
@@ -36,6 +40,7 @@ import ut.ctfe;
                 ],
             ),
             Function(
+                null,
                 "storageClasses",
                 Type("void"),
                 [
@@ -47,31 +52,37 @@ import ut.ctfe;
                 ]
             ),
             Function(
+                null,
                 "exportedFunc",
                 Type("void"),
                 [],
             ),
             Function(
+                null,
                 "externC",
                 Type("void"),
                 [],
             ),
             Function(
+                null,
                 "externCpp",
                 Type("void"),
                 [],
             ),
             Function(
+                null,
                 "identityInt",
                 Type("int"),
                 [Parameter("int", "x", "", PSC.none)],
             ),
             Function(
+                null,
                 "voldermort",
                 Type("Voldermort"),
                 [Parameter("int", "i", "", PSC.none)],
             ),
             Function(
+                null,
                 "voldermortArray",
                 Type("DasVoldermort[]"),
                 [Parameter("int", "i", "", PSC.none)],
@@ -83,6 +94,7 @@ import ut.ctfe;
 
 @("functions.bySymbol")
 @safe pure unittest {
+    static import modules.functions;
     import std.traits: PSC = ParameterStorageClass;
 
     enum mod = module_!"modules.functions";
@@ -92,6 +104,7 @@ import ut.ctfe;
                 "add1",
                 [
                     Function(
+                        null,
                         "add1",
                         Type("int"),
                         [
@@ -100,6 +113,7 @@ import ut.ctfe;
                         ],
                     ),
                     Function(
+                        null,
                         "add1",
                         Type("double"),
                         [
@@ -113,6 +127,7 @@ import ut.ctfe;
                 "withDefault",
                 [
                     Function(
+                        null,
                         "withDefault",
                         Type("double"),
                         [
@@ -126,6 +141,7 @@ import ut.ctfe;
                 "storageClasses",
                 [
                     Function(
+                        null,
                         "storageClasses",
                         Type("void"),
                         [
@@ -142,6 +158,7 @@ import ut.ctfe;
                 "exportedFunc",
                 [
                     Function(
+                        null,
                         "exportedFunc",
                         Type("void"),
                         [],
@@ -152,6 +169,7 @@ import ut.ctfe;
                 "externC",
                 [
                     Function(
+                        null,
                         "externC",
                         Type("void"),
                         [],
@@ -162,6 +180,7 @@ import ut.ctfe;
                 "externCpp",
                 [
                     Function(
+                        null,
                         "externCpp",
                         Type("void"),
                         [],
@@ -172,6 +191,7 @@ import ut.ctfe;
                 "identityInt",
                 [
                     Function(
+                        null,
                         "identityInt",
                         Type("int"),
                         [Parameter("int", "x", "", PSC.none)],
@@ -182,6 +202,7 @@ import ut.ctfe;
                 "voldermort",
                 [
                     Function(
+                        null,
                         "voldermort",
                         Type("Voldermort"),
                         [Parameter("int", "i", "", PSC.none)],
@@ -192,6 +213,7 @@ import ut.ctfe;
                 "voldermortArray",
                 [
                     Function(
+                        null,
                         "voldermortArray",
                         Type("DasVoldermort[]"),
                         [Parameter("int", "i", "", PSC.none)],
