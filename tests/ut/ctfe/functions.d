@@ -4,6 +4,42 @@ module ut.ctfe.functions;
 import ut.ctfe;
 
 
+@("pointerCastMixin.add1")
+unittest {
+    static import modules.functions;
+    import std.traits: Unqual;
+
+    enum mod = module_!"modules.functions";
+    enum add1 = mod.functionsByOverload[0];
+    static assert(add1.identifier == "add1");
+
+    auto add1Ptr = mixin(`() @trusted { return `, add1.pointerCastMixin, `add1.untypedPointer; }()`);
+    static assert(is(Unqual!(typeof(add1Ptr)) ==
+                     typeof(&__traits(getOverloads, modules.functions, "add1")[0])));
+
+    add1Ptr(1, 2).should == 4;
+    add1Ptr(2, 3).should == 6;
+}
+
+
+@("pointerCastMixin.withDefault")
+unittest {
+    static import modules.functions;
+    import std.traits: Unqual;
+
+    enum mod = module_!"modules.functions";
+    enum withDefault = mod.functionsByOverload[2];
+    static assert(withDefault.identifier == "withDefault");
+
+    auto withDefaultPtr = mixin(`() @trusted { return `, withDefault.pointerCastMixin, `withDefault.untypedPointer; }()`);
+    static assert(is(Unqual!(typeof(withDefaultPtr)) == typeof(&modules.functions.withDefault)));
+
+    withDefaultPtr(1.1, 2.2).should ~ 3.3;
+    // FIXME
+    // withDefaultPtr(1.1).should ~ 34.4;
+}
+
+
 @("functions.byOverload")
 @safe pure unittest {
     static import modules.functions;

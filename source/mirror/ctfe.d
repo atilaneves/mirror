@@ -124,6 +124,9 @@ struct Aggregate {
 struct Type {
     string identifier;
     // UDAs?
+    string toString() @safe @nogc pure nothrow const {
+        return identifier;
+    }
 }
 
 /// A variable
@@ -142,16 +145,12 @@ struct OverloadSet {
 
 /// A function
 struct Function {
-    void *ptr;
+    void *untypedPointer;
     string identifier;
     Type returnType;
     Parameter[] parameters;
-    // UDAs?
-    // Function attributes?
-
-    auto typedPointer()() @trusted {
-        return cast(double function(double, double)) ptr;
-    }
+    // TODO: @safe, pure, nothrow, etc.
+    // TODO: UDAs
 }
 
 
@@ -171,3 +170,21 @@ struct Parameter {
 // * Unit tests
 // * Class hierachies
 // * Aliases?
+
+
+string pointerCastMixin(in Function function_) @safe pure {
+    import std.conv: text;
+    return text(`cast(`, function_.pointerSignature, `) `);
+}
+
+string pointerSignature(in Function function_) @safe pure {
+    import std.conv: text;
+    import std.algorithm: map, joiner;
+
+    return text(
+        function_.returnType,
+        " function(",
+        function_.parameters.map!(p => p.type.text).joiner(", "),
+        ")",
+    );
+}
