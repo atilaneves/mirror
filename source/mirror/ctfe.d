@@ -148,6 +148,10 @@ struct Function {
     Parameter[] parameters;
     // UDAs?
     // Function attributes?
+
+    auto typedPointer()() @trusted {
+        return cast(double function(double, double)) ptr;
+    }
 }
 
 
