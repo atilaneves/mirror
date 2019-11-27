@@ -172,10 +172,22 @@ struct Parameter {
 // * Aliases?
 
 
+string pointerMixin(in string varName) @safe pure {
+    return `mixin(pointerMixin(` ~ varName ~ `, "` ~ varName ~ `"))`;
+}
+
+
+string pointerMixin(in Function function_, in string functionVarName) @safe pure {
+    import std.conv: text;
+    return `() @trusted { return ` ~ function_.pointerCastMixin ~ functionVarName ~ `.untypedPointer; }()`;
+}
+
+
 string pointerCastMixin(in Function function_) @safe pure {
     import std.conv: text;
     return text(`cast(`, function_.pointerSignature, `) `);
 }
+
 
 string pointerSignature(in Function function_) @safe pure {
     import std.conv: text;

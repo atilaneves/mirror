@@ -4,7 +4,7 @@ module ut.ctfe.functions;
 import ut.ctfe;
 
 
-@("pointerCastMixin.add1")
+@("pointerMixin.add1")
 unittest {
     static import modules.functions;
     import std.traits: Unqual;
@@ -13,7 +13,7 @@ unittest {
     enum add1 = mod.functionsByOverload[0];
     static assert(add1.identifier == "add1");
 
-    auto add1Ptr = mixin(`() @trusted { return `, add1.pointerCastMixin, `add1.untypedPointer; }()`);
+    auto add1Ptr = mixin(pointerMixin("add1"));
     static assert(is(Unqual!(typeof(add1Ptr)) ==
                      typeof(&__traits(getOverloads, modules.functions, "add1")[0])));
 
@@ -22,7 +22,7 @@ unittest {
 }
 
 
-@("pointerCastMixin.withDefault")
+@("pointerMixin.withDefault")
 unittest {
     static import modules.functions;
     import std.traits: Unqual;
@@ -31,11 +31,12 @@ unittest {
     enum withDefault = mod.functionsByOverload[2];
     static assert(withDefault.identifier == "withDefault");
 
-    auto withDefaultPtr = mixin(`() @trusted { return `, withDefault.pointerCastMixin, `withDefault.untypedPointer; }()`);
+    auto withDefaultPtr = mixin(pointerMixin("withDefault"));
     static assert(is(Unqual!(typeof(withDefaultPtr)) == typeof(&modules.functions.withDefault)));
 
     withDefaultPtr(1.1, 2.2).should ~ 3.3;
     // FIXME
+    // pointerSignature doesn't take default arguments or function attributes into account
     // withDefaultPtr(1.1).should ~ 34.4;
 }
 
