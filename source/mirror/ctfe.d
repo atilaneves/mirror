@@ -67,7 +67,7 @@ Module module_(string moduleName)() {
         }
 
         enum toFunction = Function(
-            null,
+            &F.symbol,
             F.identifier,
             Type(ReturnType!(F.symbol).stringof),
             [staticMap!(toParameter, aliasSeqOf!(Parameters!(F.symbol).length.iota))],

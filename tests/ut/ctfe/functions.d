@@ -13,7 +13,7 @@ import ut.ctfe;
     mod.functionsByOverload[].shouldBeSameSetAs(
         [
             Function(
-                null,
+                &__traits(getOverloads, modules.functions, "add1")[0],
                 "add1",
                 Type("int"),
                 [
@@ -22,7 +22,7 @@ import ut.ctfe;
                 ],
             ),
             Function(
-                null,
+                &__traits(getOverloads, modules.functions, "add1")[1],
                 "add1",
                 Type("double"),
                 [
@@ -31,7 +31,7 @@ import ut.ctfe;
                 ],
             ),
             Function(
-                null,
+                &modules.functions.withDefault,
                 "withDefault",
                 Type("double"),
                 [
@@ -40,7 +40,7 @@ import ut.ctfe;
                 ],
             ),
             Function(
-                null,
+                &modules.functions.storageClasses,
                 "storageClasses",
                 Type("void"),
                 [
@@ -52,37 +52,37 @@ import ut.ctfe;
                 ]
             ),
             Function(
-                null,
+                &modules.functions.exportedFunc,
                 "exportedFunc",
                 Type("void"),
                 [],
             ),
             Function(
-                null,
+                &modules.functions.externC,
                 "externC",
                 Type("void"),
                 [],
             ),
             Function(
-                null,
+                &modules.functions.externCpp,
                 "externCpp",
                 Type("void"),
                 [],
             ),
             Function(
-                null,
+                &modules.functions.identityInt,
                 "identityInt",
                 Type("int"),
                 [Parameter("int", "x", "", PSC.none)],
             ),
             Function(
-                null,
+                &modules.functions.voldermort,
                 "voldermort",
                 Type("Voldermort"),
                 [Parameter("int", "i", "", PSC.none)],
             ),
             Function(
-                null,
+                &modules.functions.voldermortArray,
                 "voldermortArray",
                 Type("DasVoldermort[]"),
                 [Parameter("int", "i", "", PSC.none)],
@@ -104,7 +104,7 @@ import ut.ctfe;
                 "add1",
                 [
                     Function(
-                        null,
+                        &__traits(getOverloads, modules.functions, "add1")[0],
                         "add1",
                         Type("int"),
                         [
@@ -113,7 +113,7 @@ import ut.ctfe;
                         ],
                     ),
                     Function(
-                        null,
+                        &__traits(getOverloads, modules.functions, "add1")[1],
                         "add1",
                         Type("double"),
                         [
@@ -127,7 +127,7 @@ import ut.ctfe;
                 "withDefault",
                 [
                     Function(
-                        null,
+                        &modules.functions.withDefault,
                         "withDefault",
                         Type("double"),
                         [
@@ -141,7 +141,7 @@ import ut.ctfe;
                 "storageClasses",
                 [
                     Function(
-                        null,
+                        &modules.functions.storageClasses,
                         "storageClasses",
                         Type("void"),
                         [
@@ -158,7 +158,7 @@ import ut.ctfe;
                 "exportedFunc",
                 [
                     Function(
-                        null,
+                        &modules.functions.exportedFunc,
                         "exportedFunc",
                         Type("void"),
                         [],
@@ -169,7 +169,7 @@ import ut.ctfe;
                 "externC",
                 [
                     Function(
-                        null,
+                        &modules.functions.externC,
                         "externC",
                         Type("void"),
                         [],
@@ -180,7 +180,7 @@ import ut.ctfe;
                 "externCpp",
                 [
                     Function(
-                        null,
+                        &modules.functions.externCpp,
                         "externCpp",
                         Type("void"),
                         [],
@@ -191,7 +191,7 @@ import ut.ctfe;
                 "identityInt",
                 [
                     Function(
-                        null,
+                        &modules.functions.identityInt,
                         "identityInt",
                         Type("int"),
                         [Parameter("int", "x", "", PSC.none)],
@@ -202,7 +202,7 @@ import ut.ctfe;
                 "voldermort",
                 [
                     Function(
-                        null,
+                        &modules.functions.voldermort,
                         "voldermort",
                         Type("Voldermort"),
                         [Parameter("int", "i", "", PSC.none)],
@@ -213,7 +213,7 @@ import ut.ctfe;
                 "voldermortArray",
                 [
                     Function(
-                        null,
+                        &modules.functions.voldermortArray,
                         "voldermortArray",
                         Type("DasVoldermort[]"),
                         [Parameter("int", "i", "", PSC.none)],
