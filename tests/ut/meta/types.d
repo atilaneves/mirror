@@ -35,6 +35,7 @@ import ut.meta;
             "EvenInner",
             "Inner2",
             "Outer",
+            "Char",
         ]
     );
 }

@@ -33,6 +33,7 @@ import ut.ctfe;
         Aggregate("EvenInner", Aggregate.Kind.struct_),
         Aggregate("Inner2", Aggregate.Kind.struct_),
         Aggregate("Outer", Aggregate.Kind.struct_),
+        Aggregate("Char", Aggregate.Kind.enum_),
     ];
 
     mod.allAggregates[].should == [
@@ -48,6 +49,7 @@ import ut.ctfe;
         Aggregate("EvenInner", Aggregate.Kind.struct_),
         Aggregate("Inner2", Aggregate.Kind.struct_),
         Aggregate("Outer", Aggregate.Kind.struct_),
+        Aggregate("Char", Aggregate.Kind.enum_),
     ];
 }
 

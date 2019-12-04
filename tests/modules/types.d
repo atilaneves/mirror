@@ -76,3 +76,9 @@ struct Outer {
     Inner1[] inner1s;
     Inner2 inner2;
 }
+
+
+enum Char: char {
+    a = 'a',
+    b = 'b',
+}

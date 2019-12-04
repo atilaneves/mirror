@@ -15,7 +15,7 @@ import std.meta: AliasSeq;
     alias mod = Module!"modules.types";
     alias aggregates = mod.Aggregates;
     alias enums = Filter!(isEnum, aggregates);
-    static assert(is(enums == AliasSeq!(modules.types.Enum)), enums.stringof);
+    shouldEqual!(enums, AliasSeq!(modules.types.Enum, modules.types.Char));
 }
 
 
