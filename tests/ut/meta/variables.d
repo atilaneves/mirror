@@ -16,7 +16,8 @@ import std.meta: AliasSeq;
             Variable!(int, "gInt"),
             Variable!(double, "gDouble"),
             Variable!(modules.variables.Struct, "gStruct"),
-            Variable!(int, "CONSTANT"),
+            Variable!(int, "CONSTANT_INT"),
+            Variable!(string, "CONSTANT_STRING"),
             Variable!(immutable int, "gImmutableInt"),
         )
     );

@@ -7,6 +7,7 @@ struct Struct {}
 
 Struct gStruct;
 
-enum CONSTANT = 42;
+enum CONSTANT_INT = 42;
+enum CONSTANT_STRING = "foobar";
 
 immutable int gImmutableInt;

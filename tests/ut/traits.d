@@ -505,3 +505,15 @@ static void staticGlobalFunc() {
     static void func(string function(int) @trusted errorFormatter = &defaultFormatter);
     alias params = Parameters!func;
 }
+
+
+@("isMutableSymbol")
+@safe pure unittest {
+    static import modules.variables;
+    static assert( isMutableSymbol!(modules.variables.gInt));
+    static assert( isMutableSymbol!(modules.variables.gDouble));
+    static assert( isMutableSymbol!(modules.variables.gStruct));
+    static assert(!isMutableSymbol!(modules.variables.CONSTANT_INT));
+    static assert(!isMutableSymbol!(modules.variables.CONSTANT_STRING));
+    static assert(!isMutableSymbol!(modules.variables.gImmutableInt));
+}

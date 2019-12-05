@@ -435,3 +435,13 @@ template PublicFieldNames(T) {
     enum isPublic(string fieldName) = __traits(getProtection, __traits(getMember, T, fieldName)) == "public";
     alias PublicFieldNames = Filter!(isPublic, FieldNameTuple!T);
 }
+
+
+template isMutableSymbol(alias symbol) {
+    import std.traits: isMutable;
+
+    static if(isMutable!(typeof(symbol))) {
+        enum isMutableSymbol = __traits(compiles, symbol = symbol.init);
+    } else
+        enum isMutableSymbol = false;
+}
