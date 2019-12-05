@@ -135,8 +135,9 @@ private template variables(publicMembers...) {
         ;
 
     private template toVariable(alias member) {
-        alias T = typeof(member.symbol);
-        enum id = __traits(identifier, member.symbol);
+        alias T = member.Type;
+        enum id = member.identifier;
+
         static if(__traits(compiles, Variable!(T, id, member.symbol, !isMutableSymbol!(member.symbol))))
             alias toVariable = Variable!(T, id, member.symbol, !isMutableSymbol!(member.symbol));
         else
