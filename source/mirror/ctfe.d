@@ -39,7 +39,7 @@ Module module_(string moduleName)() {
     ret.aggregates = [ staticMap!(toAggregate, module_.Aggregates) ];
     ret.allAggregates = [ staticMap!(toAggregate, module_.AllAggregates) ];
 
-    enum toVariable(alias V) = Variable(V.Type.stringof, V.name);
+    enum toVariable(alias V) = Variable(V.Type.stringof, V.identifier);
     ret.variables = [ staticMap!(toVariable, module_.Variables) ];
 
     template toFunction(alias F) {

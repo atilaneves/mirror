@@ -137,7 +137,7 @@ private template variables(publicMembers...) {
  */
 template Variable(T, string N) {
     alias Type = T;
-    enum name = N;
+    enum identifier = N;
 }
 
 
