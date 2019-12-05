@@ -125,23 +125,23 @@ package template aggregates(publicMembers...) {
 
 // Global variables
 private template variables(publicMembers...) {
+    import mirror.traits: isMutableSymbol;
     import std.meta: staticMap, Filter;
 
     private enum isVariable(alias member) =
-        is(typeof(member.symbol)) &&
-        !is(typeof(member.symbol) == function);
+        is(typeof(member.symbol))
+        && !is(typeof(member.symbol) == function)
+        && is(typeof(member.symbol.init))
+        ;
 
     private template toVariable(alias member) {
         alias T = typeof(member.symbol);
         enum id = __traits(identifier, member.symbol);
-        static if(__traits(compiles, Variable!(T, id, member.symbol)))
-            alias toVariable = Variable!(T, id, member.symbol);
+        static if(__traits(compiles, Variable!(T, id, member.symbol, !isMutableSymbol!(member.symbol))))
+            alias toVariable = Variable!(T, id, member.symbol, !isMutableSymbol!(member.symbol));
         else
-            alias toVariable = Variable!(T, id, member.symbol.init);
-
+            alias toVariable = Variable!(T, id, T.init, !isMutableSymbol!(member.symbol));
     }
-    // private alias toVariable(alias member) =
-    //     Variable!(typeof(member.symbol), __traits(identifier, member.symbol), member.symbol.init);
 
     alias variables = staticMap!(toVariable, Filter!(isVariable, publicMembers));
 }
@@ -149,10 +149,11 @@ private template variables(publicMembers...) {
 /**
    A global variable.
  */
-template Variable(T, string N, alias V) {
+template Variable(T, string N, alias V, bool C) {
     alias Type = T;
     enum identifier = N;
     enum value = V;
+    enum isConstant = C;
 }
 
 
