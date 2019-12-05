@@ -1,7 +1,7 @@
 module modules.variables;
 
 int gInt;
-double gDouble;
+immutable gDouble = 33.3;
 
 struct Struct {}
 
@@ -10,4 +10,4 @@ Struct gStruct;
 enum CONSTANT_INT = 42;
 enum CONSTANT_STRING = "foobar";
 
-immutable int gImmutableInt;
+immutable int gImmutableInt = 77;

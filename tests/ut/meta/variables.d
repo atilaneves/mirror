@@ -10,17 +10,8 @@ import std.meta: AliasSeq;
     static import modules.variables;
 
     alias mod = Module!("modules.variables");
-    shouldEqual!(
-        mod.Variables,
-        AliasSeq!(
-            Variable!(int, "gInt"),
-            Variable!(double, "gDouble"),
-            Variable!(modules.variables.Struct, "gStruct"),
-            Variable!(int, "CONSTANT_INT"),
-            Variable!(string, "CONSTANT_STRING"),
-            Variable!(immutable int, "gImmutableInt"),
-        )
-    );
+    static assert(__traits(isSame, mod.Variables[0], Variable!(int, "gInt", 0)));
+    static assert(__traits(isSame, mod.Variables[3], Variable!(int, "CONSTANT_INT", 42)));
 }
 
 
@@ -35,7 +26,7 @@ import std.meta: AliasSeq;
     shouldEqual!(
         mod.Variables,
         AliasSeq!(
-            Variable!(int[], "gInts"),
+            Variable!(int[], "gInts", (int[]).init),
         )
     );
 }

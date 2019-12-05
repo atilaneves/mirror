@@ -127,17 +127,32 @@ package template aggregates(publicMembers...) {
 private template variables(publicMembers...) {
     import std.meta: staticMap, Filter;
 
-    private enum isVariable(alias member) = is(typeof(member.symbol));
-    private alias toVariable(alias member) = Variable!(typeof(member.symbol), __traits(identifier, member.symbol));
+    private enum isVariable(alias member) =
+        is(typeof(member.symbol)) &&
+        !is(typeof(member.symbol) == function);
+
+    private template toVariable(alias member) {
+        alias T = typeof(member.symbol);
+        enum id = __traits(identifier, member.symbol);
+        static if(__traits(compiles, Variable!(T, id, member.symbol)))
+            alias toVariable = Variable!(T, id, member.symbol);
+        else
+            alias toVariable = Variable!(T, id, member.symbol.init);
+
+    }
+    // private alias toVariable(alias member) =
+    //     Variable!(typeof(member.symbol), __traits(identifier, member.symbol), member.symbol.init);
+
     alias variables = staticMap!(toVariable, Filter!(isVariable, publicMembers));
 }
 
 /**
    A global variable.
  */
-template Variable(T, string N) {
+template Variable(T, string N, alias V) {
     alias Type = T;
     enum identifier = N;
+    enum value = V;
 }
 
 

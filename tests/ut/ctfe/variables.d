@@ -10,7 +10,7 @@ import ut.ctfe;
     mod.variables[].shouldBeSameSetAs(
         [
             Variable("int", "gInt"),
-            Variable("double", "gDouble"),
+            Variable("immutable(double)", "gDouble"),
             Variable("Struct", "gStruct"),
             Variable("int", "CONSTANT_INT"),
             Variable("string", "CONSTANT_STRING"),
