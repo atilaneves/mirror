@@ -4,6 +4,18 @@ module ut.ctfe.functions;
 import ut.ctfe;
 
 
+@("call.add1")
+unittest {
+    import std.traits: Unqual;
+
+    enum mod = module_!"modules.functions";
+    enum add1 = mod.functionsByOverload[0];
+    mixin(`import `, mod.identifier, `;`);
+    mixin(mod.identifier, `.`, add1.identifier, `(1, 2)`).should == 4;
+    mixin(mod.identifier, `.`, add1.identifier, `(2, 3)`).should == 6;
+}
+
+
 @("pointerMixin.add1")
 unittest {
     static import modules.functions;
