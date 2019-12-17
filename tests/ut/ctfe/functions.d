@@ -4,6 +4,21 @@ module ut.ctfe.functions;
 import ut.ctfe;
 
 
+@("call.add1")
+unittest {
+    import std.traits: Unqual;
+
+    enum mod = module_!"modules.functions";
+    enum add1 = mod.functionsByOverload[0];
+
+    mixin(add1.importMixin);
+    mixin(mod.identifier, `.`, add1.identifier, `(1, 2)`).should == 4;
+    mixin(mod.identifier, `.`, add1.identifier, `(2, 3)`).should == 6;
+    // or, easier...
+    mixin(add1.callMixin(1, 2)).should == 4;
+}
+
+
 @("pointerMixin.add1")
 unittest {
     static import modules.functions;
@@ -50,6 +65,7 @@ unittest {
     mod.functionsByOverload[].shouldBeSameSetAs(
         [
             Function(
+                "modules.functions",
                 &__traits(getOverloads, modules.functions, "add1")[0],
                 "add1",
                 Type("int"),
@@ -59,6 +75,7 @@ unittest {
                 ],
             ),
             Function(
+                "modules.functions",
                 &__traits(getOverloads, modules.functions, "add1")[1],
                 "add1",
                 Type("double"),
@@ -68,6 +85,7 @@ unittest {
                 ],
             ),
             Function(
+                "modules.functions",
                 &modules.functions.withDefault,
                 "withDefault",
                 Type("double"),
@@ -77,6 +95,7 @@ unittest {
                 ],
             ),
             Function(
+                "modules.functions",
                 &modules.functions.storageClasses,
                 "storageClasses",
                 Type("void"),
@@ -89,36 +108,42 @@ unittest {
                 ]
             ),
             Function(
+                "modules.functions",
                 &modules.functions.exportedFunc,
                 "exportedFunc",
                 Type("void"),
                 [],
             ),
             Function(
+                "modules.functions",
                 &modules.functions.externC,
                 "externC",
                 Type("void"),
                 [],
             ),
             Function(
+                "modules.functions",
                 &modules.functions.externCpp,
                 "externCpp",
                 Type("void"),
                 [],
             ),
             Function(
+                "modules.functions",
                 &modules.functions.identityInt,
                 "identityInt",
                 Type("int"),
                 [Parameter("int", "x", "", PSC.none)],
             ),
             Function(
+                "modules.functions",
                 &modules.functions.voldermort,
                 "voldermort",
                 Type("Voldermort"),
                 [Parameter("int", "i", "", PSC.none)],
             ),
             Function(
+                "modules.functions",
                 &modules.functions.voldermortArray,
                 "voldermortArray",
                 Type("DasVoldermort[]"),
@@ -141,6 +166,7 @@ unittest {
                 "add1",
                 [
                     Function(
+                        "modules.functions",
                         &__traits(getOverloads, modules.functions, "add1")[0],
                         "add1",
                         Type("int"),
@@ -150,6 +176,7 @@ unittest {
                         ],
                     ),
                     Function(
+                        "modules.functions",
                         &__traits(getOverloads, modules.functions, "add1")[1],
                         "add1",
                         Type("double"),
@@ -164,6 +191,7 @@ unittest {
                 "withDefault",
                 [
                     Function(
+                        "modules.functions",
                         &modules.functions.withDefault,
                         "withDefault",
                         Type("double"),
@@ -178,6 +206,7 @@ unittest {
                 "storageClasses",
                 [
                     Function(
+                        "modules.functions",
                         &modules.functions.storageClasses,
                         "storageClasses",
                         Type("void"),
@@ -195,6 +224,7 @@ unittest {
                 "exportedFunc",
                 [
                     Function(
+                        "modules.functions",
                         &modules.functions.exportedFunc,
                         "exportedFunc",
                         Type("void"),
@@ -206,6 +236,7 @@ unittest {
                 "externC",
                 [
                     Function(
+                        "modules.functions",
                         &modules.functions.externC,
                         "externC",
                         Type("void"),
@@ -217,6 +248,7 @@ unittest {
                 "externCpp",
                 [
                     Function(
+                        "modules.functions",
                         &modules.functions.externCpp,
                         "externCpp",
                         Type("void"),
@@ -228,6 +260,7 @@ unittest {
                 "identityInt",
                 [
                     Function(
+                        "modules.functions",
                         &modules.functions.identityInt,
                         "identityInt",
                         Type("int"),
@@ -239,6 +272,7 @@ unittest {
                 "voldermort",
                 [
                     Function(
+                        "modules.functions",
                         &modules.functions.voldermort,
                         "voldermort",
                         Type("Voldermort"),
@@ -250,6 +284,7 @@ unittest {
                 "voldermortArray",
                 [
                     Function(
+                        "modules.functions",
                         &modules.functions.voldermortArray,
                         "voldermortArray",
                         Type("DasVoldermort[]"),
