@@ -194,7 +194,7 @@ template PublicMembers(alias A) {
     import mirror.traits: isPrivate;
     import std.meta: Filter, staticMap, Alias, AliasSeq;
 
-    private alias member(string name) = NameToMember!(A, name);
+    private alias member(string name) = MemberFromName!(A, name);
     private alias members = staticMap!(member, __traits(allMembers, A));
 
     // In the `member` template above, if it's not possible to get a member from `A`,
@@ -211,7 +211,7 @@ template PublicMembers(alias A) {
 }
 
 
-template NameToMember(alias parent, string name) {
+template MemberFromName(alias parent, string name) {
     import std.meta: Alias;
 
     enum identifier = name;

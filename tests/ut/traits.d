@@ -522,19 +522,11 @@ static void staticGlobalFunc() {
 @("isVariable")
 @safe pure unittest {
     static import modules.variables;
+    import mirror.traits: MemberFromName;
 
-    template member(alias S) {
-        enum identifier = __traits(identifier, symbol);
-        alias symbol = S;
-        static if(is(symbol))
-            alias Type = symbol;
-        else static if(is(typeof(symbol)))
-            alias Type = typeof(symbol);
-        else
-            alias Type = void;
-    }
+    alias member(string name) = MemberFromName!(modules.variables, name);
 
-    static assert( isVariable!(member!(modules.variables.gInt)));
-    static assert(!isVariable!(member!(modules.variables.Struct)));
-    static assert(!isVariable!(member!(modules.variables.templateFunction)));
+    static assert( isVariable!(member!"gInt"));
+    static assert(!isVariable!(member!"Struct"));
+    static assert(!isVariable!(member!"templateFunction"));
 }
