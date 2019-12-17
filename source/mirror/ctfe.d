@@ -67,6 +67,7 @@ Module module_(string moduleName)() {
         }
 
         enum toFunction = Function(
+            moduleName,
             &F.symbol,
             F.identifier,
             Type(ReturnType!(F.symbol).stringof),
@@ -145,12 +146,26 @@ struct OverloadSet {
 
 /// A function
 struct Function {
+    string moduleName;
     void *untypedPointer;
     string identifier;
     Type returnType;
     Parameter[] parameters;
     // TODO: @safe, pure, nothrow, etc.
     // TODO: UDAs
+
+
+    string importMixin() @safe pure nothrow const {
+        return `static import ` ~ moduleName ~ `;`;
+    }
+
+    string callMixin(A...)(auto ref A args) {
+        import std.conv: text;
+        import std.array: join;
+        import std.algorithm: map;
+        import std.range: only;
+        return text(moduleName, `.`, identifier, `(`, only(args).map!text.join(`, `), `)`);
+    }
 }
 
 
