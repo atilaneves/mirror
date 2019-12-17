@@ -517,3 +517,16 @@ static void staticGlobalFunc() {
     static assert(!isMutableSymbol!(modules.variables.CONSTANT_STRING));
     static assert(!isMutableSymbol!(modules.variables.gImmutableInt));
 }
+
+
+@("isVariable")
+@safe pure unittest {
+    static import modules.variables;
+    import mirror.traits: MemberFromName;
+
+    alias member(string name) = MemberFromName!(modules.variables, name);
+
+    static assert( isVariable!(member!"gInt"));
+    static assert(!isVariable!(member!"Struct"));
+    static assert(!isVariable!(member!"templateFunction"));
+}

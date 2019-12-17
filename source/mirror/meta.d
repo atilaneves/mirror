@@ -125,14 +125,8 @@ package template aggregates(publicMembers...) {
 
 // Global variables
 private template variables(publicMembers...) {
-    import mirror.traits: isMutableSymbol;
+    import mirror.traits: isMutableSymbol, isVariable;
     import std.meta: staticMap, Filter;
-
-    private enum isVariable(alias member) =
-        is(typeof(member.symbol))
-        && !is(typeof(member.symbol) == function)
-        && is(typeof(member.symbol.init))
-        ;
 
     private template toVariable(alias member) {
         alias T = member.Type;
