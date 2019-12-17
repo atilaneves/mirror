@@ -445,3 +445,14 @@ template isMutableSymbol(alias symbol) {
     } else
         enum isMutableSymbol = false;
 }
+
+
+template isVariable(alias member) {
+
+    enum isVariable =
+        is(typeof(member.symbol))
+        && !is(typeof(member.symbol) == function)
+        && !is(typeof(member.symbol) == void)  // can happen with templates
+        && is(typeof(member.symbol.init))
+        ;
+}

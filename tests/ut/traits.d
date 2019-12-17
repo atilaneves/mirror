@@ -517,3 +517,24 @@ static void staticGlobalFunc() {
     static assert(!isMutableSymbol!(modules.variables.CONSTANT_STRING));
     static assert(!isMutableSymbol!(modules.variables.gImmutableInt));
 }
+
+
+@("isVariable")
+@safe pure unittest {
+    static import modules.variables;
+
+    template member(alias S) {
+        enum identifier = __traits(identifier, symbol);
+        alias symbol = S;
+        static if(is(symbol))
+            alias Type = symbol;
+        else static if(is(typeof(symbol)))
+            alias Type = typeof(symbol);
+        else
+            alias Type = void;
+    }
+
+    static assert( isVariable!(member!(modules.variables.gInt)));
+    static assert(!isVariable!(member!(modules.variables.Struct)));
+    static assert(!isVariable!(member!(modules.variables.templateFunction)));
+}
