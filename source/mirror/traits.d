@@ -194,25 +194,7 @@ template PublicMembers(alias A) {
     import mirror.traits: isPrivate;
     import std.meta: Filter, staticMap, Alias, AliasSeq;
 
-    package template member(string name) {
-
-        enum identifier = name;
-
-        static if(__traits(compiles, Alias!(__traits(getMember, A, name)))) {
-
-            alias symbol = Alias!(__traits(getMember, A, name));
-
-            static if(is(symbol))
-                alias Type = symbol;
-            else static if(is(typeof(symbol)))
-                alias Type = typeof(symbol);
-            else
-                alias Type = void;
-
-        } else
-            alias symbol = void;
-    }
-
+    private alias member(string name) = NameToMember!(A, name);
     private alias members = staticMap!(member, __traits(allMembers, A));
 
     // In the `member` template above, if it's not possible to get a member from `A`,
@@ -226,6 +208,27 @@ template PublicMembers(alias A) {
     private enum notPrivate(alias member) = !isPrivate!(member.symbol);
 
     alias PublicMembers = Filter!(notPrivate, goodMembers);
+}
+
+
+template NameToMember(alias parent, string name) {
+    import std.meta: Alias;
+
+    enum identifier = name;
+
+    static if(__traits(compiles, Alias!(__traits(getMember, parent, name)))) {
+
+        alias symbol = Alias!(__traits(getMember, parent, name));
+
+        static if(is(symbol))
+            alias Type = symbol;
+        else static if(is(typeof(symbol)))
+            alias Type = typeof(symbol);
+        else
+            alias Type = void;
+
+    } else
+        alias symbol = void;
 }
 
 
