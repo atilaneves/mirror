@@ -16,6 +16,8 @@ unittest {
     mixin(mod.identifier, `.`, add1.identifier, `(2, 3)`).should == 6;
     // or, easier...
     mixin(add1.callMixin(1, 2)).should == 4;
+    auto arg = 2;
+    mixin(add1.callMixin("arg", 2)).should == 5;
 }
 
 
