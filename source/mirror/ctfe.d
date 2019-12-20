@@ -163,8 +163,17 @@ struct Function {
         import std.conv: text;
         import std.array: join;
         import std.algorithm: map;
-        import std.range: only;
-        return text(moduleName, `.`, identifier, `(`, only(args).map!text.join(`, `), `)`);
+
+        string[] argTexts;
+
+        static foreach(arg; args) {
+            argTexts ~= arg.text;
+        }
+
+        return text(
+            moduleName, `.`, identifier, `(`,
+            argTexts.map!text.join(`, `),
+            `)`);
     }
 }
 
