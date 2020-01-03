@@ -4,6 +4,52 @@ module ut.ctfe.functions;
 import ut.ctfe;
 
 
+@("wrapper.add1")
+unittest {
+    import blub;
+    import std.format: format;
+
+    enum mod = module_!"modules.functions";
+    enum add1 = mod.functionsByOverload[0];
+    mixin(add1.importMixin);
+
+    enum mixinStr = q{
+        auto wrap(Blub arg0, Blub arg1) {
+            import blub;
+            %s
+            return %s.toBlub;
+        }
+    }.format(add1.importMixin, add1.callMixin("arg0.to!int", "arg1.to!int"));
+
+    pragma(msg, mixinStr);
+    mixin(mixinStr);
+    wrap(Blub(1), Blub(2)).should == Blub(4);
+}
+
+
+@("wrapper.concatFoo")
+unittest {
+    import blub;
+    import std.format: format;
+
+    enum mod = module_!"modules.functions";
+    enum concatFoo = mod.functionsByOverload[10];
+    mixin(concatFoo.importMixin);
+
+    enum mixinStr = q{
+        auto wrap(Blub arg0, Blub arg1) {
+            import blub;
+            %s
+            return %s.toBlub;
+        }
+    }.format(concatFoo.importMixin, concatFoo.callMixin("arg0.to!string", "arg1.to!string"));
+
+    pragma(msg, mixinStr);
+    mixin(mixinStr);
+    wrap(Blub("hmmm"), Blub("quux")).should == Blub("hmmmquuxfoo");
+}
+
+
 @("call.add1")
 unittest {
     import std.traits: Unqual;
@@ -151,6 +197,16 @@ unittest {
                 Type("DasVoldermort[]"),
                 [Parameter("int", "i", "", PSC.none)],
             ),
+            Function(
+                "modules.functions",
+                &modules.functions.concatFoo,
+                "concatFoo",
+                Type("string"),
+                [
+                    Parameter("string", "s0", "", PSC.none),
+                    Parameter("string", "s1", "", PSC.none),
+                ],
+            ),
         ]
     );
 }
@@ -292,6 +348,22 @@ unittest {
                         Type("DasVoldermort[]"),
                         [Parameter("int", "i", "", PSC.none)],
                     ),
+                ]
+            ),
+            OverloadSet(
+                "concatFoo",
+                [
+                    Function(
+                        "modules.functions",
+                        &modules.functions.concatFoo,
+                        "concatFoo",
+                        Type("string"),
+                        [
+                            Parameter("string", "s0", "", PSC.none),
+                            Parameter("string", "s1", "", PSC.none),
+                        ],
+                    ),
+
                 ]
             ),
         ]

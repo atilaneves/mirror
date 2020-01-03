@@ -64,3 +64,8 @@ auto voldermortArray(int i) {
 
     return [DasVoldermort(i)];
 }
+
+
+string concatFoo(string s0, string s1) {
+    return s0 ~ s1 ~ "foo";
+}
