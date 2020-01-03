@@ -13,7 +13,7 @@ unittest {
     enum add1 = mod.functionsByOverload[0];
 
     enum mixinStr = blubWrapperMixin(add1);
-    pragma(msg, mixinStr);
+    //pragma(msg, mixinStr);
     mixin(mixinStr);
 
     wrap(Blub(1), Blub(2)).should == Blub(4);
@@ -29,7 +29,7 @@ unittest {
     enum concatFoo = mod.functionsByOverload[10];
 
     enum mixinStr = blubWrapperMixin(concatFoo);
-    pragma(msg, mixinStr);
+    //pragma(msg, mixinStr);
     mixin(mixinStr);
 
     wrap(Blub("hmmm"), Blub(42), Blub("quux")).should == Blub("hmmm42quuxfoo");
@@ -42,7 +42,7 @@ private string blubWrapperMixin(Function function_) @safe pure {
     import std.array: join;
     import std.algorithm: map;
     import std.range: iota;
-    import std.array: array;
+    import std.format: format;
 
     string[] lines;
 
@@ -52,14 +52,19 @@ private string blubWrapperMixin(Function function_) @safe pure {
     }
 
     const numParams = function_.parameters.length;
-    lines ~= "auto wrap(" ~ numParams.iota.map!(i => "Blub " ~ argName(i)).join(", ") ~ ")";
-    lines ~= "{";
-    lines ~= "    import blub;";
-    lines ~= "    " ~ function_.importMixin;
-    lines ~= "    return " ~ function_.callMixin(numParams.iota.map!(i => argName(i) ~ ".to!" ~ function_.parameters[i].type).join(", ")) ~ ".toBlub;";
-    lines ~= "}";
 
-    return lines.join("\n");
+    return q{
+        auto wrap(%s)
+        {
+            import blub;
+            %s
+            return %s
+        }
+    }.format(
+        numParams.iota.map!(i => "Blub " ~ argName(i)).join(", "),
+        function_.importMixin,
+        function_.callMixin(numParams.iota.map!(i => argName(i) ~ ".to!" ~ function_.parameters[i].type).join(", ")) ~ ".toBlub;"
+    );
 }
 
 
