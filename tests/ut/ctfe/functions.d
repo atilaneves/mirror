@@ -12,7 +12,7 @@ unittest {
     enum mod = module_!"modules.functions";
     enum add1 = mod.functionsByOverload[0];
 
-    enum mixinStr = blubWrapperMixin(add1, "int");
+    enum mixinStr = blubWrapperMixin(add1);
     pragma(msg, mixinStr);
     mixin(mixinStr);
 
@@ -20,7 +20,23 @@ unittest {
 }
 
 
-string blubWrapperMixin(Function function_, string type) @safe pure {
+@("wrapper.concatFoo")
+unittest {
+    import blub;
+    import std.format: format;
+
+    enum mod = module_!"modules.functions";
+    enum concatFoo = mod.functionsByOverload[10];
+
+    enum mixinStr = blubWrapperMixin(concatFoo);
+    pragma(msg, mixinStr);
+    mixin(mixinStr);
+
+    wrap(Blub("hmmm"), Blub(42), Blub("quux")).should == Blub("hmmm42quuxfoo");
+}
+
+
+private string blubWrapperMixin(Function function_) @safe pure {
     assert(__ctfe);
 
     import std.array: join;
@@ -40,26 +56,10 @@ string blubWrapperMixin(Function function_, string type) @safe pure {
     lines ~= "{";
     lines ~= "    import blub;";
     lines ~= "    " ~ function_.importMixin;
-    lines ~= "    return " ~ function_.callMixin(numParams.iota.map!(i => argName(i) ~ ".to!" ~ type).join(", ")) ~ ".toBlub;";
+    lines ~= "    return " ~ function_.callMixin(numParams.iota.map!(i => argName(i) ~ ".to!" ~ function_.parameters[i].type).join(", ")) ~ ".toBlub;";
     lines ~= "}";
 
     return lines.join("\n");
-}
-
-
-@("wrapper.concatFoo")
-unittest {
-    import blub;
-    import std.format: format;
-
-    enum mod = module_!"modules.functions";
-    enum concatFoo = mod.functionsByOverload[10];
-
-    enum mixinStr = blubWrapperMixin(concatFoo, "string");
-    pragma(msg, mixinStr);
-    mixin(mixinStr);
-
-    wrap(Blub("hmmm"), Blub("quux")).should == Blub("hmmmquuxfoo");
 }
 
 
@@ -217,6 +217,7 @@ unittest {
                 Type("string"),
                 [
                     Parameter("string", "s0", "", PSC.none),
+                    Parameter("int",    "i",  "", PSC.none),
                     Parameter("string", "s1", "", PSC.none),
                 ],
             ),
@@ -373,6 +374,7 @@ unittest {
                         Type("string"),
                         [
                             Parameter("string", "s0", "", PSC.none),
+                            Parameter("int",    "i",  "", PSC.none),
                             Parameter("string", "s1", "", PSC.none),
                         ],
                     ),

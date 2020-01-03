@@ -66,6 +66,7 @@ auto voldermortArray(int i) {
 }
 
 
-string concatFoo(string s0, string s1) {
-    return s0 ~ s1 ~ "foo";
+string concatFoo(string s0, int i, string s1) {
+    import std.conv: text;
+    return s0 ~ i.text ~ s1 ~ "foo";
 }
