@@ -11,19 +11,39 @@ unittest {
 
     enum mod = module_!"modules.functions";
     enum add1 = mod.functionsByOverload[0];
-    mixin(add1.importMixin);
 
-    enum mixinStr = q{
-        auto wrap(Blub arg0, Blub arg1) {
-            import blub;
-            %s
-            return %s.toBlub;
-        }
-    }.format(add1.importMixin, add1.callMixin("arg0.to!int", "arg1.to!int"));
-
+    enum mixinStr = blubWrapperMixin(add1, "int");
     pragma(msg, mixinStr);
     mixin(mixinStr);
+
     wrap(Blub(1), Blub(2)).should == Blub(4);
+}
+
+
+string blubWrapperMixin(Function function_, string type) @safe pure {
+    assert(__ctfe);
+
+    import std.array: join;
+    import std.algorithm: map;
+    import std.range: iota;
+    import std.array: array;
+
+    string[] lines;
+
+    static string argName(size_t i) {
+        import std.conv: text;
+        return text("arg", i);
+    }
+
+    const numParams = function_.parameters.length;
+    lines ~= "auto wrap(" ~ numParams.iota.map!(i => "Blub " ~ argName(i)).join(", ") ~ ")";
+    lines ~= "{";
+    lines ~= "    import blub;";
+    lines ~= "    " ~ function_.importMixin;
+    lines ~= "    return " ~ function_.callMixin(numParams.iota.map!(i => argName(i) ~ ".to!" ~ type).join(", ")) ~ ".toBlub;";
+    lines ~= "}";
+
+    return lines.join("\n");
 }
 
 
@@ -34,18 +54,11 @@ unittest {
 
     enum mod = module_!"modules.functions";
     enum concatFoo = mod.functionsByOverload[10];
-    mixin(concatFoo.importMixin);
 
-    enum mixinStr = q{
-        auto wrap(Blub arg0, Blub arg1) {
-            import blub;
-            %s
-            return %s.toBlub;
-        }
-    }.format(concatFoo.importMixin, concatFoo.callMixin("arg0.to!string", "arg1.to!string"));
-
+    enum mixinStr = blubWrapperMixin(concatFoo, "string");
     pragma(msg, mixinStr);
     mixin(mixinStr);
+
     wrap(Blub("hmmm"), Blub("quux")).should == Blub("hmmmquuxfoo");
 }
 
