@@ -10,4 +10,5 @@ mixin runTestsMain!(
     "ut.ctfe.variables",
     "ut.meta.functions",
     "ut.ctfe.functions",
+    "ut.ctfe.wrap",
 );
