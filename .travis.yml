@@ -3,7 +3,6 @@ sudo: false
 
 matrix:
   include:
-    - d: dmd-2.089.0
     - d: dmd-2.088.1
     - d: dmd-2.087.1
     - d: ldc-1.18.0

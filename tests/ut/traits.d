@@ -378,6 +378,22 @@ private class RecursiveClass2 {
 }
 
 
+@("MemberFunctionsByOverload.std.stdio.File")
+@safe @nogc pure unittest {
+    import std.stdio: File;
+    alias functions = MemberFunctionsByOverload!File;
+    static assert(functions.length > 0);
+}
+
+@("MemberFunctionsByOverload.CtorProtectionsStruct")
+@safe @nogc pure unittest {
+    import modules.issues: CtorProtectionsStruct;
+    alias functions = MemberFunctionsByOverload!CtorProtectionsStruct;
+    pragma(msg, functions.stringof);
+    static assert(functions.length == 1);  // the only public constructor
+}
+
+
 @("PublicMembers.std.socket")
 @safe @nogc pure unittest {
     import std.socket;

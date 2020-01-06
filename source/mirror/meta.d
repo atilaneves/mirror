@@ -218,7 +218,11 @@ package template functionsByOverload(alias parent, publicMembers...) {
     }
 
     private template memberToOverloads(alias member) {
-        private alias overloadSymbols = __traits(getOverloads, parent, member.identifier);
+        private enum isPublic(alias symbol) =
+            __traits(getProtection, symbol) == "public"
+            || __traits(getProtection, symbol) == "export";
+        // the reason we need to filter here is that some of the overloads might be private
+        private alias overloadSymbols = Filter!(isPublic, __traits(getOverloads, parent, member.identifier));
         private alias toOverload(alias symbol) = overload!(symbol, member.identifier);
         alias memberToOverloads = staticMap!(toOverload, overloadSymbols);
     }
