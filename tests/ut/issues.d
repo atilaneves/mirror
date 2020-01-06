@@ -15,6 +15,7 @@ import std.meta: AliasSeq;
         mod.AllAggregates,
         AliasSeq!(
             modules.issues.Issue1,
+            modules.issues.CtorProtectionsStruct,
             modules.issues.Issue1.String,
         ),
     );

@@ -151,6 +151,9 @@ template MemberFunctionsByOverload(T) if(isStruct!T || isClass!T || isInterface!
     private enum isPublic(alias F) = F.protection != Protection.private_;
     private alias symbolOf(alias S) = S.symbol;
 
+    alias members = PublicMembers!T;
+    alias overloads = functionsByOverload!(T, members);
+
     alias MemberFunctionsByOverload =
         Filter!(isMemberFunction,
                 staticMap!(symbolOf,
