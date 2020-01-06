@@ -151,6 +151,17 @@ unittest {
                 Type("DasVoldermort[]"),
                 [Parameter("int", "i", "", PSC.none)],
             ),
+            Function(
+                "modules.functions",
+                &modules.functions.concatFoo,
+                "concatFoo",
+                Type("string"),
+                [
+                    Parameter("string", "s0", "", PSC.none),
+                    Parameter("int",    "i",  "", PSC.none),
+                    Parameter("string", "s1", "", PSC.none),
+                ],
+            ),
         ]
     );
 }
@@ -292,6 +303,23 @@ unittest {
                         Type("DasVoldermort[]"),
                         [Parameter("int", "i", "", PSC.none)],
                     ),
+                ]
+            ),
+            OverloadSet(
+                "concatFoo",
+                [
+                    Function(
+                        "modules.functions",
+                        &modules.functions.concatFoo,
+                        "concatFoo",
+                        Type("string"),
+                        [
+                            Parameter("string", "s0", "", PSC.none),
+                            Parameter("int",    "i",  "", PSC.none),
+                            Parameter("string", "s1", "", PSC.none),
+                        ],
+                    ),
+
                 ]
             ),
         ]

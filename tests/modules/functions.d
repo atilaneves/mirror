@@ -64,3 +64,9 @@ auto voldermortArray(int i) {
 
     return [DasVoldermort(i)];
 }
+
+
+string concatFoo(string s0, int i, string s1) {
+    import std.conv: text;
+    return s0 ~ i.text ~ s1 ~ "foo";
+}
