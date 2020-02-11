@@ -16,6 +16,7 @@ import std.meta: AliasSeq;
         AliasSeq!(
             modules.issues.Issue1,
             modules.issues.CtorProtectionsStruct,
+            modules.issues.Issue9,
             modules.issues.Issue1.String,
         ),
     );

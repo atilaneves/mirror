@@ -14,3 +14,6 @@ struct CtorProtectionsStruct {
     private this(int i, string s) {}
     package this(string s, int i) {}
 }
+
+
+struct Issue9;
