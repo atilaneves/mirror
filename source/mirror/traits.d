@@ -93,7 +93,15 @@ private template RecursiveFieldTypesImpl(T, alreadySeen...) {
 
     static if(isStructOrClass!T) {
 
-        private alias fields = AliasSeq!(T.tupleof);
+        // This check is to deal with forward references such as std.variant.This.
+        // For some reason, checking for __traits(compiles, T.tupleof) always returns
+        // true, but checking the length actually does what we want.
+        // See modules.issues.Issue9.
+        static if(T.tupleof.length)
+            private alias fields = AliasSeq!(T.tupleof);
+        else
+            private alias fields = AliasSeq!();
+
         private alias publicFields = Filter!(templateNot!isPrivate, fields);
         private alias type(alias symbol) = typeof(symbol);
         private alias types = staticMap!(type, fields);
