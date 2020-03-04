@@ -1,7 +1,6 @@
 /**
    A fictional language implemented in D
  */
-
 module blub;
 
 

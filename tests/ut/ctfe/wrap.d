@@ -1,3 +1,6 @@
+/**
+   Tests for using CTFE mirror to wrap calling D code from a foreign language.
+ */
 module ut.ctfe.wrap;
 
 
@@ -36,6 +39,9 @@ unittest {
 }
 
 
+// Returns a string to be mixed in that defines a function `wrap`
+// That calls converts blub types to D ones, calls `function_` then
+// converts the result from D to blub.
 private string blubWrapperMixin(Function function_) @safe pure {
     assert(__ctfe);
 
@@ -52,17 +58,29 @@ private string blubWrapperMixin(Function function_) @safe pure {
     }
 
     const numParams = function_.parameters.length;
+    // what goes in the function signature between the parens
+    const wrapParams = numParams
+        .iota
+        .map!(i => "Blub " ~ argName(i))
+        .join(", ")
+        ;
+    // the arguments to pass to the wrapped D function
+    const dArgs = numParams
+        .iota
+        .map!(i => argName(i) ~ ".to!" ~ function_.parameters[i].type)
+        .join(", ")
+        ;
 
     return q{
-        auto wrap(%s)
+        auto wrap(%s /*dArgs*/)
         {
-            import blub;
-            %s
-            return %s
+            import blub: toBlub, to;
+            %s  // import mixin
+            return %s.toBlub;
         }
     }.format(
-        numParams.iota.map!(i => "Blub " ~ argName(i)).join(", "),
+        wrapParams,
         function_.importMixin,
-        function_.callMixin(numParams.iota.map!(i => argName(i) ~ ".to!" ~ function_.parameters[i].type).join(", ")) ~ ".toBlub;"
+        function_.callMixin(dArgs)
     );
 }
