@@ -36,7 +36,7 @@ struct Blub {
     }
 
     string asString() @safe @nogc pure const {
-        if(kind != Kind.string) throw new Exception("not an int");
+        if(kind != Kind.string) throw new Exception("not a string");
         return _string;
     }
 }
