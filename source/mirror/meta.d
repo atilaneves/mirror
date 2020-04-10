@@ -212,18 +212,35 @@ package template functionsByOverload(alias parent, publicMembers...) {
 
     private alias functionMembers = Filter!(memberIsRegularFunction, publicMembers);
 
-    private template overload(alias S, string I) {
+    private template overload(alias S, string I, size_t Idx) {
         alias symbol = S;
         enum identifier = I;
+        enum index = Idx;
+    }
+
+    template symbolsWithIndex(A...) {
+        import std.range: iota;
+        import std.meta: aliasSeqOf, staticMap;
+
+        template Result(alias S, size_t I) {
+            alias symbol = S;
+            enum index = I;
+        }
+
+        alias toResult(size_t I) = Result!(A[I], I);
+
+        alias symbolsWithIndex = staticMap!(toResult, aliasSeqOf!(A.length.iota));
     }
 
     private template memberToOverloads(alias member) {
-        private enum isPublic(alias symbol) =
-            __traits(getProtection, symbol) == "public"
-            || __traits(getProtection, symbol) == "export";
+        private template isPublic(alias S) {
+            enum isPublic =  __traits(getProtection, S.symbol) == "public"
+                || __traits(getProtection, S.symbol) == "export";
+        }
+        alias overloadsWithIndex = symbolsWithIndex!(__traits(getOverloads, parent, member.identifier));
         // the reason we need to filter here is that some of the overloads might be private
-        private alias overloadSymbols = Filter!(isPublic, __traits(getOverloads, parent, member.identifier));
-        private alias toOverload(alias symbol) = overload!(symbol, member.identifier);
+        private alias overloadSymbols = Filter!(isPublic, overloadsWithIndex);
+        private alias toOverload(alias symbol) = overload!(symbol.symbol, member.identifier, symbol.index);
         alias memberToOverloads = staticMap!(toOverload, overloadSymbols);
     }
 
@@ -233,6 +250,7 @@ package template functionsByOverload(alias parent, publicMembers...) {
         __traits(getLinkage, overload.symbol).toLinkage,
         overload.identifier,
         parent,
+        overload.index,
     );
 
     alias functionsByOverload = staticMap!(toFunction, staticMap!(memberToOverloads, functionMembers));
@@ -250,6 +268,7 @@ template FunctionOverload(
     Linkage L = __traits(getLinkage, F).toLinkage,
     string I = __traits(identifier, F),
     alias Parent = Alias!(__traits(parent, F)),
+    size_t Idx = 0,
 )
 {
     import mirror.traits: Parameters;
@@ -260,6 +279,7 @@ template FunctionOverload(
     alias linkage = L;
     enum identifier = I;
     alias parent = Parent;
+    enum index = Idx;
 
     alias ReturnType = RT!symbol;
     alias parameters = Parameters!F;

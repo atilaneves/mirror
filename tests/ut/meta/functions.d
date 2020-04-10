@@ -43,7 +43,7 @@ import std.meta: AliasSeq;
 
     alias expected = AliasSeq!(
         FunctionOverload!(add1Int, Protection.public_, Linkage.D),
-        FunctionOverload!(add1Double, Protection.public_, Linkage.D),
+        FunctionOverload!(add1Double, Protection.public_, Linkage.D, "add1", modules.functions, 1),
         FunctionOverload!(withDefault, Protection.public_, Linkage.D),
         FunctionOverload!(storageClasses, Protection.public_, Linkage.D),
         FunctionOverload!(exportedFunc, Protection.export_, Linkage.D),

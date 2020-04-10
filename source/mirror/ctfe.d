@@ -68,7 +68,7 @@ Module module_(string moduleName)() {
 
         enum toFunction = Function(
             moduleName,
-            &F.symbol,
+            F.index,
             F.identifier,
             Type(ReturnType!(F.symbol).stringof),
             [staticMap!(toParameter, aliasSeqOf!(Parameters!(F.symbol).length.iota))],
@@ -77,10 +77,25 @@ Module module_(string moduleName)() {
 
     ret.functionsByOverload = [ staticMap!(toFunction, module_.FunctionsByOverload) ];
 
+    template withIndex(A...) {
+        import std.range: iota;
+        import std.meta: aliasSeqOf;
+
+        template overload(alias F, size_t I) {
+            alias symbol = F.symbol;
+            enum identifier = F.identifier;
+            enum index = I;
+        }
+
+        alias toOverload(size_t I) = overload!(A[I], I);
+
+        alias withIndex = staticMap!(toOverload, aliasSeqOf!(A.length.iota));
+    }
+
     template toOverloaded(alias F) {
         enum toOverloaded = OverloadSet(
             F.identifier,
-            [ staticMap!(toFunction, F.overloads) ]
+            [ staticMap!(toFunction, withIndex!(F.overloads)) ]
         );
     }
 
@@ -147,7 +162,7 @@ struct OverloadSet {
 /// A function
 struct Function {
     string moduleName;
-    void *untypedPointer;
+    int overloadIndex;
     string identifier;
     Type returnType;
     Parameter[] parameters;
@@ -175,6 +190,27 @@ struct Function {
             argTexts.map!text.join(`, `),
             `)`);
     }
+
+    string fullyQualifiedName() @safe pure nothrow const {
+        return moduleName ~ "." ~ identifier;
+    }
+
+    string pointerMixin() @safe pure nothrow const {
+        import std.conv: text;
+        return text(`&__traits(getOverloads, `, moduleName, `, "`, identifier, `")[`, overloadIndex, `]`);
+    }
+}
+
+auto pointer(Function function_)() {
+    mixin(`static import `, function_.moduleName, `;`);
+
+    alias overloads = __traits(
+        getOverloads,
+        mixin(function_.moduleName),
+        function_.identifier
+    );
+
+    return &overloads[function_.overloadIndex];
 }
 
 
@@ -194,33 +230,3 @@ struct Parameter {
 // * Unit tests
 // * Class hierachies
 // * Aliases?
-
-
-string pointerMixin(in string varName) @safe pure {
-    return `mixin(pointerMixin(` ~ varName ~ `, "` ~ varName ~ `"))`;
-}
-
-
-string pointerMixin(in Function function_, in string functionVarName) @safe pure {
-    import std.conv: text;
-    return `() @trusted { return ` ~ function_.pointerCastMixin ~ functionVarName ~ `.untypedPointer; }()`;
-}
-
-
-string pointerCastMixin(in Function function_) @safe pure {
-    import std.conv: text;
-    return text(`cast(`, function_.pointerSignature, `) `);
-}
-
-
-string pointerSignature(in Function function_) @safe pure {
-    import std.conv: text;
-    import std.algorithm: map, joiner;
-
-    return text(
-        function_.returnType,
-        " function(",
-        function_.parameters.map!(p => p.type.text).joiner(", "),
-        ")",
-    );
-}
