@@ -4,7 +4,7 @@ module ut.ctfe.functions;
 import ut.ctfe;
 
 
-@("call.add1")
+@("callMixin.add1")
 unittest {
     import std.traits: Unqual;
 
@@ -20,6 +20,58 @@ unittest {
     mixin(add1.callMixin(1, 2)).should == 4;
     auto arg = 2;
     mixin(add1.callMixin("arg", 2)).should == 5;
+}
+
+
+@("pointerMixin_.byOverload.add1.0")
+unittest {
+    enum mod = module_!"modules.functions";
+    enum add1 = mod.functionsByOverload[0];
+
+    mixin(add1.importMixin);
+
+    auto ptr = mixin(add1.pointerMixin_);
+    static assert(is(typeof(ptr) == int function(int, int)));
+
+    ptr(1, 2).should == 4;
+    ptr(2, 3).should == 6;
+}
+
+
+@("pointerMixin_.byOverload.add1.1")
+unittest {
+    enum mod = module_!"modules.functions";
+    enum add1 = mod.functionsByOverload[1];
+
+    mixin(add1.importMixin);
+
+    auto ptr = mixin(add1.pointerMixin_);
+    static assert(is(typeof(ptr) == double function(double, double)));
+
+    ptr(1.0, 2.0).should == 4.0;
+    ptr(2.0, 3.0).should == 6.0;
+}
+
+
+@("pointerMixin_.bySymbol.add1")
+unittest {
+    enum mod = module_!"modules.functions";
+    enum add1 = mod.functionsBySymbol[0];
+
+    enum add1Int = add1.overloads[0];
+    enum add1Double = add1.overloads[1];
+
+    mixin(add1Int.importMixin);
+
+    auto ptrInt = mixin(add1Int.pointerMixin_);
+    static assert(is(typeof(ptrInt) == int function(int, int)));
+    ptrInt(1, 2).should == 4;
+    ptrInt(2, 3).should == 6;
+
+    auto ptrDouble = mixin(add1Double.pointerMixin_);
+    static assert(is(typeof(ptrDouble) == double function(double, double)));
+    ptrDouble(1.0, 2.0).should == 4.0;
+    ptrDouble(2.0, 3.0).should == 6.0;
 }
 
 
@@ -71,6 +123,7 @@ unittest {
             Function(
                 "modules.functions",
                 &__traits(getOverloads, modules.functions, "add1")[0],
+                0,
                 "add1",
                 Type("int"),
                 [
@@ -81,6 +134,7 @@ unittest {
             Function(
                 "modules.functions",
                 &__traits(getOverloads, modules.functions, "add1")[1],
+                1,
                 "add1",
                 Type("double"),
                 [
@@ -91,6 +145,7 @@ unittest {
             Function(
                 "modules.functions",
                 &modules.functions.withDefault,
+                0,
                 "withDefault",
                 Type("double"),
                 [
@@ -101,6 +156,7 @@ unittest {
             Function(
                 "modules.functions",
                 &modules.functions.storageClasses,
+                0,
                 "storageClasses",
                 Type("void"),
                 [
@@ -114,6 +170,7 @@ unittest {
             Function(
                 "modules.functions",
                 &modules.functions.exportedFunc,
+                0,
                 "exportedFunc",
                 Type("void"),
                 [],
@@ -121,6 +178,7 @@ unittest {
             Function(
                 "modules.functions",
                 &modules.functions.externC,
+                0,
                 "externC",
                 Type("void"),
                 [],
@@ -128,6 +186,7 @@ unittest {
             Function(
                 "modules.functions",
                 &modules.functions.externCpp,
+                0,
                 "externCpp",
                 Type("void"),
                 [],
@@ -135,6 +194,7 @@ unittest {
             Function(
                 "modules.functions",
                 &modules.functions.identityInt,
+                0,
                 "identityInt",
                 Type("int"),
                 [Parameter("int", "x", "", PSC.none)],
@@ -142,6 +202,7 @@ unittest {
             Function(
                 "modules.functions",
                 &modules.functions.voldermort,
+                0,
                 "voldermort",
                 Type("Voldermort"),
                 [Parameter("int", "i", "", PSC.none)],
@@ -149,6 +210,7 @@ unittest {
             Function(
                 "modules.functions",
                 &modules.functions.voldermortArray,
+                0,
                 "voldermortArray",
                 Type("DasVoldermort[]"),
                 [Parameter("int", "i", "", PSC.none)],
@@ -156,6 +218,7 @@ unittest {
             Function(
                 "modules.functions",
                 &modules.functions.concatFoo,
+                0,
                 "concatFoo",
                 Type("string"),
                 [
@@ -183,6 +246,7 @@ unittest {
                     Function(
                         "modules.functions",
                         &__traits(getOverloads, modules.functions, "add1")[0],
+                        0,
                         "add1",
                         Type("int"),
                         [
@@ -193,6 +257,7 @@ unittest {
                     Function(
                         "modules.functions",
                         &__traits(getOverloads, modules.functions, "add1")[1],
+                        1,
                         "add1",
                         Type("double"),
                         [
@@ -208,6 +273,7 @@ unittest {
                     Function(
                         "modules.functions",
                         &modules.functions.withDefault,
+                        0,
                         "withDefault",
                         Type("double"),
                         [
@@ -223,6 +289,7 @@ unittest {
                     Function(
                         "modules.functions",
                         &modules.functions.storageClasses,
+                        0,
                         "storageClasses",
                         Type("void"),
                         [
@@ -241,6 +308,7 @@ unittest {
                     Function(
                         "modules.functions",
                         &modules.functions.exportedFunc,
+                        0,
                         "exportedFunc",
                         Type("void"),
                         [],
@@ -253,6 +321,7 @@ unittest {
                     Function(
                         "modules.functions",
                         &modules.functions.externC,
+                        0,
                         "externC",
                         Type("void"),
                         [],
@@ -265,6 +334,7 @@ unittest {
                     Function(
                         "modules.functions",
                         &modules.functions.externCpp,
+                        0,
                         "externCpp",
                         Type("void"),
                         [],
@@ -277,6 +347,7 @@ unittest {
                     Function(
                         "modules.functions",
                         &modules.functions.identityInt,
+                        0,
                         "identityInt",
                         Type("int"),
                         [Parameter("int", "x", "", PSC.none)],
@@ -289,6 +360,7 @@ unittest {
                     Function(
                         "modules.functions",
                         &modules.functions.voldermort,
+                        0,
                         "voldermort",
                         Type("Voldermort"),
                         [Parameter("int", "i", "", PSC.none)],
@@ -301,6 +373,7 @@ unittest {
                     Function(
                         "modules.functions",
                         &modules.functions.voldermortArray,
+                        0,
                         "voldermortArray",
                         Type("DasVoldermort[]"),
                         [Parameter("int", "i", "", PSC.none)],
@@ -313,6 +386,7 @@ unittest {
                     Function(
                         "modules.functions",
                         &modules.functions.concatFoo,
+                        0,
                         "concatFoo",
                         Type("string"),
                         [

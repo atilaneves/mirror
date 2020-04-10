@@ -69,6 +69,7 @@ Module module_(string moduleName)() {
         enum toFunction = Function(
             moduleName,
             &F.symbol,
+            F.index,
             F.identifier,
             Type(ReturnType!(F.symbol).stringof),
             [staticMap!(toParameter, aliasSeqOf!(Parameters!(F.symbol).length.iota))],
@@ -77,10 +78,25 @@ Module module_(string moduleName)() {
 
     ret.functionsByOverload = [ staticMap!(toFunction, module_.FunctionsByOverload) ];
 
+    template withIndex(A...) {
+        import std.range: iota;
+        import std.meta: aliasSeqOf;
+
+        template overload(alias F, size_t I) {
+            alias symbol = F.symbol;
+            enum identifier = F.identifier;
+            enum index = I;
+        }
+
+        alias toOverload(size_t I) = overload!(A[I], I);
+
+        alias withIndex = staticMap!(toOverload, aliasSeqOf!(A.length.iota));
+    }
+
     template toOverloaded(alias F) {
         enum toOverloaded = OverloadSet(
             F.identifier,
-            [ staticMap!(toFunction, F.overloads) ]
+            [ staticMap!(toFunction, withIndex!(F.overloads)) ]
         );
     }
 
@@ -148,6 +164,7 @@ struct OverloadSet {
 struct Function {
     string moduleName;
     void *untypedPointer;
+    int overloadIndex;
     string identifier;
     Type returnType;
     Parameter[] parameters;
@@ -180,6 +197,22 @@ struct Function {
         return moduleName ~ "." ~ identifier;
     }
 
+    string pointerMixin_() @safe pure nothrow const {
+        import std.conv: text;
+        return text(`&__traits(getOverloads, `, moduleName, `, "`, identifier, `")[`, overloadIndex, `]`);
+    }
+}
+
+auto pointer(Function function_)() {
+    mixin(`static import `, function_.moduleName, `;`);
+
+    alias overloads = __traits(
+        getOverloads,
+        mixin(function_.moduleName),
+        function_.identifier
+    );
+
+    return &overloads[function_.overloadIndex];
 }
 
 
