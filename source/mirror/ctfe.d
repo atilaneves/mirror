@@ -68,7 +68,6 @@ Module module_(string moduleName)() {
 
         enum toFunction = Function(
             moduleName,
-            &F.symbol,
             F.index,
             F.identifier,
             Type(ReturnType!(F.symbol).stringof),
@@ -163,7 +162,6 @@ struct OverloadSet {
 /// A function
 struct Function {
     string moduleName;
-    void *untypedPointer;
     int overloadIndex;
     string identifier;
     Type returnType;
@@ -197,7 +195,7 @@ struct Function {
         return moduleName ~ "." ~ identifier;
     }
 
-    string pointerMixin_() @safe pure nothrow const {
+    string pointerMixin() @safe pure nothrow const {
         import std.conv: text;
         return text(`&__traits(getOverloads, `, moduleName, `, "`, identifier, `")[`, overloadIndex, `]`);
     }
@@ -232,33 +230,3 @@ struct Parameter {
 // * Unit tests
 // * Class hierachies
 // * Aliases?
-
-
-string pointerMixin(in string varName) @safe pure {
-    return `mixin(pointerMixin(` ~ varName ~ `, "` ~ varName ~ `"))`;
-}
-
-
-string pointerMixin(in Function function_, in string functionVarName) @safe pure {
-    import std.conv: text;
-    return `() @trusted { return ` ~ function_.pointerCastMixin ~ functionVarName ~ `.untypedPointer; }()`;
-}
-
-
-string pointerCastMixin(in Function function_) @safe pure {
-    import std.conv: text;
-    return text(`cast(`, function_.pointerSignature, `) `);
-}
-
-
-string pointerSignature(in Function function_) @safe pure {
-    import std.conv: text;
-    import std.algorithm: map, joiner;
-
-    return text(
-        function_.returnType,
-        " function(",
-        function_.parameters.map!(p => p.type.text).joiner(", "),
-        ")",
-    );
-}
