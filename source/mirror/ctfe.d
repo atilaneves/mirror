@@ -175,6 +175,11 @@ struct Function {
             argTexts.map!text.join(`, `),
             `)`);
     }
+
+    string fullyQualifiedName() @safe pure nothrow const {
+        return moduleName ~ "." ~ identifier;
+    }
+
 }
 
 

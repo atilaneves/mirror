@@ -12,8 +12,10 @@ unittest {
     enum add1 = mod.functionsByOverload[0];
 
     mixin(add1.importMixin);
-    mixin(mod.identifier, `.`, add1.identifier, `(1, 2)`).should == 4;
-    mixin(mod.identifier, `.`, add1.identifier, `(2, 3)`).should == 6;
+
+    mixin(add1.fullyQualifiedName, `(1, 2)`).should == 4;
+    mixin(add1.fullyQualifiedName, `(2, 3)`).should == 6;
+
     // or, easier...
     mixin(add1.callMixin(1, 2)).should == 4;
     auto arg = 2;
