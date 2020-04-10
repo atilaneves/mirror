@@ -75,6 +75,22 @@ unittest {
 }
 
 
+@("pointerMixin_.byOverload.withDefault")
+unittest {
+    static import modules.functions;
+
+    enum mod = module_!"modules.functions";
+    enum withDefault = mod.functionsByOverload[2];
+    static assert(withDefault.identifier == "withDefault");
+
+    auto ptr = mixin(withDefault.pointerMixin_);
+    (ptr is &modules.functions.withDefault).should == true;
+
+    ptr(1.1, 2.2).should ~ 3.3;
+    ptr(1.1).should ~ 34.4;
+}
+
+
 @("pointerMixin.add1")
 unittest {
     static import modules.functions;
