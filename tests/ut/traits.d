@@ -393,7 +393,7 @@ private class RecursiveClass2 {
 @safe @nogc pure unittest {
     import modules.issues: CtorProtectionsStruct;
     alias functions = MemberFunctionsByOverload!CtorProtectionsStruct;
-    pragma(msg, functions.stringof);
+    //pragma(msg, functions.stringof);
     static assert(functions.length == 1);  // the only public constructor
 }
 
@@ -549,4 +549,58 @@ static void staticGlobalFunc() {
     static assert( isVariable!(member!"gInt"));
     static assert(!isVariable!(member!"Struct"));
     static assert(!isVariable!(member!"templateFunction"));
+}
+
+
+@("Fields.struct.0")
+@safe pure unittest {
+
+    static struct Struct {
+        int i;
+        string s;
+    }
+
+    shouldEqual!(
+        Fields!Struct,
+        Field!(int, "i"), Field!(string, "s"),
+    );
+}
+
+
+@("Fields.struct.1")
+@safe pure unittest {
+
+    static struct Struct {
+        double d;
+        byte b;
+        string s;
+    }
+
+    shouldEqual!(
+        Fields!Struct,
+        Field!(double, "d"), Field!(byte, "b"), Field!(string, "s"),
+    );
+}
+
+
+@("Fields.class")
+@safe pure unittest {
+
+    static abstract class Abstract {}
+
+    static class Base: Abstract {
+        int i;
+    }
+
+    static class Child: Base {
+        string s;
+        this(string s) { this.s = s ~ "_suffix"; }
+    }
+
+    // pragma(msg, Fields!Child);
+
+    shouldEqual!(
+        Fields!Child,
+        Field!(string, "s"), Field!(int, "i"),
+    );
 }
