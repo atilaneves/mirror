@@ -470,3 +470,22 @@ template isVariable(alias member) {
         && is(typeof(member.symbol.init))
         ;
 }
+
+
+/**
+   The fields of a struct, union, or class
+ */
+template Fields(T) {
+    import std.meta: staticMap, aliasSeqOf;;
+    import std.traits: FieldTypeTuple, FieldNameTuple;
+    import std.range: iota;
+
+    alias toField(size_t i) = Field!(FieldTypeTuple!T[i], FieldNameTuple!T[i]);
+
+    alias Fields = staticMap!(toField, aliasSeqOf!(FieldTypeTuple!T.length.iota));
+}
+
+template Field(F, string id) {
+    alias Type = F;
+    enum identifier = id;
+}

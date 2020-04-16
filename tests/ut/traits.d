@@ -550,3 +550,34 @@ static void staticGlobalFunc() {
     static assert(!isVariable!(member!"Struct"));
     static assert(!isVariable!(member!"templateFunction"));
 }
+
+
+@("Fields.struct.0")
+@safe pure unittest {
+
+    static struct Struct {
+        int i;
+        string s;
+    }
+
+    shouldEqual!(
+        Fields!Struct,
+        Field!(int, "i"), Field!(string, "s"),
+    );
+}
+
+
+@("Fields.struct.1")
+@safe pure unittest {
+
+    static struct Struct {
+        double d;
+        byte b;
+        string s;
+    }
+
+    shouldEqual!(
+        Fields!Struct,
+        Field!(double, "d"), Field!(byte, "b"), Field!(string, "s"),
+    );
+}
