@@ -476,13 +476,34 @@ template isVariable(alias member) {
    The fields of a struct, union, or class
  */
 template Fields(T) {
-    import std.meta: staticMap, aliasSeqOf;;
+    import std.meta: staticMap, aliasSeqOf, Filter;
     import std.traits: FieldTypeTuple, FieldNameTuple;
     import std.range: iota;
 
-    alias toField(size_t i) = Field!(FieldTypeTuple!T[i], FieldNameTuple!T[i]);
+    private static struct NoType{}
 
-    alias Fields = staticMap!(toField, aliasSeqOf!(FieldTypeTuple!T.length.iota));
+    static if(is(T == class)) {
+        private alias member(string name) = __traits(getMember, T, name);
+
+
+        template TypeOf(alias A) {
+            static if(is(typeof(A)))
+                alias TypeOf = typeof(A);
+            else
+                alias TypeOf = NoType;
+        }
+
+        enum isFunction(string name) = is(TypeOf!(member!name) == function);
+        enum hasType(string name) = !is(TypeOf!(member!name) == NoType);
+        enum isField(string name) = !isFunction!name && hasType!name;
+        alias fieldNames = Filter!(isField, __traits(allMembers, T));
+        alias toField(string name) = Field!(TypeOf!(member!name), name);
+
+        alias Fields = staticMap!(toField, fieldNames);
+    } else {
+        alias toField(size_t i) = Field!(FieldTypeTuple!T[i], FieldNameTuple!T[i]);
+        alias Fields = staticMap!(toField, aliasSeqOf!(FieldTypeTuple!T.length.iota));
+    }
 }
 
 template Field(F, string id) {
