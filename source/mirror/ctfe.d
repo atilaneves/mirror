@@ -132,9 +132,9 @@ struct Aggregate {
 
     string identifier;
     Kind kind;
-    Variable[] fields;
-    Function[] functions;
-    // UDAs?
+    Variable[] fields;  // TODO
+    Function[] functions;  // TODO
+    // TODO: attributes
 }
 
 struct Type {

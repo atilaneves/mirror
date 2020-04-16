@@ -18,38 +18,49 @@ import ut.ctfe;
 
 @("types")
 @safe pure unittest {
+    import std.algorithm: map;
+
     enum mod = module_!"modules.types";
 
-    mod.aggregates[].should == [
-        Aggregate("String", Aggregate.Kind.struct_),
-        Aggregate("Enum", Aggregate.Kind.enum_),
-        Aggregate("Class", Aggregate.Kind.class_),
-        Aggregate("Interface", Aggregate.Kind.interface_),
-        Aggregate("AbstractClass", Aggregate.Kind.class_),
-        Aggregate("MiddleClass", Aggregate.Kind.class_),
-        Aggregate("LeafClass", Aggregate.Kind.class_),
-        Aggregate("Point", Aggregate.Kind.struct_),
-        Aggregate("Inner1", Aggregate.Kind.struct_),
-        Aggregate("EvenInner", Aggregate.Kind.struct_),
-        Aggregate("Inner2", Aggregate.Kind.struct_),
-        Aggregate("Outer", Aggregate.Kind.struct_),
-        Aggregate("Char", Aggregate.Kind.enum_),
+    static struct NameAndKind {
+        string id;
+        Aggregate.Kind kind;
+    }
+
+    static NameAndKind xform(Aggregate a) {
+        return NameAndKind(a.identifier, a.kind);
+    }
+
+    mod.aggregates.map!xform.should == [
+        NameAndKind("String", Aggregate.Kind.struct_),
+        NameAndKind("Enum", Aggregate.Kind.enum_),
+        NameAndKind("Class", Aggregate.Kind.class_),
+        NameAndKind("Interface", Aggregate.Kind.interface_),
+        NameAndKind("AbstractClass", Aggregate.Kind.class_),
+        NameAndKind("MiddleClass", Aggregate.Kind.class_),
+        NameAndKind("LeafClass", Aggregate.Kind.class_),
+        NameAndKind("Point", Aggregate.Kind.struct_),
+        NameAndKind("Inner1", Aggregate.Kind.struct_),
+        NameAndKind("EvenInner", Aggregate.Kind.struct_),
+        NameAndKind("Inner2", Aggregate.Kind.struct_),
+        NameAndKind("Outer", Aggregate.Kind.struct_),
+        NameAndKind("Char", Aggregate.Kind.enum_),
     ];
 
-    mod.allAggregates[].should == [
-        Aggregate("String", Aggregate.Kind.struct_),
-        Aggregate("Enum", Aggregate.Kind.enum_),
-        Aggregate("Class", Aggregate.Kind.class_),
-        Aggregate("Interface", Aggregate.Kind.interface_),
-        Aggregate("AbstractClass", Aggregate.Kind.class_),
-        Aggregate("MiddleClass", Aggregate.Kind.class_),
-        Aggregate("LeafClass", Aggregate.Kind.class_),
-        Aggregate("Point", Aggregate.Kind.struct_),
-        Aggregate("Inner1", Aggregate.Kind.struct_),
-        Aggregate("EvenInner", Aggregate.Kind.struct_),
-        Aggregate("Inner2", Aggregate.Kind.struct_),
-        Aggregate("Outer", Aggregate.Kind.struct_),
-        Aggregate("Char", Aggregate.Kind.enum_),
+    mod.allAggregates.map!xform.should == [
+        NameAndKind("String", Aggregate.Kind.struct_),
+        NameAndKind("Enum", Aggregate.Kind.enum_),
+        NameAndKind("Class", Aggregate.Kind.class_),
+        NameAndKind("Interface", Aggregate.Kind.interface_),
+        NameAndKind("AbstractClass", Aggregate.Kind.class_),
+        NameAndKind("MiddleClass", Aggregate.Kind.class_),
+        NameAndKind("LeafClass", Aggregate.Kind.class_),
+        NameAndKind("Point", Aggregate.Kind.struct_),
+        NameAndKind("Inner1", Aggregate.Kind.struct_),
+        NameAndKind("EvenInner", Aggregate.Kind.struct_),
+        NameAndKind("Inner2", Aggregate.Kind.struct_),
+        NameAndKind("Outer", Aggregate.Kind.struct_),
+        NameAndKind("Char", Aggregate.Kind.enum_),
     ];
 }
 
@@ -70,7 +81,8 @@ import ut.ctfe;
 @("variables")
 @safe pure unittest {
     enum mod = module_!"modules.variables";
-    mod.aggregates[].should == [
-        Aggregate("Struct", Aggregate.Kind.struct_),
-    ];
+    auto aggs = mod.aggregates[];
+    aggs.length.should == 1;
+    aggs[0].identifier.should == "Struct";
+    aggs[0].kind.should == Aggregate.Kind.struct_;
 }
