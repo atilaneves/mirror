@@ -1,20 +1,23 @@
 module mirror.rtti;
 
 
-immutable(RuntimeTypeInfo) rtti(T)(auto ref T obj) {
+RuntimeTypeInfo rtti(T)(auto ref T obj) {
     import std.string: split;
 
     auto ret = RuntimeTypeInfo();
 
-    ret.type = Type(typeid(obj).toString);
+    ret.typeInfo = typeid(obj);
+    ret.type = Type(ret.typeInfo.toString);
 
     return ret;
 }
 
 
 struct RuntimeTypeInfo {
+    TypeInfo typeInfo;
     Type type;
 }
+
 
 struct Type {
 

@@ -6,7 +6,7 @@ import mirror.rtti;
 
 
 
-@("type.class.abstract")
+@("type.name")
 @safe pure unittest {
 
     static abstract class Abstract {
@@ -36,4 +36,18 @@ import mirror.rtti;
     enum testId = __traits(identifier, __traits(parent, {}));
     foo.rtti.type.fullyQualifiedName.should == __MODULE__ ~ "." ~ testId ~ ".Foo";
     bar.rtti.type.fullyQualifiedName.should == __MODULE__ ~ "." ~ testId ~ ".Bar";
+}
+
+
+@("type.typeInfo")
+// The test is neither @safe nor pure because Object.opEquals isn't
+unittest {
+
+    static abstract class Abstract { }
+    static class Foo: Abstract { }
+    const Abstract foo = new Foo();
+
+    foo.rtti.typeInfo.should.not == typeid(int);
+    foo.rtti.typeInfo.should.not == typeid(Abstract);
+    foo.rtti.typeInfo.should == typeid(Foo);
 }
