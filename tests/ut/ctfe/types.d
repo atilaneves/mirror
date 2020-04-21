@@ -88,7 +88,6 @@ import ut.ctfe;
 }
 
 
-@ShouldFail
 @("types.fields.String")
 @safe pure unittest {
     enum mod = module_!"modules.types";

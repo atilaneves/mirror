@@ -433,10 +433,19 @@ unittest {
     import std.traits: PSC = ParameterStorageClass;
 
     enum mod = module_!"modules.functions";
+
     mod.allAggregates[].shouldBeSameSetAs(
         [
-            Aggregate("Voldermort", Aggregate.Kind.struct_),
-            Aggregate("DasVoldermort", Aggregate.Kind.struct_),
+            Aggregate(
+                "Voldermort",
+                Aggregate.Kind.struct_,
+                [Variable("int", "i")],
+            ),
+            Aggregate(
+                "DasVoldermort",
+                Aggregate.Kind.struct_,
+                [Variable("int", "i")],
+            ),
         ]
     );
 }
