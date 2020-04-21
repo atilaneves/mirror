@@ -506,6 +506,10 @@ template Fields(T) {
     }
 }
 
+
+/**
+   A field of a struct, union, or class
+ */
 template Field(F, string id) {
     alias Type = F;
     enum identifier = id;

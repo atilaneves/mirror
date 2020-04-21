@@ -5,7 +5,6 @@ import ut;
 import mirror.rtti;
 
 
-
 @("type.name")
 @safe pure unittest {
 
@@ -30,12 +29,17 @@ import mirror.rtti;
     const Abstract foo = new Foo();
     const Abstract bar = new Bar();
 
-    foo.rtti.type.name.should == "Foo";
-    bar.rtti.type.name.should == "Bar";
+    with(extendRTTI!(Foo, Bar)) {
+        const fooInfo = rtti(foo);
+        const barInfo = rtti(bar);
 
-    enum testId = __traits(identifier, __traits(parent, {}));
-    foo.rtti.type.fullyQualifiedName.should == __MODULE__ ~ "." ~ testId ~ ".Foo";
-    bar.rtti.type.fullyQualifiedName.should == __MODULE__ ~ "." ~ testId ~ ".Bar";
+        fooInfo.type.name.should == "Foo";
+        barInfo.type.name.should == "Bar";
+
+        enum testId = __traits(identifier, __traits(parent, {}));
+        fooInfo.type.fullyQualifiedName.should == __MODULE__ ~ "." ~ testId ~ ".Foo";
+        barInfo.type.fullyQualifiedName.should == __MODULE__ ~ "." ~ testId ~ ".Bar";
+    }
 }
 
 
@@ -47,7 +51,47 @@ unittest {
     static class Foo: Abstract { }
     const Abstract foo = new Foo();
 
-    foo.rtti.typeInfo.should.not == typeid(int);
-    foo.rtti.typeInfo.should.not == typeid(Abstract);
-    foo.rtti.typeInfo.should == typeid(Foo);
+    with(extendRTTI!(Foo)) {
+        auto info = rtti(foo);
+        info.typeInfo.should.not == typeid(int);
+        info.typeInfo.should.not == typeid(Abstract);
+        info.typeInfo.should == typeid(Foo);
+    }
+}
+
+
+@ShouldFail
+@("type.fields.0")
+@safe pure unittest {
+
+    static abstract class Abstract {}
+    static class Class: Abstract {
+        int i;
+        string s;
+    }
+    const Abstract obj = new Class();
+
+    with(extendRTTI!Class) {
+        const info = rtti(obj);
+        info.type.fields.length.should == 2;
+    }
+}
+
+
+@ShouldFail
+@("type.fields.1")
+@safe pure unittest {
+
+    static abstract class Abstract {}
+    static class Class: Abstract {
+        string s0;
+        double d;
+        string s1;
+    }
+    const Abstract obj = new Class();
+
+    with(extendRTTI!Class) {
+        const info = rtti(obj);
+        info.type.fields.length.should == 3;
+    }
 }
