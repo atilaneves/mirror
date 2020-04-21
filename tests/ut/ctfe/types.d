@@ -16,7 +16,7 @@ import ut.ctfe;
 }
 
 
-@("types")
+@("types.nameskinds")
 @safe pure unittest {
     import std.algorithm: map;
 
@@ -85,4 +85,12 @@ import ut.ctfe;
     aggs.length.should == 1;
     aggs[0].identifier.should == "Struct";
     aggs[0].kind.should == Aggregate.Kind.struct_;
+}
+
+
+@("types.fields.String")
+@safe pure unittest {
+    enum mod = module_!"modules.types";
+    immutable string_ = mod.aggregates[0];
+    string_.fields.length.should == 1;
 }

@@ -13,6 +13,7 @@ module mirror.ctfe;
  */
 Module module_(string moduleName)() {
     import mirror.meta: ModuleTemplate = Module;
+    import mirror.traits: Fields;
     import std.meta: staticMap;
 
     Module ret;
@@ -35,12 +36,12 @@ Module module_(string moduleName)() {
             static assert(false, "Unknown kind " ~ T.stringof);
     }
 
-    enum toAggregate(T) = Aggregate(T.stringof, toKind!T);
-    ret.aggregates = [ staticMap!(toAggregate, module_.Aggregates) ];
-    ret.allAggregates = [ staticMap!(toAggregate, module_.AllAggregates) ];
-
     enum toVariable(alias V) = Variable(V.Type.stringof, V.identifier);
     ret.variables = [ staticMap!(toVariable, module_.Variables) ];
+
+    enum toAggregate(T) = Aggregate(T.stringof, toKind!T, [ staticMap!(toVariable, Fields!T)] );
+    ret.aggregates = [ staticMap!(toAggregate, module_.Aggregates) ];
+    ret.allAggregates = [ staticMap!(toAggregate, module_.AllAggregates) ];
 
     template toFunction(alias F) {
 
