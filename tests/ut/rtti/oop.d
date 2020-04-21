@@ -48,14 +48,14 @@ import mirror.rtti;
 unittest {
 
     static abstract class Abstract { }
-    static class Foo: Abstract { }
-    const Abstract foo = new Foo();
+    static class Class: Abstract { }
+    const Abstract obj = new Class();
 
-    with(extendRTTI!(Foo)) {
-        auto info = rtti(foo);
+    with(extendRTTI!Class) {
+        auto info = rtti(obj);
         info.typeInfo.should.not == typeid(int);
         info.typeInfo.should.not == typeid(Abstract);
-        info.typeInfo.should == typeid(Foo);
+        info.typeInfo.should == typeid(Class);
     }
 }
 
@@ -85,13 +85,14 @@ unittest {
     static abstract class Abstract {}
     static class Class: Abstract {
         string s0;
-        double d;
         string s1;
+        double d;
+        string s2;
     }
     const Abstract obj = new Class();
 
     with(extendRTTI!Class) {
         const info = rtti(obj);
-        info.type.fields.length.should == 3;
+        info.type.fields.length.should == 4;
     }
 }
