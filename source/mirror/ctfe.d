@@ -133,7 +133,7 @@ struct Aggregate {
 
     string identifier;
     Kind kind;
-    Variable[] fields;  // TODO
+    Variable[] fields;
     Function[] functions;  // TODO
     // TODO: attributes
 }

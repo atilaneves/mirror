@@ -92,5 +92,19 @@ import ut.ctfe;
 @safe pure unittest {
     enum mod = module_!"modules.types";
     immutable string_ = mod.aggregates[0];
-    string_.fields.length.should == 1;
+    string_.fields.should == [
+        Variable("string", "value"),
+    ];
+}
+
+
+@("types.fields.Point")
+@safe pure unittest {
+    import std.algorithm: find;
+    enum mod = module_!"modules.types";
+    const point = mod.aggregates[].find!(a => a.identifier == "Point")[0];
+    point.fields.should == [
+        Variable("double", "x"),
+        Variable("double", "y"),
+    ];
 }
