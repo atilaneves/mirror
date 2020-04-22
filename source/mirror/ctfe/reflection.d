@@ -4,8 +4,7 @@
    template metaprogramming) to operate on the contents of a D module
    using string mixins.
  */
-
-module mirror.ctfe;
+module mirror.ctfe.reflection;
 
 
 /**

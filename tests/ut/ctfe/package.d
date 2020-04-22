@@ -2,4 +2,4 @@ module ut.ctfe;
 
 
 public import ut;
-public import mirror.ctfe;
+public import mirror.ctfe.reflection;
