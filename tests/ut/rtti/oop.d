@@ -29,16 +29,18 @@ import mirror.rtti;
     const Abstract foo = new Foo();
     const Abstract bar = new Bar();
 
-    with(extendRTTI!(Foo, Bar)) {
-        const fooInfo = rtti(foo);
-        const barInfo = rtti(bar);
+    with(types!(Foo, Bar)) {
+        const fooType = rtti(foo);
+        const barType = rtti(bar);
 
-        fooInfo.name.should == "Foo";
-        barInfo.name.should == "Bar";
+        fooType.name.should == "Foo";
+        barType.name.should == "Bar";
 
         enum testId = __traits(identifier, __traits(parent, {}));
-        fooInfo.fullyQualifiedName.should == __MODULE__ ~ "." ~ testId ~ ".Foo";
-        barInfo.fullyQualifiedName.should == __MODULE__ ~ "." ~ testId ~ ".Bar";
+        enum prefix = __MODULE__ ~ "." ~ testId ~ ".";
+
+        fooType.fullyQualifiedName.should == prefix ~ "Foo";
+        barType.fullyQualifiedName.should == prefix ~ "Bar";
     }
 }
 
@@ -51,11 +53,11 @@ import mirror.rtti;
     static class Class: Abstract { }
     const Abstract obj = new Class();
 
-    with(extendRTTI!Class) {
-        auto info = rtti(obj);
-        info.typeInfo.should.not == typeid(int);
-        info.typeInfo.should.not == typeid(Abstract);
-        info.typeInfo.should == typeid(Class);
+    with(types!Class) {
+        auto type = rtti(obj);
+        type.typeInfo.should.not == typeid(int);
+        type.typeInfo.should.not == typeid(Abstract);
+        type.typeInfo.should == typeid(Class);
     }
 }
 
@@ -69,13 +71,12 @@ import mirror.rtti;
     static class Class: Abstract {
         int i;
         string s;
-        this(int i, string s) { this.i = i; this.s = s; }
     }
-    const Abstract obj = new Class(42, "foobar");
+    const Abstract obj = new Class;
 
-    with(extendRTTI!Class) {
-        const info = rtti(obj);
-        info.fields.map!(a => a.typeInfo).array.should == [
+    with(types!Class) {
+        const type = rtti(obj);
+        type.fields.map!(a => a.typeInfo).array.should == [
             typeid(int),
             typeid(string),
         ];
@@ -91,15 +92,15 @@ import mirror.rtti;
     static class Class: Abstract {
         int i;
         string s;
-        this(int i, string s) { this.i = i; this.s = s; }
     }
-    const Abstract obj = new Class(42, "foobar");
+    const Abstract obj = new Class;
 
-    with(extendRTTI!Class) {
-        const info = rtti(obj);
-        info.fields.map!(a => a.type).should == [ "int", "string" ];
+    with(types!Class) {
+        const type = rtti(obj);
+        type.fields.map!(a => a.type).should == [ "int", "string" ];
     }
 }
+
 
 @("fields.id.0")
 @safe pure unittest {
@@ -109,13 +110,12 @@ import mirror.rtti;
     static class Class: Abstract {
         int i;
         string s;
-        this(int i, string s) { this.i = i; this.s = s; }
     }
-    const Abstract obj = new Class(42, "foobar");
+    const Abstract obj = new Class;
 
-    with(extendRTTI!Class) {
-        const info = rtti(obj);
-        info.fields.map!(a => a.identifier).should == [ "i", "s" ];
+    with(types!Class) {
+        const type = rtti(obj);
+        type.fields.map!(a => a.identifier).should == [ "i", "s" ];
     }
 }
 
@@ -131,14 +131,14 @@ import mirror.rtti;
     }
     const Abstract obj = new Class(42, "foobar");
 
-    with(extendRTTI!Class) {
-        const info = rtti(obj);
+    with(types!Class) {
+        const type = rtti(obj);
 
-        info.fields[0].get!int(obj).should == 42;
-        info.fields[0].get!string(obj).shouldThrow;
+        type.fields[0].get!int(obj).should == 42;
+        type.fields[0].get!string(obj).shouldThrow;
 
-        info.fields[1].get!int(obj).shouldThrow;
-        info.fields[1].get!string(obj).should == "foobar";
+        type.fields[1].get!int(obj).shouldThrow;
+        type.fields[1].get!string(obj).should == "foobar";
     }
 }
 
@@ -158,9 +158,9 @@ import mirror.rtti;
     }
     const Abstract obj = new Class();
 
-    with(extendRTTI!Class) {
-        const info = rtti(obj);
-        info.fields.map!(a => a.typeInfo).array.should == [
+    with(types!Class) {
+        const type = rtti(obj);
+        type.fields.map!(a => a.typeInfo).array.should == [
             typeid(string),
             typeid(string),
             typeid(double),
@@ -184,9 +184,9 @@ import mirror.rtti;
     }
     const Abstract obj = new Class();
 
-    with(extendRTTI!Class) {
-        const info = rtti(obj);
-        info.fields.map!(a => a.type).should == [
+    with(types!Class) {
+        const type = rtti(obj);
+        type.fields.map!(a => a.type).should == [
             "string",
             "string",
             "double",
@@ -210,9 +210,9 @@ import mirror.rtti;
     }
     const Abstract obj = new Class();
 
-    with(extendRTTI!Class) {
-        const info = rtti(obj);
-        info.fields.map!(a => a.identifier).should == [
+    with(types!Class) {
+        const type = rtti(obj);
+        type.fields.map!(a => a.identifier).should == [
             "s0",
             "s1",
             "d",
@@ -241,12 +241,12 @@ import mirror.rtti;
     }
     const Abstract obj = new Class("quux", 33.3, "toto");
 
-    with(extendRTTI!Class) {
-        const info = rtti(obj);
+    with(types!Class) {
+        const type = rtti(obj);
 
-        info.fields[0].get!string(obj).should == "quux";
-        info.fields[1].get!string(obj).shouldThrowWithMessage("Cannot get private member");
-        info.fields[2].toString(obj).should == "33.3";
+        type.fields[0].get!string(obj).should == "quux";
+        type.fields[1].get!string(obj).shouldThrowWithMessage("Cannot get private member");
+        type.fields[2].toString(obj).should == "33.3";
     }
 }
 
@@ -269,14 +269,14 @@ import mirror.rtti;
         this(double d) { this.d = d; }
     }
 
-    with(extendRTTI!Int) {
-        const info = rtti!Int;
-        info.toString(new Int(42)).should == "Int(42)";
-        info.toString(new Int(88)).should == "Int(88)";
+    with(types!Int) {
+        const type = rtti!Int;
+        type.toString(new Int(42)).should == "Int(42)";
+        type.toString(new Int(88)).should == "Int(88)";
 
         enum testName = __traits(identifier, __traits(parent, {}));
         enum prefix = __MODULE__ ~ "." ~ testName ~ ".";
-        info.toString(new Double(33.3)).shouldThrowWithMessage(
+        type.toString(new Double(33.3)).shouldThrowWithMessage(
             "Cannot call toString on obj since not of type " ~ prefix ~ "Int");
     }
 }

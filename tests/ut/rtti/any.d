@@ -5,7 +5,7 @@ import ut;
 import mirror.rtti;
 
 
-@("extendRTTI.int")
+@("types.int")
 @safe pure unittest {
-    auto extended = extendRTTI!int;
+    auto extended = types!int;
 }

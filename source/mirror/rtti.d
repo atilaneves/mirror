@@ -4,7 +4,7 @@ module mirror.rtti;
 /**
    Extend runtime type information for the given types.
  */
-ExtendedRTTI extendRTTI(Types...)() {
+Types types(T...)() {
 
     static RuntimeTypeInfo runtimeTypeInfo(T)() {
 
@@ -26,9 +26,9 @@ ExtendedRTTI extendRTTI(Types...)() {
         return ret;
     }
 
-    auto ret = ExtendedRTTI();
+    auto ret = Types();
 
-    static foreach(Type; Types) {
+    static foreach(Type; T) {
         ret._typeToInfo[typeid(Type)] = runtimeTypeInfo!Type;
     }
 
@@ -36,7 +36,7 @@ ExtendedRTTI extendRTTI(Types...)() {
 }
 
 
-struct ExtendedRTTI {
+struct Types {
 
     private RuntimeTypeInfo[TypeInfo] _typeToInfo;
 
