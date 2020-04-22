@@ -33,12 +33,12 @@ import mirror.rtti;
         const fooInfo = rtti(foo);
         const barInfo = rtti(bar);
 
-        fooInfo.type.name.should == "Foo";
-        barInfo.type.name.should == "Bar";
+        fooInfo.name.should == "Foo";
+        barInfo.name.should == "Bar";
 
         enum testId = __traits(identifier, __traits(parent, {}));
-        fooInfo.type.fullyQualifiedName.should == __MODULE__ ~ "." ~ testId ~ ".Foo";
-        barInfo.type.fullyQualifiedName.should == __MODULE__ ~ "." ~ testId ~ ".Bar";
+        fooInfo.fullyQualifiedName.should == __MODULE__ ~ "." ~ testId ~ ".Foo";
+        barInfo.fullyQualifiedName.should == __MODULE__ ~ "." ~ testId ~ ".Bar";
     }
 }
 
@@ -72,7 +72,7 @@ unittest {
 
     with(extendRTTI!Class) {
         const info = rtti(obj);
-        info.type.fields.should == [
+        info.fields.should == [
             Field("int", "i"),
             Field("string", "s"),
         ];
@@ -94,7 +94,7 @@ unittest {
 
     with(extendRTTI!Class) {
         const info = rtti(obj);
-        info.type.fields.should == [
+        info.fields.should == [
             Field("string", "s0"),
             Field("string", "s1"),
             Field("double", "d"),
