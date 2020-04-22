@@ -1,10 +1,10 @@
 /**
    Tests for using CTFE mirror to wrap calling D code from a foreign language.
  */
-module ut.ctfe.wrap;
+module ut.ctfe.reflection.wrap;
 
 
-import ut.ctfe;
+import ut.ctfe.reflection;
 
 
 @("blub.add1")

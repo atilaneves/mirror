@@ -1,7 +1,7 @@
-module ut.ctfe.functions;
+module ut.ctfe.reflection.functions;
 
 
-import ut.ctfe;
+import ut.ctfe.reflection;
 
 
 

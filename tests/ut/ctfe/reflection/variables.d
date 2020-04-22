@@ -1,7 +1,7 @@
-module ut.ctfe.variables;
+module ut.ctfe.reflection.variables;
 
 
-import ut.ctfe;
+import ut.ctfe.reflection;
 
 
 @("variables")

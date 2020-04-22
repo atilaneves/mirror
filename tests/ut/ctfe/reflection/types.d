@@ -1,7 +1,7 @@
-module ut.ctfe.types;
+module ut.ctfe.reflection.types;
 
 
-import ut.ctfe;
+import ut.ctfe.reflection;
 
 
 @("empty")
