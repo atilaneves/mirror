@@ -570,6 +570,8 @@ static void staticGlobalFunc() {
 @("Fields.struct.1")
 @safe pure unittest {
 
+    import mirror.trait_enums: Protection;
+
     static struct Struct {
         double d;
         byte b;
@@ -579,7 +581,11 @@ static void staticGlobalFunc() {
 
     shouldEqual!(
         Fields!Struct,
-        Field!(double, "d"), Field!(byte, "b"), Field!(int, "i", Protection.private_), Field!(string, "s"),
+
+        Field!(double, "d"),
+        Field!(byte, "b"),
+        Field!(int, "i", Protection.private_),
+        Field!(string, "s"),
     );
 }
 

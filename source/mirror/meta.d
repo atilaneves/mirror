@@ -6,8 +6,8 @@
 module mirror.meta;
 
 
+import mirror.trait_enums: Protection, toProtection, Linkage, toLinkage;
 import std.meta: Alias;
-
 
 /**
    Compile-time information on a D module.
@@ -289,39 +289,4 @@ template FunctionOverload(
         import std.traits: fullyQualifiedName;
         return text(`Function(`, fullyQualifiedName!symbol, ", ", protection, ", ", linkage, ")");
     }
-}
-
-
-
-/// Visibilty/protection
-enum Protection {
-    private_,
-    protected_,
-    public_,
-    export_,
-    package_,
-}
-
-
-Protection toProtection(in string str) @safe pure {
-    import std.conv: to;
-    return (str ~ "_").to!Protection;
-}
-
-
-///
-enum Linkage {
-    D,
-    C,
-    Cpp,
-    Windows,
-    ObjectiveC,
-    System,
-}
-
-
-Linkage toLinkage(in string str) @safe pure {
-    import std.conv: to;
-    if(str == "C++") return Linkage.Cpp;
-    return str.to!Linkage;
 }

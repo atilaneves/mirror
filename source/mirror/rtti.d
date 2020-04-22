@@ -116,7 +116,7 @@ private class RuntimeTypeInfoImpl(T): RuntimeTypeInfo {
  */
 abstract class Field {
 
-    import mirror.meta: Protection;
+    import mirror.trait_enums: Protection;
     import std.variant: Variant;
 
     TypeInfo typeInfo;
@@ -150,7 +150,7 @@ private class FieldImpl(P, F, string member): Field {
     }
 
     override Variant getImpl(in Object obj) scope const {
-        import mirror.meta: Protection;
+        import mirror.trait_enums: Protection;
         import std.traits: Unqual, fullyQualifiedName;
         import std.algorithm: among;
 

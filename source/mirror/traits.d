@@ -5,7 +5,7 @@
 module mirror.traits;
 
 
-import mirror.meta: Protection;
+import mirror.trait_enums: Protection;
 static import std.traits;
 
 
@@ -157,7 +157,8 @@ template isProperty(alias F) {
  */
 template MemberFunctionsByOverload(T) if(isStruct!T || isClass!T || isInterface!T)
 {
-    import mirror.meta: functionsByOverload, Protection;
+    import mirror.meta: functionsByOverload;
+    import mirror.trait_enums: Protection;
     import std.meta: Filter, staticMap;
 
     private enum isPublic(alias F) = F.protection != Protection.private_;
@@ -491,7 +492,7 @@ template isVariable(alias member) {
    The fields of a struct, union, or class
  */
 template Fields(T) {
-    import mirror.meta: toProtection;
+    import mirror.trait_enums: toProtection;
     import std.meta: staticMap, aliasSeqOf, Filter;
     import std.traits: FieldTypeTuple, FieldNameTuple;
     import std.range: iota;
