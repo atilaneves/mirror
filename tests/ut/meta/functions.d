@@ -126,6 +126,29 @@ import std.meta: AliasSeq;
 }
 
 
+@("parameters.storageClasses")
+@safe pure unittest {
+
+    import std.traits: STC = ParameterStorageClass;
+
+    alias mod = Module!("modules.functions");
+    alias storageClasses = mod.FunctionsByOverload[3];
+
+    // pragma(msg, "\n", storageClasses.parameters.stringof, "\n");
+
+    shouldEqual!(
+        storageClasses.parameters,
+        AliasSeq!(
+            Parameter!(int, void, "normal", STC.none),
+            Parameter!(int*, void, "returnScope", STC.return_ | STC.scope_),
+            Parameter!(int, void, "out_", STC.out_),
+            Parameter!(int, void, "ref_", STC.ref_),
+            Parameter!(int, void, "lazy_", STC.lazy_),
+        )
+    );
+}
+
+
 
 @("return.bySymbol")
 @safe pure unittest {

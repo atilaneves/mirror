@@ -45,8 +45,9 @@ Module module_(string moduleName)() {
         toKind!T,
         [ staticMap!(toVariable, Fields!T)],
     );
-    ret.aggregates = [ staticMap!(toAggregate, module_.Aggregates) ];
+    ret.aggregates    = [ staticMap!(toAggregate, module_.Aggregates)    ];
     ret.allAggregates = [ staticMap!(toAggregate, module_.AllAggregates) ];
+
 
     template toFunction(alias F) {
 

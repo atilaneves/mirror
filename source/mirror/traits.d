@@ -6,6 +6,7 @@ module mirror.traits;
 
 
 import mirror.meta: Protection;
+static import std.traits;
 
 
 /// Usable as a predicate to std.meta.Filter
@@ -406,12 +407,17 @@ template NumRequiredParameters(A...) if(A.length == 1) {
  */
 template Parameters(alias F) {
     import mirror.traits: Parameter;
-    import std.traits: StdParameters = Parameters, ParameterIdentifierTuple, ParameterDefaults;
+    import std.traits: StdParameters = Parameters,
+        ParameterIdentifierTuple, ParameterDefaults, ParameterStorageClassTuple;
     import std.meta: staticMap, aliasSeqOf;
     import std.range: iota;
 
-    alias parameter(size_t i) =
-        Parameter!(StdParameters!F[i], ParameterDefaults!F[i], ParameterIdentifierTuple!F[i]);
+    alias parameter(size_t i) = Parameter!(
+        StdParameters!F[i],
+        ParameterDefaults!F[i],
+        ParameterIdentifierTuple!F[i],
+        ParameterStorageClassTuple!F[i],
+    );
 
     // When a default value is a function pointer, things get... weird
     alias parameterFallback(size_t i) =
@@ -429,10 +435,16 @@ template Parameters(alias F) {
 /**
    Information on a function's parameter
  */
-template Parameter(T, alias D, string I) {
+template Parameter(
+    T,
+    alias D,
+    string I,
+    std.traits.ParameterStorageClass sc = std.traits.ParameterStorageClass.none)
+{
     alias Type = T;
     alias Default = D;
     enum identifier = I;
+    enum storageClass = sc;
 }
 
 
