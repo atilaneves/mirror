@@ -232,13 +232,21 @@ import mirror.rtti;
         private string s1;
         double d;
         string s2;
+        this(string s0, double d, string s2) {
+            this.s0 = s0;
+            this.s1 = "nope";
+            this.d = d;
+            this.s2 = s2;
+        }
     }
-    const Abstract obj = new Class();
+    const Abstract obj = new Class("quux", 33.3, "toto");
 
     with(extendRTTI!Class) {
         const info = rtti(obj);
-        info.fields[0].get!string(obj).should == "";
+
+        info.fields[0].get!string(obj).should == "quux";
         info.fields[1].get!string(obj).shouldThrowWithMessage("Cannot get private member");
+        info.fields[2].toString(obj).should == "33.3";
     }
 }
 

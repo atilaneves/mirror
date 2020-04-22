@@ -113,6 +113,7 @@ abstract class Field {
     }
 
     abstract Variant getImpl(in Object obj) scope const;
+    abstract string toString(in Object obj) scope const;
 }
 
 
@@ -141,5 +142,10 @@ class FieldImpl(P, F, string member): Field {
                 fullyQualifiedName!P);
 
         return Variant(__traits(getMember, rightType, member));
+    }
+
+    override string toString(in Object obj) scope const {
+        import std.conv: text;
+        return get!F(obj).text;
     }
 }
