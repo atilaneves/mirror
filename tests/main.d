@@ -12,4 +12,5 @@ mixin runTestsMain!(
     "ut.ctfe.functions",
     "ut.ctfe.wrap",
     "ut.rtti.oop",
+    "ut.rtti.any",
 );
