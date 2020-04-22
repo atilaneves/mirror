@@ -15,6 +15,7 @@ Module module_(string moduleName)() {
     import mirror.meta: ModuleTemplate = Module;
     import mirror.traits: Fields;
     import std.meta: staticMap;
+    import std.traits: fullyQualifiedName;
 
     Module ret;
     ret.identifier = moduleName;
@@ -36,7 +37,7 @@ Module module_(string moduleName)() {
             static assert(false, "Unknown kind " ~ T.stringof);
     }
 
-    enum toVariable(alias V) = Variable(V.Type.stringof, V.identifier);
+    enum toVariable(alias V) = Variable(fullyQualifiedName!(V.Type), V.identifier);
     ret.variables = [ staticMap!(toVariable, module_.Variables) ];
 
     enum toAggregate(T) = Aggregate(T.stringof, toKind!T, [ staticMap!(toVariable, Fields!T)] );

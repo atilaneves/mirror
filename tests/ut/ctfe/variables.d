@@ -11,7 +11,7 @@ import ut.ctfe;
         [
             Variable("int", "gInt"),
             Variable("immutable(double)", "gDouble"),
-            Variable("Struct", "gStruct"),
+            Variable("modules.variables.Struct", "gStruct"),
             Variable("int", "CONSTANT_INT"),
             Variable("string", "CONSTANT_STRING"),
             Variable("immutable(int)", "gImmutableInt"),
