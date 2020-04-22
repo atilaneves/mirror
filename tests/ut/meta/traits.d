@@ -1,4 +1,4 @@
-module ut.traits;
+module ut.meta.traits;
 
 
 import ut;

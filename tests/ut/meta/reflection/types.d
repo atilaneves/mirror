@@ -1,7 +1,7 @@
-module ut.meta.types;
+module ut.meta.reflection.types;
 
 
-import ut.meta;
+import ut.meta.reflection;
 
 
 @("empty")

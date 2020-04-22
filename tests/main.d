@@ -3,10 +3,10 @@ import unit_threaded;
 
 mixin runTestsMain!(
     "ut.issues",
-    "ut.traits",
-    "ut.meta.types",
-    "ut.meta.variables",
-    "ut.meta.functions",
+    "ut.meta.traits",
+    "ut.meta.reflection.types",
+    "ut.meta.reflection.variables",
+    "ut.meta.reflection.functions",
     "ut.ctfe.reflection.types",
     "ut.ctfe.reflection.variables",
     "ut.ctfe.reflection.functions",
