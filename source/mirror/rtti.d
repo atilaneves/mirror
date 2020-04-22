@@ -1,6 +1,13 @@
+/**
+   Runtime type information extraced from compile-tine.
+ */
 module mirror.rtti;
 
 
+/**
+   Initialise a `Types` variable (module-level, static struct
+   variable, ...)  with runtime type information for the given types.
+ */
 mixin template typesVar(alias symbol, T...) {
     shared static this() nothrow {
         symbol = types!T;
@@ -43,6 +50,10 @@ Types types(T...)() {
 }
 
 
+/**
+   Maps types or instances of them to their runtime
+   type information.
+ */
 struct Types {
 
     private RuntimeTypeInfo[TypeInfo] _typeToInfo;
@@ -86,7 +97,7 @@ abstract class RuntimeTypeInfo {
 }
 
 
-class RuntimeTypeInfoImpl(T): RuntimeTypeInfo {
+private class RuntimeTypeInfoImpl(T): RuntimeTypeInfo {
 
     override string toString(in Object obj) @safe pure scope const {
         import std.conv: text;
@@ -103,6 +114,9 @@ class RuntimeTypeInfoImpl(T): RuntimeTypeInfo {
 }
 
 
+/**
+   Fields of a struct/class
+ */
 abstract class Field {
 
     import mirror.meta: Protection;
@@ -129,7 +143,7 @@ abstract class Field {
 }
 
 
-class FieldImpl(P, F, string member): Field {
+private class FieldImpl(P, F, string member): Field {
 
     import std.variant: Variant;
 
