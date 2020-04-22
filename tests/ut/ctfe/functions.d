@@ -162,7 +162,7 @@ unittest {
 @("functions.byOverload")
 @safe pure unittest {
     static import modules.functions;
-    import std.traits: PSC = ParameterStorageClass;
+    import std.traits: PSC = ParameterStorageClass, ReturnType;
 
     enum mod = module_!"modules.functions";
     mod.functionsByOverload[].shouldBeSameSetAs(
@@ -171,96 +171,96 @@ unittest {
                 "modules.functions",
                 0,
                 "add1",
-                Type("int"),
+                Type("int", int.sizeof),
                 [
-                    Parameter("int", "i"),
-                    Parameter("int", "j"),
+                    Parameter(type!int, "i"),
+                    Parameter(type!int, "j"),
                 ],
             ),
             Function(
                 "modules.functions",
                 1,
                 "add1",
-                Type("double"),
+                Type("double", double.sizeof),
                 [
-                    Parameter("double", "d0"),
-                    Parameter("double", "d1"),
+                    Parameter(type!double, "d0"),
+                    Parameter(type!double, "d1"),
                 ],
             ),
             Function(
                 "modules.functions",
                 0,
                 "withDefault",
-                Type("double"),
+                Type("double", double.sizeof),
                 [
-                    Parameter("double", "fst"),
-                    Parameter("double", "snd", "33.3"),
+                    Parameter(type!double, "fst"),
+                    Parameter(type!double, "snd", "33.3"),
                 ],
             ),
             Function(
                 "modules.functions",
                 0,
                 "storageClasses",
-                Type("void"),
+                Type("void", 1),
                 [
-                    Parameter("int", "normal", "", PSC.none),
-                    Parameter("int*", "returnScope", "", PSC.return_ | PSC.scope_),
-                    Parameter("int", "out_", "", PSC.out_),
-                    Parameter("int", "ref_", "", PSC.ref_),
-                    Parameter("int", "lazy_", "", PSC.lazy_),
+                    Parameter(type!int, "normal", "", PSC.none),
+                    Parameter(type!(int*), "returnScope", "", PSC.return_ | PSC.scope_),
+                    Parameter(type!int, "out_", "", PSC.out_),
+                    Parameter(type!int, "ref_", "", PSC.ref_),
+                    Parameter(type!int, "lazy_", "", PSC.lazy_),
                 ]
             ),
             Function(
                 "modules.functions",
                 0,
                 "exportedFunc",
-                Type("void"),
+                Type("void", 1),
                 [],
             ),
             Function(
                 "modules.functions",
                 0,
                 "externC",
-                Type("void"),
+                Type("void", 1),
                 [],
             ),
             Function(
                 "modules.functions",
                 0,
                 "externCpp",
-                Type("void"),
+                Type("void", 1),
                 [],
             ),
             Function(
                 "modules.functions",
                 0,
                 "identityInt",
-                Type("int"),
-                [Parameter("int", "x", "", PSC.none)],
+                Type("int", int.sizeof),
+                [Parameter(type!int, "x", "", PSC.none)],
             ),
             Function(
                 "modules.functions",
                 0,
                 "voldermort",
-                Type("Voldermort"),
-                [Parameter("int", "i", "", PSC.none)],
+                Type("modules.functions.voldermort.Voldermort", ReturnType!(modules.functions.voldermort).sizeof),
+                [Parameter(type!int, "i", "", PSC.none)],
             ),
             Function(
                 "modules.functions",
                 0,
                 "voldermortArray",
-                Type("DasVoldermort[]"),
-                [Parameter("int", "i", "", PSC.none)],
+                Type("modules.functions.voldermortArray.DasVoldermort[]", ReturnType!(modules.functions.voldermortArray).sizeof),
+                [Parameter(type!int, "i", "", PSC.none)],
             ),
             Function(
                 "modules.functions",
                 0,
                 "concatFoo",
-                Type("string"),
+                Type("string", string.sizeof),
                 [
-                    Parameter("string", "s0", "", PSC.none),
-                    Parameter("int",    "i",  "", PSC.none),
-                    Parameter("string", "s1", "", PSC.none),
+                    Parameter(type!string, "s0", "", PSC.none),
+                    Parameter(type!int,    "i",  "", PSC.none),
+                    Parameter(type!string, "s1", "", PSC.none),
                 ],
             ),
         ]
@@ -271,7 +271,7 @@ unittest {
 @("functions.bySymbol")
 @safe pure unittest {
     static import modules.functions;
-    import std.traits: PSC = ParameterStorageClass;
+    import std.traits: PSC = ParameterStorageClass, ReturnType;
 
     enum mod = module_!"modules.functions";
     mod.functionsBySymbol[].shouldBeSameSetAs(
@@ -283,20 +283,20 @@ unittest {
                         "modules.functions",
                         0,
                         "add1",
-                        Type("int"),
+                        Type("int", int.sizeof),
                         [
-                            Parameter("int", "i"),
-                            Parameter("int", "j"),
+                            Parameter(type!int, "i"),
+                            Parameter(type!int, "j"),
                         ],
                     ),
                     Function(
                         "modules.functions",
                         1,
                         "add1",
-                        Type("double"),
+                        Type("double", double.sizeof),
                         [
-                            Parameter("double", "d0"),
-                            Parameter("double", "d1"),
+                            Parameter(type!double, "d0"),
+                            Parameter(type!double, "d1"),
                         ],
                     ),
                 ]
@@ -308,10 +308,10 @@ unittest {
                         "modules.functions",
                         0,
                         "withDefault",
-                        Type("double"),
+                        Type("double", double.sizeof),
                         [
-                            Parameter("double", "fst"),
-                            Parameter("double", "snd", "33.3"),
+                            Parameter(type!double, "fst"),
+                            Parameter(type!double, "snd", "33.3"),
                         ],
                     ),
                 ]
@@ -323,13 +323,13 @@ unittest {
                         "modules.functions",
                         0,
                         "storageClasses",
-                        Type("void"),
+                        Type("void", 1),
                         [
-                            Parameter("int", "normal", "", PSC.none),
-                            Parameter("int*", "returnScope", "", PSC.return_ | PSC.scope_),
-                            Parameter("int", "out_", "", PSC.out_),
-                            Parameter("int", "ref_", "", PSC.ref_),
-                            Parameter("int", "lazy_", "", PSC.lazy_),
+                            Parameter(type!int, "normal", "", PSC.none),
+                            Parameter(type!(int*), "returnScope", "", PSC.return_ | PSC.scope_),
+                            Parameter(type!int, "out_", "", PSC.out_),
+                            Parameter(type!int, "ref_", "", PSC.ref_),
+                            Parameter(type!int, "lazy_", "", PSC.lazy_),
                         ]
                     ),
                 ]
@@ -341,7 +341,7 @@ unittest {
                         "modules.functions",
                         0,
                         "exportedFunc",
-                        Type("void"),
+                        Type("void", 1),
                         [],
                     ),
                 ]
@@ -353,7 +353,7 @@ unittest {
                         "modules.functions",
                         0,
                         "externC",
-                        Type("void"),
+                        Type("void", 1),
                         [],
                         ),
                 ]
@@ -365,7 +365,7 @@ unittest {
                         "modules.functions",
                         0,
                         "externCpp",
-                        Type("void"),
+                        Type("void", 1),
                         [],
                         ),
                 ]
@@ -377,8 +377,8 @@ unittest {
                         "modules.functions",
                         0,
                         "identityInt",
-                        Type("int"),
-                        [Parameter("int", "x", "", PSC.none)],
+                        Type("int", int.sizeof),
+                        [Parameter(type!int, "x", "", PSC.none)],
                     ),
                 ]
             ),
@@ -389,8 +389,11 @@ unittest {
                         "modules.functions",
                         0,
                         "voldermort",
-                        Type("Voldermort"),
-                        [Parameter("int", "i", "", PSC.none)],
+                        Type(
+                            "modules.functions.voldermort.Voldermort",
+                            ReturnType!(modules.functions.voldermort).sizeof,
+                        ),
+                        [Parameter(type!int, "i", "", PSC.none)],
                     ),
                 ]
             ),
@@ -401,8 +404,11 @@ unittest {
                         "modules.functions",
                         0,
                         "voldermortArray",
-                        Type("DasVoldermort[]"),
-                        [Parameter("int", "i", "", PSC.none)],
+                        Type(
+                            "modules.functions.voldermortArray.DasVoldermort[]",
+                            ReturnType!(modules.functions.voldermortArray).sizeof,
+                        ),
+                        [Parameter(type!int, "i", "", PSC.none)],
                     ),
                 ]
             ),
@@ -413,11 +419,11 @@ unittest {
                         "modules.functions",
                         0,
                         "concatFoo",
-                        Type("string"),
+                        Type("string", string.sizeof),
                         [
-                            Parameter("string", "s0", "", PSC.none),
-                            Parameter("int",    "i",  "", PSC.none),
-                            Parameter("string", "s1", "", PSC.none),
+                            Parameter(type!string, "s0", "", PSC.none),
+                            Parameter(type!int,    "i",  "", PSC.none),
+                            Parameter(type!string, "s1", "", PSC.none),
                         ],
                     ),
 
@@ -437,12 +443,12 @@ unittest {
     mod.allAggregates[].shouldBeSameSetAs(
         [
             Aggregate(
-                "Voldermort",
+                "modules.functions.voldermort.Voldermort",
                 Aggregate.Kind.struct_,
                 [Variable("int", "i")],
             ),
             Aggregate(
-                "DasVoldermort",
+                "modules.functions.voldermortArray.DasVoldermort",
                 Aggregate.Kind.struct_,
                 [Variable("int", "i")],
             ),

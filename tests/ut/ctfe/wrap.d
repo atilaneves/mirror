@@ -67,7 +67,7 @@ private string blubWrapperMixin(Function function_) @safe pure {
     // the arguments to pass to the wrapped D function
     const dArgs = numParams
         .iota
-        .map!(i => argName(i) ~ ".to!" ~ function_.parameters[i].type)
+        .map!(i => argName(i) ~ ".to!(" ~ function_.parameters[i].type.name ~ ")")
         .join(", ")
         ;
 

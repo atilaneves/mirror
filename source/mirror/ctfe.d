@@ -15,6 +15,7 @@ Module module_(string moduleName)() {
     import mirror.meta: ModuleTemplate = Module;
     import mirror.traits: Fields;
     import std.meta: staticMap;
+    import std.traits: fullyQualifiedName;
 
     Module ret;
     ret.identifier = moduleName;
@@ -33,13 +34,17 @@ Module module_(string moduleName)() {
         else static if(is(U == interface))
             enum toKind = Aggregate.Kind.interface_;
         else
-            static assert(false, "Unknown kind " ~ T.stringof);
+            static assert(false, "Unknown kind " ~ fullyQualifiedName!T);
     }
 
-    enum toVariable(alias V) = Variable(V.Type.stringof, V.identifier);
+    enum toVariable(alias V) = Variable(fullyQualifiedName!(V.Type), V.identifier);
     ret.variables = [ staticMap!(toVariable, module_.Variables) ];
 
-    enum toAggregate(T) = Aggregate(T.stringof, toKind!T, [ staticMap!(toVariable, Fields!T)] );
+    enum toAggregate(T) = Aggregate(
+        fullyQualifiedName!T,
+        toKind!T,
+        [ staticMap!(toVariable, Fields!T)],
+    );
     ret.aggregates = [ staticMap!(toAggregate, module_.Aggregates) ];
     ret.allAggregates = [ staticMap!(toAggregate, module_.AllAggregates) ];
 
@@ -60,7 +65,7 @@ Module module_(string moduleName)() {
             import std.traits: ParameterStorageClassTuple;
 
             enum toParameter = Parameter(
-                Parameters!(F.symbol)[i].stringof,
+                type!(Parameters!(F.symbol)[i]),
                 ParameterIdentifierTuple!(F.symbol)[i],
                 toDefault!i,
                 ParameterStorageClassTuple!(F.symbol)[i],
@@ -71,7 +76,7 @@ Module module_(string moduleName)() {
             moduleName,
             F.index,
             F.identifier,
-            Type(ReturnType!(F.symbol).stringof),
+            type!(ReturnType!(F.symbol)),
             [staticMap!(toParameter, aliasSeqOf!(Parameters!(F.symbol).length.iota))],
         );
     }
@@ -138,12 +143,16 @@ struct Aggregate {
     // TODO: attributes
 }
 
+
+Type type(T)() {
+    import std.traits: fullyQualifiedName;
+    return Type(fullyQualifiedName!T, T.sizeof);
+}
+
 struct Type {
-    string identifier;
+    string name;
+    size_t size;
     // UDAs?
-    string toString() @safe @nogc pure nothrow const {
-        return identifier;
-    }
 }
 
 /// A variable
@@ -219,7 +228,7 @@ auto pointer(Function function_)() {
 struct Parameter {
     import std.traits: ParameterStorageClass;
 
-    string type;
+    Type type;
     string identifier;
     string default_;  /// default value, if any
     ParameterStorageClass storageClass;
