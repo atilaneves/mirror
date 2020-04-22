@@ -4,25 +4,46 @@ module mirror.rtti;
 /**
    Extend runtime type information for the given types.
  */
-ExtendedRTTI extendRTTI(T...)() {
-    return ExtendedRTTI();
+ExtendedRTTI extendRTTI(Types...)() {
+    auto ret = ExtendedRTTI();
+
+    static RuntimeTypeInfo runtimeTypeInfo(T)() {
+
+        import mirror.traits: Fields;
+
+        auto ret = RuntimeTypeInfo();
+
+        ret.typeInfo = typeid(T);
+        ret.type = Type(ret.typeInfo.toString);
+        ret.type.fields.length = Fields!T.length;
+
+        return ret;
+    }
+
+    static foreach(Type; Types) {
+        ret._typeToInfo[typeid(Type)] = runtimeTypeInfo!Type;
+    }
+
+    return ret;
 }
 
 
 struct ExtendedRTTI {
 
+    private RuntimeTypeInfo[TypeInfo] _typeToInfo;
+
     RuntimeTypeInfo rtti(T)(auto ref T obj) {
-        import mirror.traits: Fields;
-        import std.string: split;
-        import std.algorithm: map;
-        import std.array: array;
 
-        auto ret = RuntimeTypeInfo();
+        scope typeInfo = typeid(obj);
+        scope ptr = typeInfo in _typeToInfo;
 
-        ret.typeInfo = typeid(obj);
-        ret.type = Type(ret.typeInfo.toString);
+        if(ptr is null) {
+            // TypeInfo.toString isn't scope, so @trusted
+            scope infoString = () @trusted { return typeInfo.toString; }();
+            throw new Exception("Cannot get RTTI for unregistered type " ~ infoString);
+        }
 
-        return ret;
+        return *ptr;
     }
 }
 

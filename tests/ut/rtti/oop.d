@@ -60,7 +60,6 @@ unittest {
 }
 
 
-@ShouldFail
 @("type.fields.0")
 @safe pure unittest {
 
@@ -78,7 +77,6 @@ unittest {
 }
 
 
-@ShouldFail
 @("type.fields.1")
 @safe pure unittest {
 
