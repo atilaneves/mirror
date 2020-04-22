@@ -5,7 +5,7 @@ import ut;
 import mirror.rtti;
 
 
-@("type.name")
+@("name")
 @safe pure unittest {
 
     static abstract class Abstract {
@@ -43,7 +43,7 @@ import mirror.rtti;
 }
 
 
-@("type.typeInfo")
+@("typeInfo")
 // The test is neither @safe nor pure because Object.opEquals isn't
 @system unittest {
 
@@ -60,7 +60,7 @@ import mirror.rtti;
 }
 
 
-@("type.fields.0")
+@("fields.0")
 @safe pure unittest {
 
     static abstract class Abstract {}
@@ -80,7 +80,7 @@ import mirror.rtti;
 }
 
 
-@("type.fields.1")
+@("fields.1")
 @safe pure unittest {
 
     static abstract class Abstract {}
@@ -100,5 +100,26 @@ import mirror.rtti;
             Field("double", "d"),
             Field("string", "s2"),
         ];
+    }
+}
+
+
+@("toString.Int")
+@safe pure unittest {
+
+    static class Int {
+        int i;
+        this(int i) { this.i = i; }
+
+        override string toString() @safe pure scope const {
+            import std.conv: text;
+            return text(`Int(`, i, `)`);
+        }
+    }
+
+    with(extendRTTI!Int) {
+        const info = rtti!Int;
+        info.toString(new Int(42)).should == "Int(42)";
+        info.toString(new Int(88)).should == "Int(88)";
     }
 }

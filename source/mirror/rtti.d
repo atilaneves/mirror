@@ -5,14 +5,13 @@ module mirror.rtti;
    Extend runtime type information for the given types.
  */
 ExtendedRTTI extendRTTI(Types...)() {
-    auto ret = ExtendedRTTI();
 
     static RuntimeTypeInfo runtimeTypeInfo(T)() {
 
         import mirror.traits: Fields;
         import std.string: split;
 
-        auto ret = RuntimeTypeInfo();
+        auto ret = new RuntimeTypeInfoImpl!T();
 
         ret.typeInfo = typeid(T);
         ret.fullyQualifiedName = ret.typeInfo.toString;
@@ -24,6 +23,8 @@ ExtendedRTTI extendRTTI(Types...)() {
 
         return ret;
     }
+
+    auto ret = ExtendedRTTI();
 
     static foreach(Type; Types) {
         ret._typeToInfo[typeid(Type)] = runtimeTypeInfo!Type;
@@ -37,9 +38,17 @@ struct ExtendedRTTI {
 
     private RuntimeTypeInfo[TypeInfo] _typeToInfo;
 
-    RuntimeTypeInfo rtti(T)(auto ref T obj) {
+    RuntimeTypeInfo rtti(T)() {
+        return rtti(typeid(T));
+    }
 
-        scope typeInfo = typeid(obj);
+    RuntimeTypeInfo rtti(T)(auto ref T obj) {
+        if(obj is null)
+            throw new Exception("Cannot get RTTI from null object");
+        return rtti(typeid(obj));
+    }
+
+    RuntimeTypeInfo rtti(scope TypeInfo typeInfo) @safe pure scope {
         scope ptr = typeInfo in _typeToInfo;
 
         if(ptr is null) {
@@ -53,11 +62,22 @@ struct ExtendedRTTI {
 }
 
 
-struct RuntimeTypeInfo {
+abstract class RuntimeTypeInfo {
     TypeInfo typeInfo;
     string name;
     string fullyQualifiedName;
     Field[] fields;
+
+    abstract string toString(in Object obj) @safe pure scope const;
+}
+
+
+class RuntimeTypeInfoImpl(T): RuntimeTypeInfo {
+    override string toString(in Object obj) @safe pure scope const {
+        import std.conv: text;
+        import std.conv: to;
+        return text(cast(const T) obj);
+    }
 }
 
 
