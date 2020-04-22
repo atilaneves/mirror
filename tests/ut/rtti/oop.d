@@ -33,14 +33,11 @@ import mirror.rtti;
         const fooType = rtti(foo);
         const barType = rtti(bar);
 
-        fooType.name.should == "Foo";
-        barType.name.should == "Bar";
-
         enum testId = __traits(identifier, __traits(parent, {}));
         enum prefix = __MODULE__ ~ "." ~ testId ~ ".";
 
-        fooType.fullyQualifiedName.should == prefix ~ "Foo";
-        barType.fullyQualifiedName.should == prefix ~ "Bar";
+        fooType.name.should == prefix ~ "Foo";
+        barType.name.should == prefix ~ "Bar";
     }
 }
 

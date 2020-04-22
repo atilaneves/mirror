@@ -22,13 +22,11 @@ Types types(T...)() {
     static RuntimeTypeInfo runtimeTypeInfo(T)() {
 
         import mirror.traits: Fields;
-        import std.string: split;
 
         auto ret = new RuntimeTypeInfoImpl!T();
 
         ret.typeInfo = typeid(T);
-        ret.fullyQualifiedName = ret.typeInfo.toString;
-        ret.name = ret.fullyQualifiedName.split(".")[$-1];
+        ret.name = ret.typeInfo.toString;
 
         static if(is(T == class)) {
             static foreach(field; Fields!T) {
@@ -90,7 +88,6 @@ struct Types {
 abstract class RuntimeTypeInfo {
     TypeInfo typeInfo;
     string name;
-    string fullyQualifiedName;
     Field[] fields;
 
     abstract string toString(in Object obj) @safe pure scope const;
