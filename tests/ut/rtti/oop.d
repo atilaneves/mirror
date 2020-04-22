@@ -61,7 +61,7 @@ import mirror.rtti;
 
 
 @("fields.0")
-@safe pure unittest {
+@system /* typeInfo */ unittest {
 
     static abstract class Abstract {}
     static class Class: Abstract {
@@ -73,15 +73,15 @@ import mirror.rtti;
     with(extendRTTI!Class) {
         const info = rtti(obj);
         info.fields.should == [
-            Field("int", "i"),
-            Field("string", "s"),
+            Field(typeid(int), "int", "i"),
+            Field(typeid(string), "string", "s"),
         ];
     }
 }
 
 
 @("fields.1")
-@safe pure unittest {
+@system /* typeInfo */ unittest {
 
     static abstract class Abstract {}
     static class Class: Abstract {
@@ -95,10 +95,10 @@ import mirror.rtti;
     with(extendRTTI!Class) {
         const info = rtti(obj);
         info.fields.should == [
-            Field("string", "s0"),
-            Field("string", "s1"),
-            Field("double", "d"),
-            Field("string", "s2"),
+            Field(typeid(string), "string", "s0"),
+            Field(typeid(string), "string", "s1"),
+            Field(typeid(double), "double", "d"),
+            Field(typeid(string), "string", "s2"),
         ];
     }
 }

@@ -18,7 +18,7 @@ ExtendedRTTI extendRTTI(Types...)() {
         ret.name = ret.fullyQualifiedName.split(".")[$-1];
 
         static foreach(field; Fields!T) {
-            ret.fields ~= Field(field.Type.stringof, field.identifier);
+            ret.fields ~= Field(typeid(field.Type), field.Type.stringof, field.identifier);
         }
 
         return ret;
@@ -86,6 +86,7 @@ class RuntimeTypeInfoImpl(T): RuntimeTypeInfo {
 
 
 struct Field {
+    TypeInfo typeInfo;
     string type;
     string identifier;
 }
