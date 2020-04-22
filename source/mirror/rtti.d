@@ -25,7 +25,8 @@ Types types(T...)() {
 
         static if(is(T == class)) {
             static foreach(field; Fields!T) {
-                ret.fields ~= new FieldImpl!(T, field.Type, field.identifier)(typeid(field.Type), field.protection);
+                ret.fields ~= new FieldImpl!(T, field.Type, field.identifier)
+                                            (typeid(field.Type), field.protection);
             }
         }
 
