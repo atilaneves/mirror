@@ -61,7 +61,7 @@ Module module_(string moduleName)() {
             import std.traits: ParameterStorageClassTuple;
 
             enum toParameter = Parameter(
-                Parameters!(F.symbol)[i].stringof,
+                type!(Parameters!(F.symbol)[i]),
                 ParameterIdentifierTuple!(F.symbol)[i],
                 toDefault!i,
                 ParameterStorageClassTuple!(F.symbol)[i],
@@ -139,8 +139,14 @@ struct Aggregate {
     // TODO: attributes
 }
 
+
+Type type(T)() {
+    import std.traits: fullyQualifiedName;
+    return Type(fullyQualifiedName!T, T.sizeof);
+}
+
 struct Type {
-    string identifier;
+    string name;
     size_t size;
     // UDAs?
 }
@@ -218,7 +224,7 @@ auto pointer(Function function_)() {
 struct Parameter {
     import std.traits: ParameterStorageClass;
 
-    string type;
+    Type type;
     string identifier;
     string default_;  /// default value, if any
     ParameterStorageClass storageClass;

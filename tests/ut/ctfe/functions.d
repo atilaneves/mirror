@@ -173,8 +173,8 @@ unittest {
                 "add1",
                 Type("int", int.sizeof),
                 [
-                    Parameter("int", "i"),
-                    Parameter("int", "j"),
+                    Parameter(type!int, "i"),
+                    Parameter(type!int, "j"),
                 ],
             ),
             Function(
@@ -183,8 +183,8 @@ unittest {
                 "add1",
                 Type("double", double.sizeof),
                 [
-                    Parameter("double", "d0"),
-                    Parameter("double", "d1"),
+                    Parameter(type!double, "d0"),
+                    Parameter(type!double, "d1"),
                 ],
             ),
             Function(
@@ -193,8 +193,8 @@ unittest {
                 "withDefault",
                 Type("double", double.sizeof),
                 [
-                    Parameter("double", "fst"),
-                    Parameter("double", "snd", "33.3"),
+                    Parameter(type!double, "fst"),
+                    Parameter(type!double, "snd", "33.3"),
                 ],
             ),
             Function(
@@ -203,11 +203,11 @@ unittest {
                 "storageClasses",
                 Type("void", 1),
                 [
-                    Parameter("int", "normal", "", PSC.none),
-                    Parameter("int*", "returnScope", "", PSC.return_ | PSC.scope_),
-                    Parameter("int", "out_", "", PSC.out_),
-                    Parameter("int", "ref_", "", PSC.ref_),
-                    Parameter("int", "lazy_", "", PSC.lazy_),
+                    Parameter(type!int, "normal", "", PSC.none),
+                    Parameter(type!(int*), "returnScope", "", PSC.return_ | PSC.scope_),
+                    Parameter(type!int, "out_", "", PSC.out_),
+                    Parameter(type!int, "ref_", "", PSC.ref_),
+                    Parameter(type!int, "lazy_", "", PSC.lazy_),
                 ]
             ),
             Function(
@@ -236,21 +236,21 @@ unittest {
                 0,
                 "identityInt",
                 Type("int", int.sizeof),
-                [Parameter("int", "x", "", PSC.none)],
+                [Parameter(type!int, "x", "", PSC.none)],
             ),
             Function(
                 "modules.functions",
                 0,
                 "voldermort",
                 Type("Voldermort", ReturnType!(modules.functions.voldermort).sizeof),
-                [Parameter("int", "i", "", PSC.none)],
+                [Parameter(type!int, "i", "", PSC.none)],
             ),
             Function(
                 "modules.functions",
                 0,
                 "voldermortArray",
                 Type("DasVoldermort[]", ReturnType!(modules.functions.voldermortArray).sizeof),
-                [Parameter("int", "i", "", PSC.none)],
+                [Parameter(type!int, "i", "", PSC.none)],
             ),
             Function(
                 "modules.functions",
@@ -258,9 +258,9 @@ unittest {
                 "concatFoo",
                 Type("string", string.sizeof),
                 [
-                    Parameter("string", "s0", "", PSC.none),
-                    Parameter("int",    "i",  "", PSC.none),
-                    Parameter("string", "s1", "", PSC.none),
+                    Parameter(type!string, "s0", "", PSC.none),
+                    Parameter(type!int,    "i",  "", PSC.none),
+                    Parameter(type!string, "s1", "", PSC.none),
                 ],
             ),
         ]
@@ -285,8 +285,8 @@ unittest {
                         "add1",
                         Type("int", int.sizeof),
                         [
-                            Parameter("int", "i"),
-                            Parameter("int", "j"),
+                            Parameter(type!int, "i"),
+                            Parameter(type!int, "j"),
                         ],
                     ),
                     Function(
@@ -295,8 +295,8 @@ unittest {
                         "add1",
                         Type("double", double.sizeof),
                         [
-                            Parameter("double", "d0"),
-                            Parameter("double", "d1"),
+                            Parameter(type!double, "d0"),
+                            Parameter(type!double, "d1"),
                         ],
                     ),
                 ]
@@ -310,8 +310,8 @@ unittest {
                         "withDefault",
                         Type("double", double.sizeof),
                         [
-                            Parameter("double", "fst"),
-                            Parameter("double", "snd", "33.3"),
+                            Parameter(type!double, "fst"),
+                            Parameter(type!double, "snd", "33.3"),
                         ],
                     ),
                 ]
@@ -325,11 +325,11 @@ unittest {
                         "storageClasses",
                         Type("void", 1),
                         [
-                            Parameter("int", "normal", "", PSC.none),
-                            Parameter("int*", "returnScope", "", PSC.return_ | PSC.scope_),
-                            Parameter("int", "out_", "", PSC.out_),
-                            Parameter("int", "ref_", "", PSC.ref_),
-                            Parameter("int", "lazy_", "", PSC.lazy_),
+                            Parameter(type!int, "normal", "", PSC.none),
+                            Parameter(type!(int*), "returnScope", "", PSC.return_ | PSC.scope_),
+                            Parameter(type!int, "out_", "", PSC.out_),
+                            Parameter(type!int, "ref_", "", PSC.ref_),
+                            Parameter(type!int, "lazy_", "", PSC.lazy_),
                         ]
                     ),
                 ]
@@ -378,7 +378,7 @@ unittest {
                         0,
                         "identityInt",
                         Type("int", int.sizeof),
-                        [Parameter("int", "x", "", PSC.none)],
+                        [Parameter(type!int, "x", "", PSC.none)],
                     ),
                 ]
             ),
@@ -390,7 +390,7 @@ unittest {
                         0,
                         "voldermort",
                         Type("Voldermort", ReturnType!(modules.functions.voldermort).sizeof),
-                        [Parameter("int", "i", "", PSC.none)],
+                        [Parameter(type!int, "i", "", PSC.none)],
                     ),
                 ]
             ),
@@ -402,7 +402,7 @@ unittest {
                         0,
                         "voldermortArray",
                         Type("DasVoldermort[]", ReturnType!(modules.functions.voldermortArray).sizeof),
-                        [Parameter("int", "i", "", PSC.none)],
+                        [Parameter(type!int, "i", "", PSC.none)],
                     ),
                 ]
             ),
@@ -415,9 +415,9 @@ unittest {
                         "concatFoo",
                         Type("string", string.sizeof),
                         [
-                            Parameter("string", "s0", "", PSC.none),
-                            Parameter("int",    "i",  "", PSC.none),
-                            Parameter("string", "s1", "", PSC.none),
+                            Parameter(type!string, "s0", "", PSC.none),
+                            Parameter(type!int,    "i",  "", PSC.none),
+                            Parameter(type!string, "s1", "", PSC.none),
                         ],
                     ),
 
