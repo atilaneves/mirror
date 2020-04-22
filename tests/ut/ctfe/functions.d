@@ -162,7 +162,7 @@ unittest {
 @("functions.byOverload")
 @safe pure unittest {
     static import modules.functions;
-    import std.traits: PSC = ParameterStorageClass;
+    import std.traits: PSC = ParameterStorageClass, ReturnType;
 
     enum mod = module_!"modules.functions";
     mod.functionsByOverload[].shouldBeSameSetAs(
@@ -171,7 +171,7 @@ unittest {
                 "modules.functions",
                 0,
                 "add1",
-                Type("int"),
+                Type("int", int.sizeof),
                 [
                     Parameter("int", "i"),
                     Parameter("int", "j"),
@@ -181,7 +181,7 @@ unittest {
                 "modules.functions",
                 1,
                 "add1",
-                Type("double"),
+                Type("double", double.sizeof),
                 [
                     Parameter("double", "d0"),
                     Parameter("double", "d1"),
@@ -191,7 +191,7 @@ unittest {
                 "modules.functions",
                 0,
                 "withDefault",
-                Type("double"),
+                Type("double", double.sizeof),
                 [
                     Parameter("double", "fst"),
                     Parameter("double", "snd", "33.3"),
@@ -201,7 +201,7 @@ unittest {
                 "modules.functions",
                 0,
                 "storageClasses",
-                Type("void"),
+                Type("void", 1),
                 [
                     Parameter("int", "normal", "", PSC.none),
                     Parameter("int*", "returnScope", "", PSC.return_ | PSC.scope_),
@@ -214,49 +214,49 @@ unittest {
                 "modules.functions",
                 0,
                 "exportedFunc",
-                Type("void"),
+                Type("void", 1),
                 [],
             ),
             Function(
                 "modules.functions",
                 0,
                 "externC",
-                Type("void"),
+                Type("void", 1),
                 [],
             ),
             Function(
                 "modules.functions",
                 0,
                 "externCpp",
-                Type("void"),
+                Type("void", 1),
                 [],
             ),
             Function(
                 "modules.functions",
                 0,
                 "identityInt",
-                Type("int"),
+                Type("int", int.sizeof),
                 [Parameter("int", "x", "", PSC.none)],
             ),
             Function(
                 "modules.functions",
                 0,
                 "voldermort",
-                Type("Voldermort"),
+                Type("Voldermort", ReturnType!(modules.functions.voldermort).sizeof),
                 [Parameter("int", "i", "", PSC.none)],
             ),
             Function(
                 "modules.functions",
                 0,
                 "voldermortArray",
-                Type("DasVoldermort[]"),
+                Type("DasVoldermort[]", ReturnType!(modules.functions.voldermortArray).sizeof),
                 [Parameter("int", "i", "", PSC.none)],
             ),
             Function(
                 "modules.functions",
                 0,
                 "concatFoo",
-                Type("string"),
+                Type("string", string.sizeof),
                 [
                     Parameter("string", "s0", "", PSC.none),
                     Parameter("int",    "i",  "", PSC.none),
@@ -271,7 +271,7 @@ unittest {
 @("functions.bySymbol")
 @safe pure unittest {
     static import modules.functions;
-    import std.traits: PSC = ParameterStorageClass;
+    import std.traits: PSC = ParameterStorageClass, ReturnType;
 
     enum mod = module_!"modules.functions";
     mod.functionsBySymbol[].shouldBeSameSetAs(
@@ -283,7 +283,7 @@ unittest {
                         "modules.functions",
                         0,
                         "add1",
-                        Type("int"),
+                        Type("int", int.sizeof),
                         [
                             Parameter("int", "i"),
                             Parameter("int", "j"),
@@ -293,7 +293,7 @@ unittest {
                         "modules.functions",
                         1,
                         "add1",
-                        Type("double"),
+                        Type("double", double.sizeof),
                         [
                             Parameter("double", "d0"),
                             Parameter("double", "d1"),
@@ -308,7 +308,7 @@ unittest {
                         "modules.functions",
                         0,
                         "withDefault",
-                        Type("double"),
+                        Type("double", double.sizeof),
                         [
                             Parameter("double", "fst"),
                             Parameter("double", "snd", "33.3"),
@@ -323,7 +323,7 @@ unittest {
                         "modules.functions",
                         0,
                         "storageClasses",
-                        Type("void"),
+                        Type("void", 1),
                         [
                             Parameter("int", "normal", "", PSC.none),
                             Parameter("int*", "returnScope", "", PSC.return_ | PSC.scope_),
@@ -341,7 +341,7 @@ unittest {
                         "modules.functions",
                         0,
                         "exportedFunc",
-                        Type("void"),
+                        Type("void", 1),
                         [],
                     ),
                 ]
@@ -353,7 +353,7 @@ unittest {
                         "modules.functions",
                         0,
                         "externC",
-                        Type("void"),
+                        Type("void", 1),
                         [],
                         ),
                 ]
@@ -365,7 +365,7 @@ unittest {
                         "modules.functions",
                         0,
                         "externCpp",
-                        Type("void"),
+                        Type("void", 1),
                         [],
                         ),
                 ]
@@ -377,7 +377,7 @@ unittest {
                         "modules.functions",
                         0,
                         "identityInt",
-                        Type("int"),
+                        Type("int", int.sizeof),
                         [Parameter("int", "x", "", PSC.none)],
                     ),
                 ]
@@ -389,7 +389,7 @@ unittest {
                         "modules.functions",
                         0,
                         "voldermort",
-                        Type("Voldermort"),
+                        Type("Voldermort", ReturnType!(modules.functions.voldermort).sizeof),
                         [Parameter("int", "i", "", PSC.none)],
                     ),
                 ]
@@ -401,7 +401,7 @@ unittest {
                         "modules.functions",
                         0,
                         "voldermortArray",
-                        Type("DasVoldermort[]"),
+                        Type("DasVoldermort[]", ReturnType!(modules.functions.voldermortArray).sizeof),
                         [Parameter("int", "i", "", PSC.none)],
                     ),
                 ]
@@ -413,7 +413,7 @@ unittest {
                         "modules.functions",
                         0,
                         "concatFoo",
-                        Type("string"),
+                        Type("string", string.sizeof),
                         [
                             Parameter("string", "s0", "", PSC.none),
                             Parameter("int",    "i",  "", PSC.none),
