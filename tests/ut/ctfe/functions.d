@@ -443,12 +443,12 @@ unittest {
     mod.allAggregates[].shouldBeSameSetAs(
         [
             Aggregate(
-                "Voldermort",
+                "modules.functions.voldermort.Voldermort",
                 Aggregate.Kind.struct_,
                 [Variable("int", "i")],
             ),
             Aggregate(
-                "DasVoldermort",
+                "modules.functions.voldermortArray.DasVoldermort",
                 Aggregate.Kind.struct_,
                 [Variable("int", "i")],
             ),

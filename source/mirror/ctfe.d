@@ -40,7 +40,11 @@ Module module_(string moduleName)() {
     enum toVariable(alias V) = Variable(fullyQualifiedName!(V.Type), V.identifier);
     ret.variables = [ staticMap!(toVariable, module_.Variables) ];
 
-    enum toAggregate(T) = Aggregate(T.stringof, toKind!T, [ staticMap!(toVariable, Fields!T)] );
+    enum toAggregate(T) = Aggregate(
+        fullyQualifiedName!T,
+        toKind!T,
+        [ staticMap!(toVariable, Fields!T)],
+    );
     ret.aggregates = [ staticMap!(toAggregate, module_.Aggregates) ];
     ret.allAggregates = [ staticMap!(toAggregate, module_.AllAggregates) ];
 
