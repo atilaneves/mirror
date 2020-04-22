@@ -75,7 +75,11 @@ abstract class RuntimeTypeInfo {
 class RuntimeTypeInfoImpl(T): RuntimeTypeInfo {
     override string toString(in Object obj) @safe pure scope const {
         import std.conv: text;
-        import std.conv: to;
+        import std.traits: fullyQualifiedName;
+
+        scope rightType = cast(const T) obj;
+        if(rightType is null)
+            throw new Exception("Cannot call toString on obj since not of type " ~ fullyQualifiedName!T);
         return text(cast(const T) obj);
     }
 }

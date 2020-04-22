@@ -117,9 +117,19 @@ import mirror.rtti;
         }
     }
 
+    static class Double {
+        double d;
+        this(double d) { this.d = d; }
+    }
+
     with(extendRTTI!Int) {
         const info = rtti!Int;
         info.toString(new Int(42)).should == "Int(42)";
         info.toString(new Int(88)).should == "Int(88)";
+
+        enum testName = __traits(identifier, __traits(parent, {}));
+        enum prefix = __MODULE__ ~ "." ~ testName ~ ".";
+        info.toString(new Double(33.3)).shouldThrowWithMessage(
+            "Cannot call toString on obj since not of type " ~ prefix ~ "Int");
     }
 }
