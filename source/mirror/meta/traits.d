@@ -2,7 +2,7 @@
    Information about types and symbols at compile-time,
    similar to std.traits.
  */
-module mirror.traits;
+module mirror.meta.traits;
 
 
 import mirror.trait_enums: Protection;
@@ -89,7 +89,7 @@ alias RecursiveFieldTypes(T) = RecursiveFieldTypesImpl!T;
 
 private template RecursiveFieldTypesImpl(T, alreadySeen...) {
 
-    import mirror.traits: isStruct, isClass;
+    import mirror.meta.traits: isStruct, isClass;
     import std.meta: staticMap, AliasSeq, NoDuplicates, Filter,
         templateNot, staticIndexOf;
 
@@ -157,7 +157,7 @@ template isProperty(alias F) {
  */
 template MemberFunctionsByOverload(T) if(isStruct!T || isClass!T || isInterface!T)
 {
-    import mirror.meta: functionsByOverload;
+    import mirror.meta.reflection: functionsByOverload;
     import mirror.trait_enums: Protection;
     import std.meta: Filter, staticMap;
 
@@ -207,7 +207,7 @@ private template isMemberFunction(alias F) {
 
 
 template PublicMembers(alias A) {
-    import mirror.traits: isPrivate;
+    import mirror.meta.traits: isPrivate;
     import std.meta: Filter, staticMap, Alias, AliasSeq;
 
     private alias member(string name) = MemberFromName!(A, name);
@@ -407,7 +407,7 @@ template NumRequiredParameters(A...) if(A.length == 1) {
    parameters.
  */
 template Parameters(alias F) {
-    import mirror.traits: Parameter;
+    import mirror.meta.traits: Parameter;
     import std.traits: StdParameters = Parameters,
         ParameterIdentifierTuple, ParameterDefaults, ParameterStorageClassTuple;
     import std.meta: staticMap, aliasSeqOf;

@@ -11,8 +11,8 @@ module mirror.ctfe.reflection;
    Returns compile-time reflection information about a D module.
  */
 Module module_(string moduleName)() {
-    import mirror.meta: ModuleTemplate = Module;
-    import mirror.traits: Fields;
+    import mirror.meta.reflection: ModuleTemplate = Module;
+    import mirror.meta.traits: Fields;
     import std.meta: staticMap;
     import std.traits: fullyQualifiedName;
 
@@ -22,7 +22,7 @@ Module module_(string moduleName)() {
     alias module_ = ModuleTemplate!moduleName;
 
     template toKind(T) {
-        import mirror.traits: FundamentalType;
+        import mirror.meta.traits: FundamentalType;
         alias U = FundamentalType!T;
         static if(is(U == enum))
             enum toKind = Aggregate.Kind.enum_;
@@ -49,7 +49,7 @@ Module module_(string moduleName)() {
 
 
     template toFunction(alias F) {
-        import mirror.traits: Parameters;
+        import mirror.meta.traits: Parameters;
         import std.traits: ReturnType;
 
         template toDefault(alias Default) {

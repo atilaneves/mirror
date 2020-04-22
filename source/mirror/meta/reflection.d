@@ -3,7 +3,7 @@
    reflection, allowing client code to do type-level computations on the
    contents of a D module.
  */
-module mirror.meta;
+module mirror.meta.reflection;
 
 
 import mirror.trait_enums: Protection, toProtection, Linkage, toLinkage;
@@ -14,7 +14,7 @@ import std.meta: Alias;
  */
 template Module(string moduleName) {
 
-    import mirror.traits: RecursiveTypeTree, RecursiveFieldTypes, FundamentalType, PublicMembers,
+    import mirror.meta.traits: RecursiveTypeTree, RecursiveFieldTypes, FundamentalType, PublicMembers,
         MemberFunctionsByOverload;
     import std.meta: Alias, NoDuplicates, Filter, staticMap, templateNot;
 
@@ -69,7 +69,7 @@ template Module(string moduleName) {
 
 private template returnTypes(functions...) {
 
-    import mirror.traits: FundamentalType;
+    import mirror.meta.traits: FundamentalType;
     import std.traits: ReturnType;
     import std.meta: staticMap, NoDuplicates;
 
@@ -89,7 +89,7 @@ private template returnTypes(functions...) {
 
 private template parameterTypes(functions...) {
 
-    import mirror.traits: FundamentalType;
+    import mirror.meta.traits: FundamentalType;
     import std.traits: Parameters;
     import std.meta: staticMap, NoDuplicates;
 
@@ -125,7 +125,7 @@ package template aggregates(publicMembers...) {
 
 // Global variables
 private template variables(publicMembers...) {
-    import mirror.traits: isMutableSymbol, isVariable;
+    import mirror.meta.traits: isMutableSymbol, isVariable;
     import std.meta: staticMap, Filter;
 
     private template toVariable(alias member) {
@@ -154,7 +154,7 @@ template Variable(T, string N, alias V, bool C) {
 
 private template functionsBySymbol(alias parent, publicMembers...) {
 
-    import mirror.traits: memberIsRegularFunction;
+    import mirror.meta.traits: memberIsRegularFunction;
     import std.meta: Filter, staticMap;
 
     private alias functionMembers = Filter!(memberIsRegularFunction, publicMembers);
@@ -207,7 +207,7 @@ template FunctionSymbol(
 
 package template functionsByOverload(alias parent, publicMembers...) {
 
-    import mirror.traits: memberIsRegularFunction;
+    import mirror.meta.traits: memberIsRegularFunction;
     import std.meta: Filter, staticMap;
 
     private alias functionMembers = Filter!(memberIsRegularFunction, publicMembers);
@@ -271,7 +271,7 @@ template FunctionOverload(
     size_t Idx = 0,
 )
 {
-    import mirror.traits: Parameters;
+    import mirror.meta.traits: Parameters;
     import std.traits: RT = ReturnType;
 
     alias symbol = F;
