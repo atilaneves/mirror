@@ -149,11 +149,13 @@ Type type(T)() {
     return Type(fullyQualifiedName!T, T.sizeof);
 }
 
+
 struct Type {
     string name;
     size_t size;
     // UDAs?
 }
+
 
 /// A variable
 struct Variable {
@@ -169,7 +171,8 @@ struct OverloadSet {
     Function[] overloads;
 }
 
-/// A function
+
+/// A function. Each of these describes only one overload.
 struct Function {
     string moduleName;
     int overloadIndex;
@@ -211,6 +214,10 @@ struct Function {
     }
 }
 
+/**
+   Returns a pointer to the function described
+   by `function_`.
+ */
 auto pointer(Function function_)() {
     mixin(`static import `, function_.moduleName, `;`);
 
