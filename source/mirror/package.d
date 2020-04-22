@@ -1,5 +1,5 @@
 module mirror;
 
 
-public import mirror.ctfe;
-public import mirror.meta;
+public import mirror.ctfe.reflection;
+public import mirror.meta.reflection;

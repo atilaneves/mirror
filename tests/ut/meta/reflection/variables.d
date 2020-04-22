@@ -1,7 +1,7 @@
-module ut.meta.variables;
+module ut.meta.reflection.variables;
 
 
-import ut.meta;
+import ut.meta.reflection;
 import std.meta: AliasSeq;
 
 

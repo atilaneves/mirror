@@ -21,7 +21,7 @@ Types types(T...)() {
 
     static RuntimeTypeInfo runtimeTypeInfo(T)() {
 
-        import mirror.traits: Fields;
+        import mirror.meta.traits: Fields;
 
         auto ret = new RuntimeTypeInfoImpl!T();
 

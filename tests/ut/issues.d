@@ -2,7 +2,7 @@ module ut.issues;
 
 
 import ut;
-import mirror.meta;
+import mirror.meta.reflection;
 import std.meta: AliasSeq;
 
 

@@ -1,9 +1,9 @@
-module ut.traits;
+module ut.meta.traits;
 
 
 import ut;
-import mirror.meta;
-import mirror.traits;
+import mirror.meta.reflection;
+import mirror.meta.traits;
 import std.meta: AliasSeq;
 
 
@@ -542,7 +542,6 @@ static void staticGlobalFunc() {
 @("isVariable")
 @safe pure unittest {
     static import modules.variables;
-    import mirror.traits: MemberFromName;
 
     alias member(string name) = MemberFromName!(modules.variables, name);
 
