@@ -19,7 +19,7 @@ ExtendedRTTI extendRTTI(Types...)() {
 
         static if(is(T == class)) {
             static foreach(field; Fields!T) {
-                ret.fields ~= new FieldImpl!(T, field.Type, field.identifier)(typeid(field.Type));
+                ret.fields ~= new FieldImpl!(T, field.Type, field.identifier)(typeid(field.Type), field.protection);
             }
         }
 
@@ -93,16 +93,19 @@ class RuntimeTypeInfoImpl(T): RuntimeTypeInfo {
 
 abstract class Field {
 
+    import mirror.meta: Protection;
     import std.variant: Variant;
 
     TypeInfo typeInfo;
     string type;
     string identifier;
+    Protection protection;
 
-    this(TypeInfo typeInfo, string type, string identifier) @safe pure scope {
+    this(TypeInfo typeInfo, string type, string identifier, in Protection protection) @safe pure scope {
         this.typeInfo = typeInfo;
         this.type = type;
         this.identifier = identifier;
+        this.protection = protection;
     }
 
     T get(T)(in Object obj) const {
@@ -117,13 +120,18 @@ class FieldImpl(P, F, string member): Field {
 
     import std.variant: Variant;
 
-    this(TypeInfo typeInfo) {
+    this(TypeInfo typeInfo, in Protection protection) {
         import std.traits: fullyQualifiedName;
-        super(typeInfo, fullyQualifiedName!F, member);
+        super(typeInfo, fullyQualifiedName!F, member, protection);
     }
 
     override Variant getImpl(in Object obj) scope const {
+        import mirror.meta: Protection;
         import std.traits: Unqual, fullyQualifiedName;
+        import std.algorithm: among;
+
+        if(!protection.among(Protection.export_, Protection.public_))
+            throw new Exception("Cannot get private member");
 
         scope rightType = cast(P) obj;
         if(rightType is null)

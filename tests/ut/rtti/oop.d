@@ -221,6 +221,27 @@ import mirror.rtti;
     }
 }
 
+@("fields.get.1")
+@system unittest {
+
+    import std.algorithm: map;
+
+    static abstract class Abstract {}
+    static class Class: Abstract {
+        string s0;
+        private string s1;
+        double d;
+        string s2;
+    }
+    const Abstract obj = new Class();
+
+    with(extendRTTI!Class) {
+        const info = rtti(obj);
+        info.fields[0].get!string(obj).should == "";
+        info.fields[1].get!string(obj).shouldThrowWithMessage("Cannot get private member");
+    }
+}
+
 
 @("toString.Int")
 @safe pure unittest {

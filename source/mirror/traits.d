@@ -5,6 +5,9 @@
 module mirror.traits;
 
 
+import mirror.meta: Protection;
+
+
 /// Usable as a predicate to std.meta.Filter
 enum isEnum(T) = is(T == enum);
 
@@ -476,6 +479,7 @@ template isVariable(alias member) {
    The fields of a struct, union, or class
  */
 template Fields(T) {
+    import mirror.meta: toProtection;
     import std.meta: staticMap, aliasSeqOf, Filter;
     import std.traits: FieldTypeTuple, FieldNameTuple;
     import std.range: iota;
@@ -484,7 +488,6 @@ template Fields(T) {
 
     static if(is(T == class)) {
         private alias member(string name) = __traits(getMember, T, name);
-
 
         template TypeOf(alias A) {
             static if(is(typeof(A)))
@@ -497,7 +500,11 @@ template Fields(T) {
         enum hasType(string name) = !is(TypeOf!(member!name) == NoType);
         enum isField(string name) = !isFunction!name && hasType!name;
         alias fieldNames = Filter!(isField, __traits(allMembers, T));
-        alias toField(string name) = Field!(TypeOf!(member!name), name);
+        alias toField(string name) = Field!(
+            TypeOf!(member!name),
+            name,
+            __traits(getProtection, member!name).toProtection
+        );
 
         alias Fields = staticMap!(toField, fieldNames);
     } else {
@@ -510,7 +517,8 @@ template Fields(T) {
 /**
    A field of a struct, union, or class
  */
-template Field(F, string id) {
+template Field(F, string id, Protection prot = Protection.public_) {
     alias Type = F;
     enum identifier = id;
+    enum protection = prot;
 }
