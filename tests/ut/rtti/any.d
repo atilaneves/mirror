@@ -21,3 +21,18 @@ import mirror.rtti;
         rtti(c).shouldThrowWithMessage("Cannot get RTTI from null object");
     }
 }
+
+
+@("rtti.unregistered")
+@safe pure unittest {
+    static class Class {}
+    enum testName = __traits(identifier, __traits(parent, {}));
+    enum prefix = __MODULE__ ~ "." ~ testName ~ ".";
+
+    with(types!()) {
+        rtti(new Class).shouldThrowWithMessage(
+            "Cannot get RTTI for unregistered type " ~
+            prefix ~ "Class"
+            );
+    }
+}
