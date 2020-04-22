@@ -60,28 +60,94 @@ import mirror.rtti;
 }
 
 
-@("fields.0")
+@("fields.typeInfo.0")
+@system unittest {
+    import std.algorithm: map;
+    import std.array: array;
+
+    static abstract class Abstract {}
+    static class Class: Abstract {
+        int i;
+        string s;
+        this(int i, string s) { this.i = i; this.s = s; }
+    }
+    const Abstract obj = new Class(42, "foobar");
+
+    with(extendRTTI!Class) {
+        const info = rtti(obj);
+        info.fields.map!(a => a.typeInfo).array.should == [
+            typeid(int),
+            typeid(string),
+        ];
+    }
+}
+
+
+@("fields.type.0")
+@safe pure unittest {
+    import std.algorithm: map;
+
+    static abstract class Abstract {}
+    static class Class: Abstract {
+        int i;
+        string s;
+        this(int i, string s) { this.i = i; this.s = s; }
+    }
+    const Abstract obj = new Class(42, "foobar");
+
+    with(extendRTTI!Class) {
+        const info = rtti(obj);
+        info.fields.map!(a => a.type).should == [ "int", "string" ];
+    }
+}
+
+@("fields.id.0")
+@safe pure unittest {
+    import std.algorithm: map;
+
+    static abstract class Abstract {}
+    static class Class: Abstract {
+        int i;
+        string s;
+        this(int i, string s) { this.i = i; this.s = s; }
+    }
+    const Abstract obj = new Class(42, "foobar");
+
+    with(extendRTTI!Class) {
+        const info = rtti(obj);
+        info.fields.map!(a => a.identifier).should == [ "i", "s" ];
+    }
+}
+
+
+@("fields.get.0")
 @system /* typeInfo */ unittest {
 
     static abstract class Abstract {}
     static class Class: Abstract {
         int i;
         string s;
+        this(int i, string s) { this.i = i; this.s = s; }
     }
-    const Abstract obj = new Class();
+    const Abstract obj = new Class(42, "foobar");
 
     with(extendRTTI!Class) {
         const info = rtti(obj);
-        info.fields.should == [
-            Field(typeid(int), "int", "i"),
-            Field(typeid(string), "string", "s"),
-        ];
+
+        info.fields[0].get!int(obj).should == 42;
+        info.fields[0].get!string(obj).shouldThrow;
+
+        info.fields[1].get!int(obj).shouldThrow;
+        info.fields[1].get!string(obj).should == "foobar";
     }
 }
 
 
-@("fields.1")
-@system /* typeInfo */ unittest {
+@("fields.typeInfo.1")
+@system unittest {
+
+    import std.algorithm: map;
+    import std.array: array;
 
     static abstract class Abstract {}
     static class Class: Abstract {
@@ -94,11 +160,63 @@ import mirror.rtti;
 
     with(extendRTTI!Class) {
         const info = rtti(obj);
-        info.fields.should == [
-            Field(typeid(string), "string", "s0"),
-            Field(typeid(string), "string", "s1"),
-            Field(typeid(double), "double", "d"),
-            Field(typeid(string), "string", "s2"),
+        info.fields.map!(a => a.typeInfo).array.should == [
+            typeid(string),
+            typeid(string),
+            typeid(double),
+            typeid(string),
+        ];
+    }
+}
+
+
+@("fields.type.1")
+@safe pure unittest {
+
+    import std.algorithm: map;
+
+    static abstract class Abstract {}
+    static class Class: Abstract {
+        string s0;
+        string s1;
+        double d;
+        string s2;
+    }
+    const Abstract obj = new Class();
+
+    with(extendRTTI!Class) {
+        const info = rtti(obj);
+        info.fields.map!(a => a.type).should == [
+            "string",
+            "string",
+            "double",
+            "string",
+        ];
+    }
+}
+
+
+@("fields.id.1")
+@safe pure unittest {
+
+    import std.algorithm: map;
+
+    static abstract class Abstract {}
+    static class Class: Abstract {
+        string s0;
+        string s1;
+        double d;
+        string s2;
+    }
+    const Abstract obj = new Class();
+
+    with(extendRTTI!Class) {
+        const info = rtti(obj);
+        info.fields.map!(a => a.identifier).should == [
+            "s0",
+            "s1",
+            "d",
+            "s2",
         ];
     }
 }

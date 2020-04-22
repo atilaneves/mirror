@@ -17,8 +17,10 @@ ExtendedRTTI extendRTTI(Types...)() {
         ret.fullyQualifiedName = ret.typeInfo.toString;
         ret.name = ret.fullyQualifiedName.split(".")[$-1];
 
-        static foreach(field; Fields!T) {
-            ret.fields ~= Field(typeid(field.Type), field.Type.stringof, field.identifier);
+        static if(is(T == class)) {
+            static foreach(field; Fields!T) {
+                ret.fields ~= new FieldImpl!(T, field.Type, field.identifier)(typeid(field.Type));
+            }
         }
 
         return ret;
@@ -89,8 +91,47 @@ class RuntimeTypeInfoImpl(T): RuntimeTypeInfo {
 }
 
 
-struct Field {
+abstract class Field {
+
+    import std.variant: Variant;
+
     TypeInfo typeInfo;
     string type;
     string identifier;
+
+    this(TypeInfo typeInfo, string type, string identifier) @safe pure scope {
+        this.typeInfo = typeInfo;
+        this.type = type;
+        this.identifier = identifier;
+    }
+
+    T get(T)(in Object obj) const {
+        return getImpl(obj).get!T;
+    }
+
+    abstract Variant getImpl(in Object obj) scope const;
+}
+
+
+class FieldImpl(P, F, string member): Field {
+
+    import std.variant: Variant;
+
+    this(TypeInfo typeInfo) {
+        import std.traits: fullyQualifiedName;
+        super(typeInfo, fullyQualifiedName!F, member);
+    }
+
+    override Variant getImpl(in Object obj) scope const {
+        import std.traits: Unqual, fullyQualifiedName;
+
+        scope rightType = cast(P) obj;
+        if(rightType is null)
+            throw new Exception(
+                "Cannot call get!" ~
+                fullyQualifiedName!F ~ " since not of type " ~
+                fullyQualifiedName!P);
+
+        return Variant(__traits(getMember, rightType, member));
+    }
 }
