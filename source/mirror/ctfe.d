@@ -72,7 +72,7 @@ Module module_(string moduleName)() {
             moduleName,
             F.index,
             F.identifier,
-            Type(ReturnType!(F.symbol).stringof, ReturnType!(F.symbol).sizeof),
+            type!(ReturnType!(F.symbol)),
             [staticMap!(toParameter, aliasSeqOf!(Parameters!(F.symbol).length.iota))],
         );
     }

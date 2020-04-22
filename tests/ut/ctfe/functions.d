@@ -242,14 +242,14 @@ unittest {
                 "modules.functions",
                 0,
                 "voldermort",
-                Type("Voldermort", ReturnType!(modules.functions.voldermort).sizeof),
+                Type("modules.functions.voldermort.Voldermort", ReturnType!(modules.functions.voldermort).sizeof),
                 [Parameter(type!int, "i", "", PSC.none)],
             ),
             Function(
                 "modules.functions",
                 0,
                 "voldermortArray",
-                Type("DasVoldermort[]", ReturnType!(modules.functions.voldermortArray).sizeof),
+                Type("modules.functions.voldermortArray.DasVoldermort[]", ReturnType!(modules.functions.voldermortArray).sizeof),
                 [Parameter(type!int, "i", "", PSC.none)],
             ),
             Function(
@@ -389,7 +389,10 @@ unittest {
                         "modules.functions",
                         0,
                         "voldermort",
-                        Type("Voldermort", ReturnType!(modules.functions.voldermort).sizeof),
+                        Type(
+                            "modules.functions.voldermort.Voldermort",
+                            ReturnType!(modules.functions.voldermort).sizeof,
+                        ),
                         [Parameter(type!int, "i", "", PSC.none)],
                     ),
                 ]
@@ -401,7 +404,10 @@ unittest {
                         "modules.functions",
                         0,
                         "voldermortArray",
-                        Type("DasVoldermort[]", ReturnType!(modules.functions.voldermortArray).sizeof),
+                        Type(
+                            "modules.functions.voldermortArray.DasVoldermort[]",
+                            ReturnType!(modules.functions.voldermortArray).sizeof,
+                        ),
                         [Parameter(type!int, "i", "", PSC.none)],
                     ),
                 ]
