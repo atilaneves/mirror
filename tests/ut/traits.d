@@ -573,12 +573,13 @@ static void staticGlobalFunc() {
     static struct Struct {
         double d;
         byte b;
+        private int i;
         string s;
     }
 
     shouldEqual!(
         Fields!Struct,
-        Field!(double, "d"), Field!(byte, "b"), Field!(string, "s"),
+        Field!(double, "d"), Field!(byte, "b"), Field!(int, "i", Protection.private_), Field!(string, "s"),
     );
 }
 
