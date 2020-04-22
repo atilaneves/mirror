@@ -133,3 +133,9 @@ import mirror.rtti;
             "Cannot call toString on obj since not of type " ~ prefix ~ "Int");
     }
 }
+
+
+@("extendRTTI.int")
+@safe pure unittest {
+    auto extended = extendRTTI!int;
+}
