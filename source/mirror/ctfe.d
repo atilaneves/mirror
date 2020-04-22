@@ -50,35 +50,29 @@ Module module_(string moduleName)() {
 
 
     template toFunction(alias F) {
+        import mirror.traits: Parameters;
+        import std.traits: ReturnType;
 
-        import std.range: iota;
-        import std.meta: aliasSeqOf;
-        import std.traits: ReturnType, Parameters, ParameterDefaults, ParameterIdentifierTuple;
-
-        template toDefault(size_t i) {
-            static if(is(ParameterDefaults!(F.symbol)[i] == void))
+        template toDefault(alias Default) {
+            static if(is(Default == void))
                 enum toDefault = "";
             else
-                enum toDefault = ParameterDefaults!(F.symbol)[i].stringof;
+                enum toDefault = Default.stringof;
         }
 
-        template toParameter(size_t i) {
-            import std.traits: ParameterStorageClassTuple;
-
-            enum toParameter = Parameter(
-                type!(Parameters!(F.symbol)[i]),
-                ParameterIdentifierTuple!(F.symbol)[i],
-                toDefault!i,
-                ParameterStorageClassTuple!(F.symbol)[i],
-            );
-        }
+        enum toParameter(alias P) = Parameter(
+            type!(P.Type),
+            P.identifier,
+            toDefault!(P.Default),
+            P.storageClass
+        );
 
         enum toFunction = Function(
             moduleName,
             F.index,
             F.identifier,
             type!(ReturnType!(F.symbol)),
-            [staticMap!(toParameter, aliasSeqOf!(Parameters!(F.symbol).length.iota))],
+            [ staticMap!(toParameter, Parameters!(F.symbol)) ],
         );
     }
 
