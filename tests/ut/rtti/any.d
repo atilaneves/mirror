@@ -36,3 +36,18 @@ import mirror.rtti;
             );
     }
 }
+
+
+@("mixin")
+@safe pure unittest {
+
+    static struct Namespace {
+        static immutable mirror.rtti.Types _types;
+        mixin typesVar!(_types, int, double);
+    }
+
+    with(Namespace._types) {
+        rtti(42).name.should == "int";
+        rtti(33.3).name.should == "double";
+    }
+}

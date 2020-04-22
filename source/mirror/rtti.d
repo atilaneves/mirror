@@ -1,6 +1,12 @@
 module mirror.rtti;
 
 
+mixin template typesVar(alias symbol, T...) {
+    shared static this() nothrow {
+        symbol = types!T;
+    }
+}
+
 /**
    Extend runtime type information for the given types.
  */
@@ -40,17 +46,22 @@ struct Types {
 
     private RuntimeTypeInfo[TypeInfo] _typeToInfo;
 
-    RuntimeTypeInfo rtti(T)() {
+    auto rtti(T)() inout {
         return rtti(typeid(T));
     }
 
-    RuntimeTypeInfo rtti(T)(auto ref T obj) {
-        if(obj is null)
-            throw new Exception("Cannot get RTTI from null object");
+    auto rtti(T)(auto ref T obj) inout {
+        import std.traits: isPointer;
+
+        static if(is(T == class)) {
+            if(obj is null)
+                throw new Exception("Cannot get RTTI from null object");
+        }
+
         return rtti(typeid(obj));
     }
 
-    RuntimeTypeInfo rtti(scope TypeInfo typeInfo) @safe pure scope {
+    auto rtti(scope TypeInfo typeInfo) @safe pure scope inout {
         scope ptr = typeInfo in _typeToInfo;
 
         if(ptr is null) {
