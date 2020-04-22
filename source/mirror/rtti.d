@@ -15,7 +15,10 @@ ExtendedRTTI extendRTTI(Types...)() {
 
         ret.typeInfo = typeid(T);
         ret.type = Type(ret.typeInfo.toString);
-        ret.type.fields.length = Fields!T.length;
+
+        static foreach(field; Fields!T) {
+            ret.type.fields ~= Field(field.Type.stringof, field.identifier);
+        }
 
         return ret;
     }
@@ -70,5 +73,6 @@ struct Type {
 
 
 struct Field {
-
+    string type;
+    string identifier;
 }

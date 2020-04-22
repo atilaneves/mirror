@@ -72,7 +72,10 @@ unittest {
 
     with(extendRTTI!Class) {
         const info = rtti(obj);
-        info.type.fields.length.should == 2;
+        info.type.fields.should == [
+            Field("int", "i"),
+            Field("string", "s"),
+        ];
     }
 }
 
@@ -91,6 +94,11 @@ unittest {
 
     with(extendRTTI!Class) {
         const info = rtti(obj);
-        info.type.fields.length.should == 4;
+        info.type.fields.should == [
+            Field("string", "s0"),
+            Field("string", "s1"),
+            Field("double", "d"),
+            Field("string", "s2"),
+        ];
     }
 }
