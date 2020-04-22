@@ -45,7 +45,7 @@ import mirror.rtti;
 
 @("type.typeInfo")
 // The test is neither @safe nor pure because Object.opEquals isn't
-unittest {
+@system unittest {
 
     static abstract class Abstract { }
     static class Class: Abstract { }
