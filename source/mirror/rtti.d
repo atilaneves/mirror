@@ -212,7 +212,7 @@ private:
         if(!protection.among(Protection.export_, Protection.public_))
             throw new Exception("Cannot get private member");
 
-        scope rightType = cast(CopyTypeQualifiers!(O, P)) obj;
+        auto rightType = cast(CopyTypeQualifiers!(O, P)) obj;
         if(rightType is null)
             throw new Exception(
                 "Cannot call get!" ~
