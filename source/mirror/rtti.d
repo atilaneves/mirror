@@ -154,7 +154,7 @@ abstract class Field {
     }
 
     abstract inout(Variant) getImpl(inout Object obj) @safe const;
-    abstract void setImpl(Object obj, in Variant value) const;
+    abstract void setImpl(Object obj, in Variant value) @safe const;
     abstract string toString(in Object obj) const;
 }
 
@@ -179,8 +179,14 @@ private class FieldImpl(P, F, string member): Field {
         return ret;
     }
 
-    override void setImpl(Object obj, in Variant value) const {
-        getMember(obj) = value.get!F;
+    override void setImpl(Object obj, in Variant value) @safe const {
+        import std.traits: fullyQualifiedName;
+
+        auto ptr = () @trusted { return value.peek!F; }();
+        if(ptr is null)
+            throw new Exception("Cannot set value since not of type " ~ fullyQualifiedName!F);
+
+        getMember(obj) = *ptr;
     }
 
     override string toString(in Object obj) const {
