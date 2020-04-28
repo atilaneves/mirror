@@ -153,7 +153,7 @@ abstract class Field {
         setImpl(obj, Variant(value));
     }
 
-    abstract Variant getImpl(inout Object obj) const;
+    abstract inout(Variant) getImpl(inout Object obj) @safe const;
     abstract void setImpl(Object obj, in Variant value) const;
     abstract string toString(in Object obj) const;
 }
@@ -168,13 +168,15 @@ private class FieldImpl(P, F, string member): Field {
         super(typeInfo, fullyQualifiedName!F, member, protection);
     }
 
-    override Variant getImpl(inout Object obj) const {
+    override inout(Variant) getImpl(inout Object obj) @safe const {
         import std.traits: Unqual;
 
         auto member = getMember(obj);
-        auto ret = Variant(cast(Unqual!(typeof(member))) member);
+        auto ret = () @trusted {
+            return Variant(cast(Unqual!(typeof(member))) member);
+        }();
 
-        return cast(inout) ret;
+        return ret;
     }
 
     override void setImpl(Object obj, in Variant value) const {
