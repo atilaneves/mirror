@@ -219,7 +219,7 @@ import mirror.rtti;
 }
 
 @("fields.get.1")
-@system unittest {
+@safe unittest {
 
     import std.algorithm: map;
 
@@ -249,7 +249,7 @@ import mirror.rtti;
 
 
 @("field.get")
-@system unittest {
+@safe unittest {
     static class Class {
         int i;
         double d;
@@ -274,7 +274,7 @@ import mirror.rtti;
 
 
 @("field.set")
-@system unittest {
+@safe unittest {
     static class Class {
         int i;
         double d;
