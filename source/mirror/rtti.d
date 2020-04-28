@@ -157,7 +157,7 @@ abstract class Field {
     }
 
     void set(T)(Object obj, T value) const {
-        setImpl(obj, Variant(value));
+        setImpl(obj, () @trusted { return Variant(value); }());
     }
 
     abstract inout(Variant) getImpl(inout Object obj) @safe const;
