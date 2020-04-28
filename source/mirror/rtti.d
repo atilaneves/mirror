@@ -162,7 +162,7 @@ abstract class Field {
 
     abstract inout(Variant) getImpl(inout Object obj) @safe const;
     abstract void setImpl(Object obj, in Variant value) @safe const;
-    abstract string toString(in Object obj) const;
+    abstract string toString(in Object obj) @safe const;
 }
 
 
@@ -196,7 +196,7 @@ private class FieldImpl(P, F, string member): Field {
         getMember(obj) = *ptr;
     }
 
-    override string toString(in Object obj) const {
+    override string toString(in Object obj) @safe const {
         import std.conv: text;
         return get!F(obj).text;
     }
