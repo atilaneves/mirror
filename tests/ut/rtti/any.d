@@ -38,7 +38,7 @@ import mirror.rtti;
 }
 
 
-@("mixin")
+@("typesVar")
 @safe pure unittest {
 
     static struct Namespace {

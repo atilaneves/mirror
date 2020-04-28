@@ -219,7 +219,7 @@ import mirror.rtti;
 }
 
 @("fields.get.1")
-@system unittest {
+@safe unittest {
 
     import std.algorithm: map;
 
@@ -244,6 +244,51 @@ import mirror.rtti;
         type.fields[0].get!string(obj).should == "quux";
         type.fields[1].get!string(obj).shouldThrowWithMessage("Cannot get private member");
         type.fields[2].toString(obj).should == "33.3";
+    }
+}
+
+
+@("field.get")
+@safe unittest {
+    static class Class {
+        int i;
+        double d;
+        this(int i, double d) { this.i = i; this.d = d; }
+    }
+
+    const Object obj = new Class(42, 33.3);
+
+    with(types!Class) {
+        const type = rtti(obj);
+
+        type.field("i").get!int(obj).should == 42;
+        type.field("i").get!string(obj).shouldThrow;
+
+        type.field("d").get!double(obj).should == 33.3;
+        type.field("d").get!string(obj).shouldThrow;
+
+        type.field("foo").shouldThrowWithMessage("No field named 'foo'");
+        type.field("bar").shouldThrowWithMessage("No field named 'bar'");
+    }
+}
+
+
+@("field.set")
+@safe unittest {
+    static class Class {
+        int i;
+        double d;
+        this(int i, double d) { this.i = i; this.d = d; }
+    }
+
+    Object obj = new Class(42, 33.3);
+
+    with(types!Class) {
+        const type = rtti(obj);
+        type.field("i").get!int(obj).should == 42;
+
+        type.field("i").set(obj, 77);
+        type.field("i").get!int(obj).should == 77;
     }
 }
 

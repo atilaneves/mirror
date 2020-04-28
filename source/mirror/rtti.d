@@ -86,11 +86,24 @@ struct Types {
 
 
 abstract class RuntimeTypeInfo {
+
     TypeInfo typeInfo;
     string name;
     Field[] fields;
 
     abstract string toString(in Object obj) @safe pure scope const;
+
+    inout(Field) field(in string identifier) @safe pure scope inout {
+        import std.array: empty, front;
+        import std.algorithm.searching: find;
+
+        auto ret = fields.find!(a => a.identifier == identifier);
+
+        if(ret.empty)
+            throw new Exception("No field named '" ~ identifier ~ "'");
+
+        return ret.front;
+    }
 }
 
 
@@ -131,12 +144,25 @@ abstract class Field {
         this.protection = protection;
     }
 
-    T get(T)(in Object obj) const {
-        return getImpl(obj).get!T;
+    auto get(T, O)(O obj) const {
+        import std.traits: CopyTypeQualifiers, fullyQualifiedName;
+
+        auto variant = getImpl(obj);
+        scope ptr = () @trusted { return variant.peek!T; }();
+
+        if(ptr is null)
+            throw new Exception("Cannot get!(" ~ fullyQualifiedName!T ~ ") because of actual type " ~ variant.type.toString);
+
+        return cast(CopyTypeQualifiers!(O, T)) *ptr;
     }
 
-    abstract Variant getImpl(in Object obj) scope const;
-    abstract string toString(in Object obj) scope const;
+    void set(T)(Object obj, T value) const {
+        setImpl(obj, () @trusted { return Variant(value); }());
+    }
+
+    abstract inout(Variant) getImpl(inout Object obj) @safe const;
+    abstract void setImpl(Object obj, in Variant value) @safe const;
+    abstract string toString(in Object obj) @safe const;
 }
 
 
@@ -149,26 +175,50 @@ private class FieldImpl(P, F, string member): Field {
         super(typeInfo, fullyQualifiedName!F, member, protection);
     }
 
-    override Variant getImpl(in Object obj) scope const {
+    override inout(Variant) getImpl(inout Object obj) @safe const {
+        import std.traits: Unqual;
+
+        auto member = getMember(obj);
+        auto ret = () @trusted {
+            return Variant(cast(Unqual!(typeof(member))) member);
+        }();
+
+        return ret;
+    }
+
+    override void setImpl(Object obj, in Variant value) @safe const {
+        import std.traits: fullyQualifiedName;
+
+        auto ptr = () @trusted { return value.peek!F; }();
+        if(ptr is null)
+            throw new Exception("Cannot set value since not of type " ~ fullyQualifiedName!F);
+
+        getMember(obj) = *ptr;
+    }
+
+    override string toString(in Object obj) @safe const {
+        import std.conv: text;
+        return get!F(obj).text;
+    }
+
+private:
+
+    ref getMember(O)(O obj) const {
+
         import mirror.trait_enums: Protection;
-        import std.traits: Unqual, fullyQualifiedName;
+        import std.traits: Unqual, fullyQualifiedName, CopyTypeQualifiers;
         import std.algorithm: among;
 
         if(!protection.among(Protection.export_, Protection.public_))
             throw new Exception("Cannot get private member");
 
-        scope rightType = cast(P) obj;
+        auto rightType = cast(CopyTypeQualifiers!(O, P)) obj;
         if(rightType is null)
             throw new Exception(
                 "Cannot call get!" ~
                 fullyQualifiedName!F ~ " since not of type " ~
                 fullyQualifiedName!P);
 
-        return Variant(__traits(getMember, rightType, member));
-    }
-
-    override string toString(in Object obj) scope const {
-        import std.conv: text;
-        return get!F(obj).text;
+        return __traits(getMember, rightType, member);
     }
 }
