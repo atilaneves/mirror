@@ -144,9 +144,16 @@ abstract class Field {
         this.protection = protection;
     }
 
-    T get(T, O)(O obj) const {
-        import std.traits: CopyTypeQualifiers;
-        return getImpl(obj).get!(CopyTypeQualifiers!(O, T));
+    auto get(T, O)(O obj) const {
+        import std.traits: CopyTypeQualifiers, fullyQualifiedName;
+
+        auto variant = getImpl(obj);
+        scope ptr = () @trusted { return variant.peek!T; }();
+
+        if(ptr is null)
+            throw new Exception("Cannot get!(" ~ fullyQualifiedName!T ~ ") because of actual type " ~ variant.type.toString);
+
+        return cast(CopyTypeQualifiers!(O, T)) *ptr;
     }
 
     void set(T)(Object obj, T value) const {
