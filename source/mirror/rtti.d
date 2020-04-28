@@ -144,15 +144,16 @@ abstract class Field {
         this.protection = protection;
     }
 
-    T get(T)(in Object obj) const {
-        return getImpl(obj).get!T;
+    T get(T, O)(O obj) const {
+        import std.traits: CopyTypeQualifiers;
+        return getImpl(obj).get!(CopyTypeQualifiers!(O, T));
     }
 
     void set(T)(Object obj, T value) const {
         setImpl(obj, Variant(value));
     }
 
-    abstract Variant getImpl(in Object obj) const;
+    abstract Variant getImpl(inout Object obj) const;
     abstract void setImpl(Object obj, in Variant value) const;
     abstract string toString(in Object obj) const;
 }
@@ -167,8 +168,13 @@ private class FieldImpl(P, F, string member): Field {
         super(typeInfo, fullyQualifiedName!F, member, protection);
     }
 
-    override Variant getImpl(in Object obj) const {
-        return Variant(getMember(obj));
+    override Variant getImpl(inout Object obj) const {
+        import std.traits: Unqual;
+
+        auto member = getMember(obj);
+        auto ret = Variant(cast(Unqual!(typeof(member))) member);
+
+        return cast(inout) ret;
     }
 
     override void setImpl(Object obj, in Variant value) const {
@@ -182,16 +188,16 @@ private class FieldImpl(P, F, string member): Field {
 
 private:
 
-    ref getMember(inout Object obj) inout {
+    ref getMember(O)(O obj) const {
 
         import mirror.trait_enums: Protection;
-        import std.traits: Unqual, fullyQualifiedName;
+        import std.traits: Unqual, fullyQualifiedName, CopyTypeQualifiers;
         import std.algorithm: among;
 
         if(!protection.among(Protection.export_, Protection.public_))
             throw new Exception("Cannot get private member");
 
-        scope rightType = cast(P) obj;
+        scope rightType = cast(CopyTypeQualifiers!(O, P)) obj;
         if(rightType is null)
             throw new Exception(
                 "Cannot call get!" ~
