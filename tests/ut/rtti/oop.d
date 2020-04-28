@@ -248,6 +248,31 @@ import mirror.rtti;
 }
 
 
+@("field")
+@system unittest {
+    static class Class {
+        int i;
+        double d;
+        this(int i, double d) { this.i = i; this.d = d; }
+    }
+
+    const Object obj = new Class(42, 33.3);
+
+    with(types!Class) {
+        const type = rtti(obj);
+
+        type.field("i").get!int(obj).should == 42;
+        type.field("i").get!string(obj).shouldThrow;
+
+        type.field("d").get!double(obj).should == 33.3;
+        type.field("d").get!string(obj).shouldThrow;
+
+        type.field("foo").shouldThrowWithMessage("No field named 'foo'");
+        type.field("bar").shouldThrowWithMessage("No field named 'bar'");
+    }
+}
+
+
 @("toString.Int")
 @safe pure unittest {
 

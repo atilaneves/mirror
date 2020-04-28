@@ -86,11 +86,24 @@ struct Types {
 
 
 abstract class RuntimeTypeInfo {
+
     TypeInfo typeInfo;
     string name;
     Field[] fields;
 
     abstract string toString(in Object obj) @safe pure scope const;
+
+    inout(Field) field(in string identifier) @safe pure scope inout {
+        import std.array: empty, front;
+        import std.algorithm.searching: find;
+
+        auto ret = fields.find!(a => a.identifier == identifier);
+
+        if(ret.empty)
+            throw new Exception("No field named '" ~ identifier ~ "'");
+
+        return ret.front;
+    }
 }
 
 
