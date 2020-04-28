@@ -148,8 +148,13 @@ abstract class Field {
         return getImpl(obj).get!T;
     }
 
-    abstract Variant getImpl(in Object obj) scope const;
-    abstract string toString(in Object obj) scope const;
+    void set(T)(Object obj, T value) const {
+        setImpl(obj, Variant(value));
+    }
+
+    abstract Variant getImpl(in Object obj) const;
+    abstract void setImpl(Object obj, in Variant value) const;
+    abstract string toString(in Object obj) const;
 }
 
 
@@ -162,7 +167,23 @@ private class FieldImpl(P, F, string member): Field {
         super(typeInfo, fullyQualifiedName!F, member, protection);
     }
 
-    override Variant getImpl(in Object obj) scope const {
+    override Variant getImpl(in Object obj) const {
+        return Variant(getMember(obj));
+    }
+
+    override void setImpl(Object obj, in Variant value) const {
+        getMember(obj) = value.get!F;
+    }
+
+    override string toString(in Object obj) const {
+        import std.conv: text;
+        return get!F(obj).text;
+    }
+
+private:
+
+    ref getMember(inout Object obj) inout {
+
         import mirror.trait_enums: Protection;
         import std.traits: Unqual, fullyQualifiedName;
         import std.algorithm: among;
@@ -177,11 +198,6 @@ private class FieldImpl(P, F, string member): Field {
                 fullyQualifiedName!F ~ " since not of type " ~
                 fullyQualifiedName!P);
 
-        return Variant(__traits(getMember, rightType, member));
-    }
-
-    override string toString(in Object obj) scope const {
-        import std.conv: text;
-        return get!F(obj).text;
+        return __traits(getMember, rightType, member);
     }
 }

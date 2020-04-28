@@ -248,7 +248,7 @@ import mirror.rtti;
 }
 
 
-@("field")
+@("field.get")
 @system unittest {
     static class Class {
         int i;
@@ -269,6 +269,26 @@ import mirror.rtti;
 
         type.field("foo").shouldThrowWithMessage("No field named 'foo'");
         type.field("bar").shouldThrowWithMessage("No field named 'bar'");
+    }
+}
+
+
+@("field.set")
+@system unittest {
+    static class Class {
+        int i;
+        double d;
+        this(int i, double d) { this.i = i; this.d = d; }
+    }
+
+    Object obj = new Class(42, 33.3);
+
+    with(types!Class) {
+        const type = rtti(obj);
+        type.field("i").get!int(obj).should == 42;
+
+        type.field("i").set(obj, 77);
+        type.field("i").get!int(obj).should == 77;
     }
 }
 
