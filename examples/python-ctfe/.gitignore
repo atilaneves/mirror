@@ -1,0 +1,3 @@
+*.so
+source/python/package.d
+*.pyc
