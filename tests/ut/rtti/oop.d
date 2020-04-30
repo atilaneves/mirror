@@ -348,3 +348,27 @@ import mirror.rtti;
         ];
     }
 }
+
+
+@("methods.byName")
+@safe pure unittest {
+
+    static class Class {
+        void foo() {}
+        void bar() {}
+    }
+
+    const Object obj = new Class;
+
+    with(types!Class) {
+        const type = rtti(obj);
+
+        const foo = type.method("foo");
+        assert(foo is type.methods[0]);
+
+        const bar = type.method("bar");
+        assert(bar is type.methods[1]);
+
+        type.method("baz").shouldThrowWithMessage(`No method named 'baz'`);
+    }
+}

@@ -100,13 +100,21 @@ abstract class RuntimeTypeInfo {
     abstract string toString(in Object obj) @safe pure scope const;
 
     inout(Field) field(in string identifier) @safe pure scope inout {
+        return findInArray(identifier, "field", fields);
+    }
+
+    inout(Method) method(in string identifier) @safe pure scope inout {
+        return findInArray(identifier, "method", methods);
+    }
+
+    private static findInArray(T)(in string identifier, in string kind, T arr) {
         import std.array: empty, front;
         import std.algorithm.searching: find;
 
-        auto ret = fields.find!(a => a.identifier == identifier);
+        auto ret = arr.find!(a => a.identifier == identifier);
 
         if(ret.empty)
-            throw new Exception("No field named '" ~ identifier ~ "'");
+            throw new Exception("No " ~ kind ~ " named '" ~ identifier ~ "'");
 
         return ret.front;
     }
@@ -229,20 +237,31 @@ private:
     }
 }
 
-interface Method {
-    string toString() @safe pure scope const;
+abstract class Method {
+
+    string identifier;
+
+    this(string identifier) @safe @nogc pure scope const {
+        this.identifier = identifier;
+    }
+
+    override string toString() @safe pure scope const {
+        return reprImpl();
+    }
+
+    abstract string reprImpl() @safe pure scope const;
 }
 
 
 class MethodImpl(alias F): Method {
 
-    private enum repr = reprImpl;
+    string identifier;
 
-    override string toString() @safe pure scope const {
-        return repr;
+    this() const {
+        super(__traits(identifier, F));
     }
 
-    private static string reprImpl() {
+    override string reprImpl() @safe pure scope const {
         import std.traits: ReturnType, Parameters;
         import std.conv: text;
         return text(ReturnType!F.stringof, " ", __traits(identifier, F), Parameters!F.stringof);
