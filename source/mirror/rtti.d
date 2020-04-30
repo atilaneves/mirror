@@ -249,9 +249,11 @@ abstract class Method {
     }
 
     immutable string identifier;
+    immutable RuntimeTypeInfo type;
 
-    this(string identifier) @safe @nogc pure scope const {
+    this(string identifier, immutable RuntimeTypeInfo type) @safe @nogc pure scope const {
         this.identifier = identifier;
+        this.type = type;
     }
 
     final override string toString() @safe pure scope const {
@@ -298,7 +300,7 @@ abstract class Method {
 class MethodImpl(alias F): Method {
 
     this() const {
-        super(__traits(identifier, F));
+        super(__traits(identifier, F), runtimeTypeInfo!(typeof(F)));
     }
 
     override string reprImpl() @safe pure scope const {
