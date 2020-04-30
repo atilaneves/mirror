@@ -496,5 +496,8 @@ import mirror.rtti;
 
         () @trusted { debug type.method("sayMyName").returnType.typeInfo.should == typeid(string); }();
         type.method("sayMyName").returnType.name.should == "immutable(char)[]";
+
+        type.method("twoInts").parameters.length.should == 2;
+        type.method("threeInts").parameters.length.should == 3;
     }
 }

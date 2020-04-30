@@ -289,6 +289,7 @@ abstract class Method {
     abstract bool isStatic() @safe @nogc pure scope const;
     abstract bool isSafe() @safe @nogc pure scope const;
     abstract RuntimeTypeInfo returnType() @safe pure scope const;
+    abstract RuntimeTypeInfo[] parameters() @safe pure scope const;
     abstract string reprImpl() @safe pure scope const;
     abstract Variant callImpl(TypeQualifier objQualifier, inout Object obj, Variant[] args) const;
 }
@@ -372,5 +373,17 @@ class MethodImpl(alias F): Method {
     override RuntimeTypeInfo returnType() @safe pure scope const {
         import std.traits: ReturnType;
         return runtimeTypeInfo!(ReturnType!F);
+    }
+
+    override RuntimeTypeInfo[] parameters() @safe pure scope const {
+        import std.traits: Parameters;
+
+        RuntimeTypeInfo[] ret;
+
+        static foreach(parameter; Parameters!F) {
+            ret ~= runtimeTypeInfo!parameter;
+        }
+
+        return ret;
     }
 }
