@@ -147,13 +147,11 @@ abstract class Field {
     import mirror.trait_enums: Protection;
     import std.variant: Variant;
 
-    TypeInfo typeInfo;
-    string type;
-    string identifier;
-    Protection protection;
+    immutable RuntimeTypeInfo type;
+    immutable string identifier;
+    immutable Protection protection;
 
-    this(TypeInfo typeInfo, string type, string identifier, in Protection protection) @safe pure scope {
-        this.typeInfo = typeInfo;
+    this(immutable RuntimeTypeInfo type, string identifier, in Protection protection) @safe pure scope {
         this.type = type;
         this.identifier = identifier;
         this.protection = protection;
@@ -187,7 +185,7 @@ private class FieldImpl(P, F, string member): Field {
 
     this(TypeInfo typeInfo, in Protection protection) {
         import std.traits: fullyQualifiedName;
-        super(typeInfo, fullyQualifiedName!F, member, protection);
+        super(runtimeTypeInfo!F, member, protection);
     }
 
     override inout(Variant) getImpl(inout Object obj) @safe const {

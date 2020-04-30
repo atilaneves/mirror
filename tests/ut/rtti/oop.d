@@ -73,7 +73,7 @@ import mirror.rtti;
 
     with(types!Class) {
         const type = rtti(obj);
-        type.fields.map!(a => a.typeInfo).array.should == [
+        type.fields.map!(a => a.type.typeInfo).array.should == [
             typeid(int),
             typeid(string),
         ];
@@ -94,7 +94,7 @@ import mirror.rtti;
 
     with(types!Class) {
         const type = rtti(obj);
-        type.fields.map!(a => a.type).should == [ "int", "string" ];
+        type.fields.map!(a => a.type.name).should == [ "int", "immutable(char)[]" ];
     }
 }
 
@@ -157,7 +157,7 @@ import mirror.rtti;
 
     with(types!Class) {
         const type = rtti(obj);
-        type.fields.map!(a => a.typeInfo).array.should == [
+        type.fields.map!(a => a.type.typeInfo).array.should == [
             typeid(string),
             typeid(string),
             typeid(double),
@@ -183,11 +183,11 @@ import mirror.rtti;
 
     with(types!Class) {
         const type = rtti(obj);
-        type.fields.map!(a => a.type).should == [
-            "string",
-            "string",
+        type.fields.map!(a => a.type.name).should == [
+            "immutable(char)[]",
+            "immutable(char)[]",
             "double",
-            "string",
+            "immutable(char)[]",
         ];
     }
 }
