@@ -322,3 +322,29 @@ import mirror.rtti;
             "Cannot call toString on obj since not of type " ~ prefix ~ "Int");
     }
 }
+
+
+@("methods.toString")
+@safe pure unittest {
+
+    import std.algorithm.iteration: map;
+
+    static class Arithmetic {
+        int i;
+        this(int i) { this.i = i; }
+        int add(int j) const { return i + j; }
+        int mul(int j) const { return i * j; }
+        double toDouble() const { return i; }
+    }
+
+    const Object obj = new Arithmetic(3);
+
+    with(types!Arithmetic) {
+        const type = rtti(obj);
+        type.methods.map!(a => a.toString).should == [
+            "int add(int)",
+            "int mul(int)",
+            "double toDouble()",
+        ];
+    }
+}

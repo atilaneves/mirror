@@ -21,7 +21,7 @@ Types types(T...)() {
 
     static RuntimeTypeInfo runtimeTypeInfo(T)() {
 
-        import mirror.meta.traits: Fields;
+        import mirror.meta.traits: Fields, MemberFunctionsByOverload;
 
         auto ret = new RuntimeTypeInfoImpl!T();
 
@@ -29,9 +29,14 @@ Types types(T...)() {
         ret.name = ret.typeInfo.toString;
 
         static if(is(T == class)) {
+
             static foreach(field; Fields!T) {
                 ret.fields ~= new FieldImpl!(T, field.Type, field.identifier)
                                             (typeid(field.Type), field.protection);
+            }
+
+            static foreach(memberFunction; MemberFunctionsByOverload!T) {
+                ret.methods ~= new MethodImpl!memberFunction();
             }
         }
 
@@ -56,11 +61,11 @@ struct Types {
 
     private RuntimeTypeInfo[TypeInfo] _typeToInfo;
 
-    auto rtti(T)() inout {
+    inout(RuntimeTypeInfo) rtti(T)() inout {
         return rtti(typeid(T));
     }
 
-    auto rtti(T)(auto ref T obj) inout {
+    inout(RuntimeTypeInfo) rtti(T)(auto ref T obj) inout {
         import std.traits: isPointer;
 
         static if(is(T == class)) {
@@ -71,7 +76,7 @@ struct Types {
         return rtti(typeid(obj));
     }
 
-    auto rtti(scope TypeInfo typeInfo) @safe pure scope inout {
+    inout(RuntimeTypeInfo) rtti(scope TypeInfo typeInfo) @safe pure scope inout {
         scope ptr = typeInfo in _typeToInfo;
 
         if(ptr is null) {
@@ -90,6 +95,7 @@ abstract class RuntimeTypeInfo {
     TypeInfo typeInfo;
     string name;
     Field[] fields;
+    Method[] methods;
 
     abstract string toString(in Object obj) @safe pure scope const;
 
@@ -220,5 +226,25 @@ private:
                 fullyQualifiedName!P);
 
         return __traits(getMember, rightType, member);
+    }
+}
+
+interface Method {
+    string toString() @safe pure scope const;
+}
+
+
+class MethodImpl(alias F): Method {
+
+    private enum repr = reprImpl;
+
+    override string toString() @safe pure scope const {
+        return repr;
+    }
+
+    private static string reprImpl() {
+        import std.traits: ReturnType, Parameters;
+        import std.conv: text;
+        return text(ReturnType!F.stringof, " ", __traits(identifier, F), Parameters!F.stringof);
     }
 }
