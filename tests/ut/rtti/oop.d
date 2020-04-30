@@ -73,7 +73,7 @@ import mirror.rtti;
 
     with(types!Class) {
         const type = rtti(obj);
-        type.fields.map!(a => a.typeInfo).array.should == [
+        type.fields.map!(a => a.type.typeInfo).array.should == [
             typeid(int),
             typeid(string),
         ];
@@ -94,7 +94,7 @@ import mirror.rtti;
 
     with(types!Class) {
         const type = rtti(obj);
-        type.fields.map!(a => a.type).should == [ "int", "string" ];
+        type.fields.map!(a => a.type.name).should == [ "int", "immutable(char)[]" ];
     }
 }
 
@@ -157,7 +157,7 @@ import mirror.rtti;
 
     with(types!Class) {
         const type = rtti(obj);
-        type.fields.map!(a => a.typeInfo).array.should == [
+        type.fields.map!(a => a.type.typeInfo).array.should == [
             typeid(string),
             typeid(string),
             typeid(double),
@@ -183,11 +183,11 @@ import mirror.rtti;
 
     with(types!Class) {
         const type = rtti(obj);
-        type.fields.map!(a => a.type).should == [
-            "string",
-            "string",
+        type.fields.map!(a => a.type.name).should == [
+            "immutable(char)[]",
+            "immutable(char)[]",
             "double",
-            "string",
+            "immutable(char)[]",
         ];
     }
 }
@@ -248,7 +248,7 @@ import mirror.rtti;
 }
 
 
-@("field.get")
+@("fields.byName.get")
 @safe unittest {
     static class Class {
         int i;
@@ -273,12 +273,14 @@ import mirror.rtti;
 }
 
 
-@("field.set")
+@("fields.byName.set")
 @safe unittest {
     static class Class {
         int i;
         double d;
-        this(int i, double d) { this.i = i; this.d = d; }
+        const int const_;
+        immutable int immutable_;
+        this(int i, double d) { this.i = i; this.d = d; this.const_ = 77; this.immutable_ = 42; }
     }
 
     Object obj = new Class(42, 33.3);
@@ -289,6 +291,9 @@ import mirror.rtti;
 
         type.field("i").set(obj, 77);
         type.field("i").get!int(obj).should == 77;
+
+        type.field("const_").set(obj, 0).shouldThrowWithMessage("Cannot set const member 'const_'");
+        type.field("immutable_").set(obj, 0).shouldThrowWithMessage("Cannot set immutable member 'immutable_'");
     }
 }
 
@@ -448,6 +453,56 @@ import mirror.rtti;
         const set = type.method("set");
         set.call(oops, 33).shouldThrowWithMessage("Cannot call 'set' on object not of type Arithmetic");
     }
+}
 
 
+@("methods.traits")
+@safe pure unittest {
+
+    static abstract class Abstract {
+        abstract void lefunc();
+    }
+
+    static class Class: Abstract {
+        final void final_() {}
+        @safe void safe() {}
+        @trusted void trusted() {}
+        @system void system() {}
+        override void lefunc() {}
+        static void static_() {}
+        void twoInts(int i, int j) { }
+        void threeInts(int i, int j, int k) { }
+        string sayMyName() const { return "LeClass"; }
+    }
+
+    const Object obj = new Class;
+
+    with(types!Class) {
+        const type = rtti(obj);
+
+        type.method("final_").isFinal.should == true;
+        type.method("safe").isFinal.should == false;
+
+        type.method("lefunc").isOverride.should == true;
+        type.method("final_").isOverride.should == false;
+
+        type.method("static_").isStatic.should == true;
+        type.method("final_").isStatic.should == false;
+
+        type.method("safe").isVirtual.should == true;
+        type.method("final_").isVirtual.should == false;
+
+        type.method("safe").isSafe.should == true;
+        type.method("trusted").isSafe.should == true;
+        type.method("system").isSafe.should == false;
+
+        type.method("twoInts").arity.should == 2;
+        type.method("threeInts").arity.should == 3;
+
+        () @trusted { debug type.method("sayMyName").returnType.typeInfo.should == typeid(string); }();
+        type.method("sayMyName").returnType.name.should == "immutable(char)[]";
+
+        type.method("twoInts").parameters.length.should == 2;
+        type.method("threeInts").parameters.length.should == 3;
+    }
 }

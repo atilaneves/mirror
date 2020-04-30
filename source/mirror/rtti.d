@@ -19,34 +19,35 @@ mixin template typesVar(alias symbol, T...) {
  */
 Types types(T...)() {
 
-    static RuntimeTypeInfo runtimeTypeInfo(T)() {
-
-        import mirror.meta.traits: Fields, MemberFunctionsByOverload;
-
-        auto ret = new RuntimeTypeInfoImpl!T();
-
-        ret.typeInfo = typeid(T);
-        ret.name = ret.typeInfo.toString;
-
-        static if(is(T == class)) {
-
-            static foreach(field; Fields!T) {
-                ret.fields ~= new FieldImpl!(T, field.Type, field.identifier)
-                                            (typeid(field.Type), field.protection);
-            }
-
-            static foreach(memberFunction; MemberFunctionsByOverload!T) {
-                ret.methods ~= new MethodImpl!memberFunction();
-            }
-        }
-
-        return ret;
-    }
-
     auto ret = Types();
 
     static foreach(Type; T) {
         ret._typeToInfo[typeid(Type)] = runtimeTypeInfo!Type;
+    }
+
+    return ret;
+}
+
+
+RuntimeTypeInfo runtimeTypeInfo(T)() {
+
+    import mirror.meta.traits: Fields, MemberFunctionsByOverload;
+
+    auto ret = new RuntimeTypeInfoImpl!T();
+
+    ret.typeInfo = typeid(T);
+    ret.name = ret.typeInfo.toString;
+
+    static if(is(T == class)) {
+
+        static foreach(field; Fields!T) {
+            ret.fields ~= new FieldImpl!(T, field.Type, field.identifier)
+                (typeid(field.Type), field.protection);
+        }
+
+        static foreach(memberFunction; MemberFunctionsByOverload!T) {
+            ret.methods ~= new MethodImpl!memberFunction();
+        }
     }
 
     return ret;
@@ -146,13 +147,11 @@ abstract class Field {
     import mirror.trait_enums: Protection;
     import std.variant: Variant;
 
-    TypeInfo typeInfo;
-    string type;
-    string identifier;
-    Protection protection;
+    immutable RuntimeTypeInfo type;
+    immutable string identifier;
+    immutable Protection protection;
 
-    this(TypeInfo typeInfo, string type, string identifier, in Protection protection) @safe pure scope {
-        this.typeInfo = typeInfo;
+    this(immutable RuntimeTypeInfo type, string identifier, in Protection protection) @safe pure scope {
         this.type = type;
         this.identifier = identifier;
         this.protection = protection;
@@ -186,7 +185,7 @@ private class FieldImpl(P, F, string member): Field {
 
     this(TypeInfo typeInfo, in Protection protection) {
         import std.traits: fullyQualifiedName;
-        super(typeInfo, fullyQualifiedName!F, member, protection);
+        super(runtimeTypeInfo!F, member, protection);
     }
 
     override inout(Variant) getImpl(inout Object obj) @safe const {
@@ -203,11 +202,18 @@ private class FieldImpl(P, F, string member): Field {
     override void setImpl(Object obj, in Variant value) @safe const {
         import std.traits: fullyQualifiedName;
 
-        auto ptr = () @trusted { return value.peek!F; }();
-        if(ptr is null)
-            throw new Exception("Cannot set value since not of type " ~ fullyQualifiedName!F);
+        static if(is(F == immutable))
+            throw new Exception("Cannot set immutable member '" ~ identifier ~ "'");
+        else static if(is(F == const))
+            throw new Exception("Cannot set const member '" ~ identifier ~ "'");
+        else {
 
-        getMember(obj) = *ptr;
+            auto ptr = () @trusted { return value.peek!F; }();
+            if(ptr is null)
+                throw new Exception("Cannot set value since not of type " ~ fullyQualifiedName!F);
+
+            getMember(obj) = *ptr;
+        }
     }
 
     override string toString(in Object obj) @safe const {
@@ -248,9 +254,11 @@ abstract class Method {
     }
 
     immutable string identifier;
+    immutable RuntimeTypeInfo type;
 
-    this(string identifier) @safe @nogc pure scope const {
+    this(string identifier, immutable RuntimeTypeInfo type) @safe @nogc pure scope const {
         this.identifier = identifier;
+        this.type = type;
     }
 
     final override string toString() @safe pure scope const {
@@ -278,6 +286,17 @@ abstract class Method {
             return impl.get!R;
     }
 
+    final bool isVirtual() @safe @nogc pure scope const {
+        return !isFinal && !isStatic;
+    }
+
+    abstract size_t arity() @safe @nogc pure scope const;
+    abstract bool isFinal() @safe @nogc pure scope const;
+    abstract bool isOverride() @safe @nogc pure scope const;
+    abstract bool isStatic() @safe @nogc pure scope const;
+    abstract bool isSafe() @safe @nogc pure scope const;
+    abstract RuntimeTypeInfo returnType() @safe pure scope const;
+    abstract RuntimeTypeInfo[] parameters() @safe pure scope const;
     abstract string reprImpl() @safe pure scope const;
     abstract Variant callImpl(TypeQualifier objQualifier, inout Object obj, Variant[] args) const;
 }
@@ -286,7 +305,7 @@ abstract class Method {
 class MethodImpl(alias F): Method {
 
     this() const {
-        super(__traits(identifier, F));
+        super(__traits(identifier, F), runtimeTypeInfo!(typeof(F)));
     }
 
     override string reprImpl() @safe pure scope const {
@@ -333,5 +352,45 @@ class MethodImpl(alias F): Method {
             }
         } else
             throw new Exception("Cannot call " ~ identifier ~ " on object");
+    }
+
+    override bool isFinal() @safe @nogc pure scope const {
+        import std.traits: isFinalFunction;
+        return isFinalFunction!F;
+    }
+
+    override bool isOverride() @safe @nogc pure scope const {
+        return __traits(isOverrideFunction, F);
+    }
+
+    override bool isStatic() @safe @nogc pure scope const {
+        return __traits(isStaticFunction, F);
+    }
+
+    override bool isSafe() @safe @nogc pure scope const {
+        import std.traits: isSafe;
+        return isSafe!F;
+    }
+
+    override size_t arity() @safe @nogc pure scope const {
+        import std.traits: arity;
+        return arity!F;
+    }
+
+    override RuntimeTypeInfo returnType() @safe pure scope const {
+        import std.traits: ReturnType;
+        return runtimeTypeInfo!(ReturnType!F);
+    }
+
+    override RuntimeTypeInfo[] parameters() @safe pure scope const {
+        import std.traits: Parameters;
+
+        RuntimeTypeInfo[] ret;
+
+        static foreach(parameter; Parameters!F) {
+            ret ~= runtimeTypeInfo!parameter;
+        }
+
+        return ret;
     }
 }
