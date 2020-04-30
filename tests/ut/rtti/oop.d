@@ -248,7 +248,7 @@ import mirror.rtti;
 }
 
 
-@("field.get")
+@("fields.byName.get")
 @safe unittest {
     static class Class {
         int i;
@@ -273,7 +273,7 @@ import mirror.rtti;
 }
 
 
-@("field.set")
+@("fields.byName.set")
 @safe unittest {
     static class Class {
         int i;
