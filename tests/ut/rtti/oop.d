@@ -467,6 +467,7 @@ import mirror.rtti;
         static void static_() {}
         void twoInts(int i, int j) { }
         void threeInts(int i, int j, int k) { }
+        string sayMyName() const { return "LeClass"; }
     }
 
     const Object obj = new Class;
@@ -492,5 +493,8 @@ import mirror.rtti;
 
         type.method("twoInts").arity.should == 2;
         type.method("threeInts").arity.should == 3;
+
+        () @trusted { debug type.method("sayMyName").returnType.typeInfo.should == typeid(string); }();
+        type.method("sayMyName").returnType.name.should == "immutable(char)[]";
     }
 }

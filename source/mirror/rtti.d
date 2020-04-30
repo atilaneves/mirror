@@ -17,36 +17,37 @@ mixin template typesVar(alias symbol, T...) {
 /**
    Extend runtime type information for the given types.
  */
-Types types(T...)() {
-
-    static RuntimeTypeInfo runtimeTypeInfo(T)() {
-
-        import mirror.meta.traits: Fields, MemberFunctionsByOverload;
-
-        auto ret = new RuntimeTypeInfoImpl!T();
-
-        ret.typeInfo = typeid(T);
-        ret.name = ret.typeInfo.toString;
-
-        static if(is(T == class)) {
-
-            static foreach(field; Fields!T) {
-                ret.fields ~= new FieldImpl!(T, field.Type, field.identifier)
-                                            (typeid(field.Type), field.protection);
-            }
-
-            static foreach(memberFunction; MemberFunctionsByOverload!T) {
-                ret.methods ~= new MethodImpl!memberFunction();
-            }
-        }
-
-        return ret;
-    }
+Types types(TypeArgs...)() {
 
     auto ret = Types();
 
-    static foreach(Type; T) {
+    static foreach(Type; TypeArgs) {
         ret._typeToInfo[typeid(Type)] = runtimeTypeInfo!Type;
+    }
+
+    return ret;
+}
+
+
+RuntimeTypeInfo runtimeTypeInfo(T)() {
+
+    import mirror.meta.traits: Fields, MemberFunctionsByOverload;
+
+    auto ret = new RuntimeTypeInfoImpl!T();
+
+    ret.typeInfo = typeid(T);
+    ret.name = ret.typeInfo.toString;
+
+    static if(is(T == class)) {
+
+        static foreach(field; Fields!T) {
+            ret.fields ~= new FieldImpl!(T, field.Type, field.identifier)
+                (typeid(field.Type), field.protection);
+        }
+
+        static foreach(memberFunction; MemberFunctionsByOverload!T) {
+            ret.methods ~= new MethodImpl!memberFunction();
+        }
     }
 
     return ret;
@@ -287,6 +288,7 @@ abstract class Method {
     abstract bool isOverride() @safe @nogc pure scope const;
     abstract bool isStatic() @safe @nogc pure scope const;
     abstract bool isSafe() @safe @nogc pure scope const;
+    abstract RuntimeTypeInfo returnType() @safe pure scope const;
     abstract string reprImpl() @safe pure scope const;
     abstract Variant callImpl(TypeQualifier objQualifier, inout Object obj, Variant[] args) const;
 }
@@ -367,4 +369,8 @@ class MethodImpl(alias F): Method {
         return arity!F;
     }
 
+    override RuntimeTypeInfo returnType() @safe pure scope const {
+        import std.traits: ReturnType;
+        return runtimeTypeInfo!(ReturnType!F);
+    }
 }
