@@ -234,10 +234,3 @@ struct Parameter {
     string default_;  /// default value, if any
     ParameterStorageClass storageClass;
 }
-
-
-// TODO:
-// * Module {c,d}tors
-// * Unit tests
-// * Class hierachies
-// * Aliases?
