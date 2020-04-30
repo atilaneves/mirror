@@ -278,7 +278,15 @@ abstract class Method {
             return impl.get!R;
     }
 
-    abstract bool isFinal() @safe pure scope const;
+    final bool isVirtual() @safe @nogc pure scope const {
+        return !isFinal && !isStatic;
+    }
+
+    abstract size_t arity() @safe @nogc pure scope const;
+    abstract bool isFinal() @safe @nogc pure scope const;
+    abstract bool isOverride() @safe @nogc pure scope const;
+    abstract bool isStatic() @safe @nogc pure scope const;
+    abstract bool isSafe() @safe @nogc pure scope const;
     abstract string reprImpl() @safe pure scope const;
     abstract Variant callImpl(TypeQualifier objQualifier, inout Object obj, Variant[] args) const;
 }
@@ -336,8 +344,27 @@ class MethodImpl(alias F): Method {
             throw new Exception("Cannot call " ~ identifier ~ " on object");
     }
 
-    override bool isFinal() @safe pure scope const {
+    override bool isFinal() @safe @nogc pure scope const {
         import std.traits: isFinalFunction;
         return isFinalFunction!F;
     }
+
+    override bool isOverride() @safe @nogc pure scope const {
+        return __traits(isOverrideFunction, F);
+    }
+
+    override bool isStatic() @safe @nogc pure scope const {
+        return __traits(isStaticFunction, F);
+    }
+
+    override bool isSafe() @safe @nogc pure scope const {
+        import std.traits: isSafe;
+        return isSafe!F;
+    }
+
+    override size_t arity() @safe @nogc pure scope const {
+        import std.traits: arity;
+        return arity!F;
+    }
+
 }

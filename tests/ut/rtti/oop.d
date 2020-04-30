@@ -454,17 +454,43 @@ import mirror.rtti;
 @("methods.traits")
 @safe pure unittest {
 
-    static class Class {
+    static abstract class Abstract {
+        abstract void lefunc();
+    }
+
+    static class Class: Abstract {
         final void final_() {}
         @safe void safe() {}
+        @trusted void trusted() {}
         @system void system() {}
+        override void lefunc() {}
+        static void static_() {}
+        void twoInts(int i, int j) { }
+        void threeInts(int i, int j, int k) { }
     }
 
     const Object obj = new Class;
 
     with(types!Class) {
         const type = rtti(obj);
+
         type.method("final_").isFinal.should == true;
         type.method("safe").isFinal.should == false;
+
+        type.method("lefunc").isOverride.should == true;
+        type.method("final_").isOverride.should == false;
+
+        type.method("static_").isStatic.should == true;
+        type.method("final_").isStatic.should == false;
+
+        type.method("safe").isVirtual.should == true;
+        type.method("final_").isVirtual.should == false;
+
+        type.method("safe").isSafe.should == true;
+        type.method("trusted").isSafe.should == true;
+        type.method("system").isSafe.should == false;
+
+        type.method("twoInts").arity.should == 2;
+        type.method("threeInts").arity.should == 3;
     }
 }
