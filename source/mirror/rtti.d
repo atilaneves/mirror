@@ -278,6 +278,7 @@ abstract class Method {
             return impl.get!R;
     }
 
+    abstract bool isFinal() @safe pure scope const;
     abstract string reprImpl() @safe pure scope const;
     abstract Variant callImpl(TypeQualifier objQualifier, inout Object obj, Variant[] args) const;
 }
@@ -333,5 +334,10 @@ class MethodImpl(alias F): Method {
             }
         } else
             throw new Exception("Cannot call " ~ identifier ~ " on object");
+    }
+
+    override bool isFinal() @safe pure scope const {
+        import std.traits: isFinalFunction;
+        return isFinalFunction!F;
     }
 }

@@ -448,6 +448,23 @@ import mirror.rtti;
         const set = type.method("set");
         set.call(oops, 33).shouldThrowWithMessage("Cannot call 'set' on object not of type Arithmetic");
     }
+}
 
 
+@("methods.traits")
+@safe pure unittest {
+
+    static class Class {
+        final void final_() {}
+        @safe void safe() {}
+        @system void system() {}
+    }
+
+    const Object obj = new Class;
+
+    with(types!Class) {
+        const type = rtti(obj);
+        type.method("final_").isFinal.should == true;
+        type.method("safe").isFinal.should == false;
+    }
 }
