@@ -328,6 +328,20 @@ import mirror.rtti;
     }
 }
 
+@("toString.interface")
+@safe pure unittest {
+
+    static interface Interface {}
+    static class Class: Interface {}
+
+    with(types!Interface) {
+        const type = rtti!Interface;
+        enum testId = __traits(identifier, __traits(parent, {}));
+        enum prefix = __MODULE__ ~ "." ~ testId ~ ".";
+        type.toString(new Class).shouldThrowWithMessage("Cannot cast non-class type " ~ prefix ~ "Interface");
+    }
+}
+
 
 @("methods.toString")
 @safe pure unittest {
