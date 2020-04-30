@@ -17,11 +17,11 @@ mixin template typesVar(alias symbol, T...) {
 /**
    Extend runtime type information for the given types.
  */
-Types types(TypeArgs...)() {
+Types types(T...)() {
 
     auto ret = Types();
 
-    static foreach(Type; TypeArgs) {
+    static foreach(Type; T) {
         ret._typeToInfo[typeid(Type)] = runtimeTypeInfo!Type;
     }
 
@@ -202,11 +202,18 @@ private class FieldImpl(P, F, string member): Field {
     override void setImpl(Object obj, in Variant value) @safe const {
         import std.traits: fullyQualifiedName;
 
-        auto ptr = () @trusted { return value.peek!F; }();
-        if(ptr is null)
-            throw new Exception("Cannot set value since not of type " ~ fullyQualifiedName!F);
+        static if(is(F == immutable))
+            throw new Exception("Cannot set immutable member '" ~ identifier ~ "'");
+        else static if(is(F == const))
+            throw new Exception("Cannot set const member '" ~ identifier ~ "'");
+        else {
 
-        getMember(obj) = *ptr;
+            auto ptr = () @trusted { return value.peek!F; }();
+            if(ptr is null)
+                throw new Exception("Cannot set value since not of type " ~ fullyQualifiedName!F);
+
+            getMember(obj) = *ptr;
+        }
     }
 
     override string toString(in Object obj) @safe const {
