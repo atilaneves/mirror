@@ -1,0 +1,52 @@
+module python;
+
+#include "Python.h"
+
+
+enum MethodArgs {
+    Var = METH_VARARGS,
+    Keywords = METH_KEYWORDS,
+    Static = METH_STATIC,
+    None = METH_NOARGS,
+    O = METH_O,
+}
+
+
+auto pyModuleCreate(PyModuleDef* moduleDef) @nogc nothrow {
+    return PyModule_Create(moduleDef);
+}
+
+auto pyModuleDef(A...)(auto ref A args) {
+    import std.functional: forward;
+
+    return PyModuleDef(
+        // the line below is a manual D version expansion of PyModuleDef_HEAD_INIT
+        PyModuleDef_Base(PyObject(1 /*ref count*/, null /*type*/), null /*m_init*/, 0/*m_index*/, null/*m_copy*/),
+        forward!args
+    );
+}
+
+/**
+   Helper function to create PyMethodDef structs.
+   The strings are compile-time parameters to avoid passing GC-allocated memory
+   to Python (by calling std.string.toStringz or manually appending the null
+   terminator).
+ */
+auto pyMethodDef(string name, int flags = defaultMethodFlags, string doc = "", F)
+                (F cfunction) pure
+{
+    import std.traits: ReturnType, Parameters, isPointer;
+    import std.meta: allSatisfy;
+
+    static assert(isPointer!(ReturnType!F),
+                  "C function method implementation must return a pointer");
+    static assert(allSatisfy!(isPointer, Parameters!F),
+                  "C function method implementation must take pointers");
+    static assert(Parameters!F.length == 2 || Parameters!F.length == 3,
+                  "C function method implementation must take 2 or 3 pointers");
+
+    return PyMethodDef(name.ptr, cast(PyCFunction) cfunction, flags, doc.ptr);
+}
+
+
+enum defaultMethodFlags = MethodArgs.Var | MethodArgs.Keywords;

@@ -21,7 +21,7 @@ Types types(T...)() {
 
     static RuntimeTypeInfo runtimeTypeInfo(T)() {
 
-        import mirror.meta.traits: Fields;
+        import mirror.meta.traits: Fields, MemberFunctionsByOverload;
 
         auto ret = new RuntimeTypeInfoImpl!T();
 
@@ -29,9 +29,14 @@ Types types(T...)() {
         ret.name = ret.typeInfo.toString;
 
         static if(is(T == class)) {
+
             static foreach(field; Fields!T) {
                 ret.fields ~= new FieldImpl!(T, field.Type, field.identifier)
                                             (typeid(field.Type), field.protection);
+            }
+
+            static foreach(memberFunction; MemberFunctionsByOverload!T) {
+                ret.methods ~= new MethodImpl!memberFunction();
             }
         }
 
@@ -56,11 +61,11 @@ struct Types {
 
     private RuntimeTypeInfo[TypeInfo] _typeToInfo;
 
-    auto rtti(T)() inout {
+    inout(RuntimeTypeInfo) rtti(T)() inout {
         return rtti(typeid(T));
     }
 
-    auto rtti(T)(auto ref T obj) inout {
+    inout(RuntimeTypeInfo) rtti(T)(auto ref T obj) inout {
         import std.traits: isPointer;
 
         static if(is(T == class)) {
@@ -71,7 +76,7 @@ struct Types {
         return rtti(typeid(obj));
     }
 
-    auto rtti(scope TypeInfo typeInfo) @safe pure scope inout {
+    inout(RuntimeTypeInfo) rtti(scope TypeInfo typeInfo) @safe pure scope inout {
         scope ptr = typeInfo in _typeToInfo;
 
         if(ptr is null) {
@@ -90,17 +95,26 @@ abstract class RuntimeTypeInfo {
     TypeInfo typeInfo;
     string name;
     Field[] fields;
+    Method[] methods;
 
     abstract string toString(in Object obj) @safe pure scope const;
 
-    inout(Field) field(in string identifier) @safe pure scope inout {
+    final inout(Field) field(in string identifier) @safe pure scope inout {
+        return findInArray(identifier, "field", fields);
+    }
+
+    final inout(Method) method(in string identifier) @safe pure scope inout {
+        return findInArray(identifier, "method", methods);
+    }
+
+    private static findInArray(T)(in string identifier, in string kind, T arr) {
         import std.array: empty, front;
         import std.algorithm.searching: find;
 
-        auto ret = fields.find!(a => a.identifier == identifier);
+        auto ret = arr.find!(a => a.identifier == identifier);
 
         if(ret.empty)
-            throw new Exception("No field named '" ~ identifier ~ "'");
+            throw new Exception("No " ~ kind ~ " named '" ~ identifier ~ "'");
 
         return ret.front;
     }
@@ -144,7 +158,7 @@ abstract class Field {
         this.protection = protection;
     }
 
-    auto get(T, O)(O obj) const {
+    final get(T, O)(O obj) const {
         import std.traits: CopyTypeQualifiers, fullyQualifiedName;
 
         auto variant = getImpl(obj);
@@ -156,7 +170,7 @@ abstract class Field {
         return cast(CopyTypeQualifiers!(O, T)) *ptr;
     }
 
-    void set(T)(Object obj, T value) const {
+    final void set(T)(Object obj, T value) const {
         setImpl(obj, () @trusted { return Variant(value); }());
     }
 
@@ -220,5 +234,104 @@ private:
                 fullyQualifiedName!P);
 
         return __traits(getMember, rightType, member);
+    }
+}
+
+abstract class Method {
+
+    import std.variant: Variant;
+
+    enum TypeQualifier {
+        mutable,
+        const_,
+        immutable_,
+    }
+
+    immutable string identifier;
+
+    this(string identifier) @safe @nogc pure scope const {
+        this.identifier = identifier;
+    }
+
+    final override string toString() @safe pure scope const {
+        return reprImpl();
+    }
+
+    final R call(R = void, O, A...)(O obj, A args) const {
+        Variant[A.length] variants;
+        static foreach(i; 0 .. A.length) variants[i] = args[i];
+
+        static if(is(O == immutable))
+            const qualifier = TypeQualifier.immutable_;
+        else static if(is(O == const))
+            const qualifier = TypeQualifier.const_;
+        else
+            const qualifier = TypeQualifier.mutable;
+
+        auto impl() {
+            return callImpl(qualifier, obj, variants[]);
+        }
+
+        static if(is(R == void))
+            impl;
+        else
+            return impl.get!R;
+    }
+
+    abstract string reprImpl() @safe pure scope const;
+    abstract Variant callImpl(TypeQualifier objQualifier, inout Object obj, Variant[] args) const;
+}
+
+
+class MethodImpl(alias F): Method {
+
+    this() const {
+        super(__traits(identifier, F));
+    }
+
+    override string reprImpl() @safe pure scope const {
+        import std.traits: ReturnType, Parameters;
+        import std.conv: text;
+        return text(ReturnType!F.stringof, " ", __traits(identifier, F), Parameters!F.stringof);
+    }
+
+    override Variant callImpl(TypeQualifier objQualifier, inout Object obj, Variant[] variantArgs) const {
+        import std.typecons: Tuple;
+        import std.traits: Parameters, ReturnType, FA = FunctionAttribute, hasFunctionAttributes;
+        import std.conv: text;
+
+        if(variantArgs.length != Parameters!F.length)
+            throw new Exception(text("'", identifier, "'", " takes ",
+                                     Parameters!F.length, " parameter(s), not ", variantArgs.length));
+
+        Tuple!(Parameters!F) args;
+
+        alias RightType = __traits(parent, F);
+        auto rightType = cast(RightType) obj;
+
+        if(rightType is null)
+            throw new Exception("Cannot call '" ~ identifier ~ "' on object not of type " ~ RightType.stringof);
+
+        const isObjConstant = objQualifier == TypeQualifier.const_ || objQualifier == TypeQualifier.immutable_;
+        if(isObjConstant && !hasFunctionAttributes!(F, "const"))
+           throw new Exception("Cannot call non-const method '" ~ identifier ~ "' on const obj");
+
+        enum mixinStr = `rightType.` ~ __traits(identifier, F) ~ `(args.expand)`;
+
+        static if(__traits(compiles, mixin(mixinStr))) {
+
+            static foreach(i; 0 .. args.length) {
+                args[i] = variantArgs[i].get!(typeof(args[i]));
+            }
+
+            static if(is(ReturnType!F == void)) {
+                mixin(mixinStr, `;`);
+                return Variant.init;
+            } else {
+                auto ret = mixin(mixinStr);
+                return Variant(ret);
+            }
+        } else
+            throw new Exception("Cannot call " ~ identifier ~ " on object");
     }
 }

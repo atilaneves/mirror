@@ -322,3 +322,132 @@ import mirror.rtti;
             "Cannot call toString on obj since not of type " ~ prefix ~ "Int");
     }
 }
+
+
+@("methods.toString")
+@safe pure unittest {
+
+    import std.algorithm.iteration: map;
+
+    static class Arithmetic {
+        int i;
+        this(int i) { this.i = i; }
+        int add(int j) const { return i + j; }
+        int mul(int j) const { return i * j; }
+        double toDouble() const { return i; }
+    }
+
+    const Object obj = new Arithmetic(3);
+
+    with(types!Arithmetic) {
+        const type = rtti(obj);
+        type.methods.map!(a => a.toString).should == [
+            "int add(int)",
+            "int mul(int)",
+            "double toDouble()",
+        ];
+    }
+}
+
+
+@("methods.byName")
+@safe pure unittest {
+
+    static class Class {
+        void foo() {}
+        void bar() {}
+    }
+
+    const Object obj = new Class;
+
+    with(types!Class) {
+        const type = rtti(obj);
+
+        const foo = type.method("foo");
+        assert(foo is type.methods[0]);
+
+        const bar = type.method("bar");
+        assert(bar is type.methods[1]);
+
+        type.method("baz").shouldThrowWithMessage(`No method named 'baz'`);
+    }
+}
+
+
+@("methods.call.happy")
+// Method calls can't be guaranteed to be @safe or pure
+@system unittest {
+
+    static class Arithmetic {
+        int i;
+        this(int i) { this.i = i; }
+        int addMul(int j, int k) const { return (i + j) * k; }
+        void set(int i) { this.i = i; }
+    }
+
+    with(types!Arithmetic) {
+        const Object obj = new Arithmetic(3);
+
+        const type = rtti(obj);
+        const addMul = type.method("addMul");
+
+        addMul.call!int(obj, 1, 2).should == 8;
+        addMul.call!int(obj, 2, 4).should == 20;
+    }
+
+    with(types!Arithmetic) {
+        auto ari = new Arithmetic(3);
+        Object obj = ari;
+
+        const type = rtti(obj);
+        const set = type.method("set");
+
+        ari.i.should == 3;
+        set.call(obj, 42);
+        ari.i.should == 42;
+    }
+}
+
+
+@("methods.call.sad")
+// Method calls can't be guaranteed to be @safe or pure
+@system unittest {
+
+    static class Arithmetic {
+        int i;
+        this(int i) { this.i = i; }
+        int addMul(int j, int k) const { return (i + j) * k; }
+        void set(int i) { this.i = i; }
+    }
+
+    with(types!Arithmetic) {
+        const Object obj = new Arithmetic(3);
+        const type = rtti(obj);
+        const set = type.method("set");
+        set.call(obj, 42).shouldThrowWithMessage("Cannot call non-const method 'set' on const obj");
+    }
+
+    with(types!Arithmetic) {
+        immutable Object obj = cast(immutable) new Arithmetic(3);
+        const type = rtti(obj);
+        const set = type.method("set");
+        set.call(obj, 42).shouldThrowWithMessage("Cannot call non-const method 'set' on const obj");
+    }
+
+    with(types!Arithmetic) {
+        Object obj = new Arithmetic(3);
+        const type = rtti(obj);
+        const set = type.method("set");
+        set.call(obj, 42, 33).shouldThrowWithMessage("'set' takes 1 parameter(s), not 2");
+    }
+
+    with(types!Arithmetic) {
+        static class NotArithmetic {}
+        Object oops = new NotArithmetic;
+        const type = rtti(new Arithmetic(3));
+        const set = type.method("set");
+        set.call(oops, 33).shouldThrowWithMessage("Cannot call 'set' on object not of type Arithmetic");
+    }
+
+
+}

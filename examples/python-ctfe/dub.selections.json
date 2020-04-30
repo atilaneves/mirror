@@ -1,0 +1,7 @@
+{
+	"fileVersion": 1,
+	"versions": {
+		"mirror": {"path":"../../"},
+		"unit-threaded": "0.10.8"
+	}
+}
