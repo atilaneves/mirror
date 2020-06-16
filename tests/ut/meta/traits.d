@@ -357,7 +357,7 @@ private class RecursiveClass2 {
 }
 
 
-@("MemberFunctionsByOverload.class")
+@("MemberFunctionsByOverload.class.simple")
 @safe @nogc pure unittest {
 
     static class Class {
@@ -368,7 +368,7 @@ private class RecursiveClass2 {
         string bar(int i) { return "foobar"; }
     }
 
-    //pragma(msg, "MemberFunctionsByOverload.class: ", MemberFunctionsByOverload!Class.stringof);
+    // pragma(msg, "MemberFunctionsByOverload.class: ", MemberFunctionsByOverload!Class.stringof);
 
     shouldEqual!(
         MemberFunctionsByOverload!Class,

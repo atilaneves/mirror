@@ -21,3 +21,17 @@ import std.meta: AliasSeq;
         ),
     );
 }
+
+
+@("MemberFunctionsByOverload.class.templateAlias")
+@safe @nogc pure unittest {
+
+    import mirror.meta.traits: MemberFunctionsByOverload;
+
+    static class Class {
+        T default_(T)() { return T.init; }  // both this and the alias below
+        alias defaultInt = default_!int;    // are needed to mimic a bug
+    }
+
+    alias fs = MemberFunctionsByOverload!Class;  // should compile
+}
