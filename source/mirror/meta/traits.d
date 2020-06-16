@@ -25,8 +25,8 @@ enum isClass(T) = is(T == class);
    If a type is a class or an interface.
    Usable as a predicate to std.meta.Filter
 */
-enum isOOP(T) = is(T == class) || is(T == interface);
-
+enum isOOP(alias T) = is(T == class) || is(T == interface);
+int add() { return 0; }
 
 template moduleOf(alias T) {
     import std.traits: moduleName;
