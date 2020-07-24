@@ -32,6 +32,8 @@ Module module_(string moduleName)() {
             enum toKind = Aggregate.Kind.class_;
         else static if(is(U == interface))
             enum toKind = Aggregate.Kind.interface_;
+        else static if(is(U == union))
+            enum toKind = Aggregate.Kind.union_;
         else
             static assert(false, "Unknown kind " ~ fullyQualifiedName!T);
     }
@@ -44,6 +46,7 @@ Module module_(string moduleName)() {
         toKind!T,
         [ staticMap!(toVariable, Fields!T)],
     );
+
     ret.aggregates    = [ staticMap!(toAggregate, module_.Aggregates)    ];
     ret.allAggregates = [ staticMap!(toAggregate, module_.AllAggregates) ];
 
@@ -128,6 +131,7 @@ struct Aggregate {
         struct_,
         class_,
         interface_,
+        union_,
     }
 
     string identifier;

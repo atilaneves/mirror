@@ -82,3 +82,7 @@ enum Char: char {
     a = 'a',
     b = 'b',
 }
+
+union Union {
+
+}
