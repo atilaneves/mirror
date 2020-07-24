@@ -45,6 +45,7 @@ import ut.ctfe.reflection;
         NameAndKind("modules.types.Inner2", Aggregate.Kind.struct_),
         NameAndKind("modules.types.Outer", Aggregate.Kind.struct_),
         NameAndKind("modules.types.Char", Aggregate.Kind.enum_),
+        NameAndKind("modules.types.Union", Aggregate.Kind.union_),
     ];
 
     mod.allAggregates.map!xform.should == [
@@ -61,6 +62,7 @@ import ut.ctfe.reflection;
         NameAndKind("modules.types.Inner2", Aggregate.Kind.struct_),
         NameAndKind("modules.types.Outer", Aggregate.Kind.struct_),
         NameAndKind("modules.types.Char", Aggregate.Kind.enum_),
+        NameAndKind("modules.types.Union", Aggregate.Kind.union_),
     ];
 }
 

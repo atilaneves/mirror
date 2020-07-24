@@ -36,6 +36,7 @@ import ut.meta.reflection;
             "Inner2",
             "Outer",
             "Char",
+            "Union",
         ]
     );
 }

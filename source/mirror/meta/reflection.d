@@ -32,7 +32,7 @@ template Module(string moduleName) {
 
     private template isAggregate(T) {
         alias U = FundamentalType!T;
-        enum isAggregate = is(U == enum) || is(U == struct) || is(U == class) || is(U == interface);
+        enum isAggregate = is(U == enum) || is(U == struct) || is(U == class) || is(U == interface) || is(U == union);
     }
 
     /// User-defined structs/classes and all types contained in them
