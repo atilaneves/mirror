@@ -21,6 +21,9 @@ enum isInterface(T) = is(T == interface);
 /// Usable as a predicate to std.meta.Filter
 enum isClass(T) = is(T == class);
 
+/// Usable as a predicate to std.meta.Filter
+enum isUnion(T) = is(T == union);
+
 /**
    If a type is a class or an interface.
    Usable as a predicate to std.meta.Filter
@@ -155,7 +158,7 @@ template isProperty(alias F) {
    All member function symbols in T with overloads represented
    separately.
  */
-template MemberFunctionsByOverload(T) if(isStruct!T || isClass!T || isInterface!T)
+template MemberFunctionsByOverload(T) if(isStruct!T || isClass!T || isInterface!T || isUnion!T)
 {
     import mirror.meta.reflection: functionsByOverload;
     import mirror.trait_enums: Protection;
