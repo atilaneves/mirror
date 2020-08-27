@@ -300,7 +300,7 @@ template BinaryOperators(T) {
         private enum hasOperatorDir(BinOpDir dir, string op) = is(typeof(probeOperator!(T, functionName(dir), op)));
         private enum hasOperator(string op) =
             hasOperatorDir!(BinOpDir.left, op)
-            || hasOperatorDir!(BinOpDir.right, op);
+         || hasOperatorDir!(BinOpDir.right, op);
 
         alias ops = Filter!(hasOperator, overloadable);
 
