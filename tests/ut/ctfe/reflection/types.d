@@ -93,7 +93,7 @@ import ut.ctfe.reflection;
 @("fields.String")
 @safe pure unittest {
     enum mod = module_!"modules.types";
-    immutable string_ = mod.aggregates[0];
+    auto string_ = mod.aggregates[0];
     string_.fields.should == [
         Variable("string", "value"),
     ];
@@ -104,7 +104,7 @@ import ut.ctfe.reflection;
 @safe pure unittest {
     import std.algorithm: find;
     enum mod = module_!"modules.types";
-    const point = mod.aggregates[].find!(a => a.identifier == "modules.types.Point")[0];
+    auto point = mod.aggregates[].find!(a => a.identifier == "modules.types.Point")[0];
     point.fields.should == [
         Variable("double", "x"),
         Variable("double", "y"),
