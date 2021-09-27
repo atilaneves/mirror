@@ -6,7 +6,7 @@ import mirror.rtti;
 
 
 @("name")
-@safe pure unittest {
+@safe unittest {
 
     static abstract class Abstract {
         string getName() @safe pure nothrow scope const;
@@ -96,7 +96,7 @@ private void shouldEqual(
 
 
 @("fields.type.0")
-@safe pure unittest {
+@safe unittest {
     import std.algorithm: map;
 
     static abstract class Abstract {}
@@ -114,7 +114,7 @@ private void shouldEqual(
 
 
 @("fields.id.0")
-@safe pure unittest {
+@safe unittest {
     import std.algorithm: map;
 
     static abstract class Abstract {}
@@ -184,7 +184,7 @@ private void shouldEqual(
 
 
 @("fields.type.1")
-@safe pure unittest {
+@safe unittest {
 
     import std.algorithm: map;
 
@@ -210,7 +210,7 @@ private void shouldEqual(
 
 
 @("fields.id.1")
-@safe pure unittest {
+@safe unittest {
 
     import std.algorithm: map;
 
@@ -315,7 +315,7 @@ private void shouldEqual(
 
 
 @("toString.Int")
-@safe pure unittest {
+@safe unittest {
 
     static class Int {
         int i;
@@ -345,7 +345,7 @@ private void shouldEqual(
 }
 
 @("toString.interface")
-@safe pure unittest {
+@safe unittest {
 
     static interface Interface {}
     static class Class: Interface {}
@@ -360,7 +360,7 @@ private void shouldEqual(
 
 
 @("methods.toString")
-@safe pure unittest {
+@safe unittest {
 
     import std.algorithm.iteration: map;
 
@@ -386,7 +386,7 @@ private void shouldEqual(
 
 
 @("methods.byName")
-@safe pure unittest {
+@safe unittest {
 
     static class Class {
         void foo() {}
@@ -487,7 +487,7 @@ private void shouldEqual(
 
 
 @("methods.traits")
-@safe pure unittest {
+@safe unittest {
 
     static abstract class Abstract {
         abstract void lefunc();

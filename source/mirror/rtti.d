@@ -77,7 +77,7 @@ struct Types {
         return rtti(typeid(obj));
     }
 
-    inout(RuntimeTypeInfo) rtti(scope TypeInfo typeInfo) @safe pure scope inout {
+    inout(RuntimeTypeInfo) rtti(scope TypeInfo typeInfo) @safe scope inout {
         scope ptr = typeInfo in _typeToInfo;
 
         if(ptr is null) {

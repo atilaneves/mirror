@@ -6,12 +6,12 @@ import mirror.rtti;
 
 
 @("types.int")
-@safe pure unittest {
+@safe unittest {
     auto extended = types!int;
 }
 
 @("rtti.null.object")
-@safe pure unittest {
+@safe unittest {
     static class Class {}
     Object o;
     Class c;
@@ -24,7 +24,7 @@ import mirror.rtti;
 
 
 @("rtti.unregistered")
-@safe pure unittest {
+@safe unittest {
     static class Class {}
     enum testName = __traits(identifier, __traits(parent, {}));
     enum prefix = __MODULE__ ~ "." ~ testName ~ ".";
@@ -39,7 +39,7 @@ import mirror.rtti;
 
 
 @("typesVar")
-@safe pure unittest {
+@safe unittest {
 
     static struct Namespace {
         static immutable mirror.rtti.Types _types;
