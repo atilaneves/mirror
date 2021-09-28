@@ -7,14 +7,14 @@ import ut.meta.reflection;
 @("empty")
 @safe pure unittest {
     alias mod = Module!"modules.empty";
-    typeNames!mod.should == [];
+    typeNames!mod.shouldBeEmpty;
 }
 
 
 @("imports")
 @safe pure unittest {
     alias mod = Module!"modules.imports";
-    typeNames!mod.should == [];
+    typeNames!mod.shouldBeEmpty;
 }
 
 
@@ -45,7 +45,7 @@ import ut.meta.reflection;
 @("problems")
 @safe pure unittest {
     alias mod = Module!"modules.problems";
-    typeNames!mod.should == [];
+    typeNames!mod.shouldBeEmpty;
 }
 
 

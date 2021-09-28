@@ -73,11 +73,25 @@ import mirror.rtti;
 
     with(types!Class) {
         const type = rtti(obj);
-        type.fields.map!(a => a.type.typeInfo).array.should == [
-            typeid(int),
-            typeid(string),
-        ];
+        type.fields.map!(a => a.type.typeInfo).array.shouldEqual(
+            [
+                typeid(int),
+                typeid(string),
+            ]
+        );
     }
+}
+
+
+// needed because of TypeInfo.opEquals being non-const
+private void shouldEqual(
+    const(TypeInfo)[] lhs,
+    const(TypeInfo)[] rhs,
+    in string file = __FILE__,
+    in size_t line = __LINE__)
+{
+    import unit_threaded : _shouldEqual = shouldEqual;
+    (cast(TypeInfo[]) lhs)._shouldEqual(cast (TypeInfo[]) rhs, file, line);
 }
 
 
@@ -157,12 +171,14 @@ import mirror.rtti;
 
     with(types!Class) {
         const type = rtti(obj);
-        type.fields.map!(a => a.type.typeInfo).array.should == [
-            typeid(string),
-            typeid(string),
-            typeid(double),
-            typeid(string),
-        ];
+        type.fields.map!(a => a.type.typeInfo).array.shouldEqual(
+            [
+                typeid(string),
+                typeid(string),
+                typeid(double),
+                typeid(string),
+            ]
+        );
     }
 }
 
