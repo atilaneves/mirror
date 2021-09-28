@@ -1,7 +1,6 @@
 # mirror - compile and run time reflection for D
 
-[![Build Status](https://travis-ci.org/atilaneves/mirror.png?branch=master)](https://travis-ci.org/atilaneves/mirror)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/atilaneves/mirror?branch=master&svg=true)](https://ci.appveyor.com/project/atilaneves/mirror)
+[![Actions Status](https://github.com/atilaneves/mirror/workflows/CI/badge.svg)](https://github.com/atilaneves/mirror/actions)
 [![Coverage](https://codecov.io/gh/atilaneves/mirror/branch/master/graph/badge.svg)](https://codecov.io/gh/atilaneves/mirror)
 
 ## A unified API for compile and runtime reflection in D
