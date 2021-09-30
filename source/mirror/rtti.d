@@ -10,7 +10,7 @@ module mirror.rtti;
  */
 mixin template typesVar(alias symbol, T...) {
     shared static this() nothrow {
-        symbol = types!T;
+        symbol = cast(typeof(symbol)) types!T;
     }
 }
 
@@ -77,7 +77,7 @@ struct Types {
         return rtti(typeid(obj));
     }
 
-    inout(RuntimeTypeInfo) rtti(scope TypeInfo typeInfo) @safe pure scope inout {
+    inout(RuntimeTypeInfo) rtti(scope TypeInfo typeInfo) @safe scope inout {
         scope ptr = typeInfo in _typeToInfo;
 
         if(ptr is null) {
@@ -147,11 +147,11 @@ abstract class Field {
     import mirror.trait_enums: Protection;
     import std.variant: Variant;
 
-    immutable RuntimeTypeInfo type;
+    const RuntimeTypeInfo type;
     immutable string identifier;
     immutable Protection protection;
 
-    this(immutable RuntimeTypeInfo type, string identifier, in Protection protection) @safe pure scope {
+    this(const RuntimeTypeInfo type, string identifier, in Protection protection) @safe pure scope {
         this.type = type;
         this.identifier = identifier;
         this.protection = protection;
@@ -254,9 +254,9 @@ abstract class Method {
     }
 
     immutable string identifier;
-    immutable RuntimeTypeInfo type;
+    const RuntimeTypeInfo type;
 
-    this(string identifier, immutable RuntimeTypeInfo type) @safe @nogc pure scope const {
+    this(string identifier, const RuntimeTypeInfo type) @safe @nogc pure scope const {
         this.identifier = identifier;
         this.type = type;
     }
@@ -295,8 +295,8 @@ abstract class Method {
     abstract bool isOverride() @safe @nogc pure scope const;
     abstract bool isStatic() @safe @nogc pure scope const;
     abstract bool isSafe() @safe @nogc pure scope const;
-    abstract RuntimeTypeInfo returnType() @safe pure scope const;
-    abstract RuntimeTypeInfo[] parameters() @safe pure scope const;
+    abstract RuntimeTypeInfo returnType() @safe scope const;
+    abstract RuntimeTypeInfo[] parameters() @safe scope const;
     abstract string reprImpl() @safe pure scope const;
     abstract Variant callImpl(TypeQualifier objQualifier, inout Object obj, Variant[] args) const;
 }
@@ -377,12 +377,12 @@ class MethodImpl(alias F): Method {
         return arity!F;
     }
 
-    override RuntimeTypeInfo returnType() @safe pure scope const {
+    override RuntimeTypeInfo returnType() @safe scope const {
         import std.traits: ReturnType;
         return runtimeTypeInfo!(ReturnType!F);
     }
 
-    override RuntimeTypeInfo[] parameters() @safe pure scope const {
+    override RuntimeTypeInfo[] parameters() @safe scope const {
         import std.traits: Parameters;
 
         RuntimeTypeInfo[] ret;
