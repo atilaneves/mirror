@@ -22,3 +22,8 @@ configuration "unittest" {
     dflags "-preview=dip1000" "-preview=dip1008"
     dependency "unit-threaded" version="*"
 }
+
+
+buildType "unittest-cov" {
+    dflags "-cov=ctfe"
+}
