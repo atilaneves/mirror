@@ -114,7 +114,7 @@ Module module_(string moduleName)() {
 struct Module {
     string identifier;
     Aggregate[] aggregates;
-    Aggregate[] allAggregates;  // includes all function return types
+    Aggregate[] allAggregates;  /// includes all function return types
     Variable[] variables;
     Function[] functionsByOverload;
     OverloadSet[] functionsBySymbol;
@@ -167,6 +167,16 @@ struct Variable {
 struct OverloadSet {
     string identifier;
     Function[] overloads;
+
+    invariant { assert(overloads.length > 0); }
+
+    string importMixin() @safe pure nothrow const scope {
+        return overloads[0].importMixin;
+    }
+
+    string fullyQualifiedName() @safe pure nothrow const scope {
+        return overloads[0].fullyQualifiedName;
+    }
 }
 
 
