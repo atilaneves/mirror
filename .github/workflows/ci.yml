@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-20.04, windows-2019]
-        dc: [dmd-2.098.1, ldc-1.28.1]
+        dc: [dmd-2.099.1, ldc-1.29.0]
 
     runs-on: ${{ matrix.os }}
     steps:
