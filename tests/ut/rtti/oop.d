@@ -52,9 +52,9 @@ import mirror.rtti;
 
     with(types!Class) {
         auto type = rtti(obj);
-        type.typeInfo.should.not == typeid(int);
-        type.typeInfo.should.not == typeid(Abstract);
-        type.typeInfo.should == typeid(Class);
+        assert(type.typeInfo != typeid(int));
+        assert(type.typeInfo != typeid(Abstract));
+        assert(type.typeInfo == typeid(Class));
     }
 }
 
@@ -529,7 +529,7 @@ private void shouldEqual(
         type.method("twoInts").arity.should == 2;
         type.method("threeInts").arity.should == 3;
 
-        () @trusted { debug type.method("sayMyName").returnType.typeInfo.should == typeid(string); }();
+        // FIXME - better way of doing this
         type.method("sayMyName").returnType.name.should == "immutable(char)[]";
 
         type.method("twoInts").parameters.length.should == 2;
