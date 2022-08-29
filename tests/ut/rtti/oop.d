@@ -89,6 +89,7 @@ private void shouldEqual(
     const(TypeInfo)[] rhs,
     in string file = __FILE__,
     in size_t line = __LINE__)
+    @trusted // TypeInfo.opEquals
 {
     import unit_threaded : _shouldEqual = shouldEqual;
     (cast(TypeInfo[]) lhs)._shouldEqual(cast (TypeInfo[]) rhs, file, line);
@@ -363,6 +364,7 @@ private void shouldEqual(
 @safe unittest {
 
     import std.algorithm.iteration: map;
+    import std.array: array;
 
     static class Arithmetic {
         int i;
@@ -376,7 +378,7 @@ private void shouldEqual(
 
     with(types!Arithmetic) {
         const type = rtti(obj);
-        type.methods.map!(a => a.toString).should == [
+        type.methods.map!(a => a.toString).array.should == [
             "int add(int)",
             "int mul(int)",
             "double toDouble()",
