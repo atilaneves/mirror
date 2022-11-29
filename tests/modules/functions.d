@@ -47,22 +47,22 @@ static this() { }
 unittest {}
 
 
-auto voldermort(int i) {
-    static struct Voldermort {
+auto voldemort(int i) {
+    static struct Voldemort {
         int i;
     }
 
-    return Voldermort(i);
+    return Voldemort(i);
 }
 
 
-auto voldermortArray(int i) {
+auto voldemortArray(int i) {
 
-    static struct DasVoldermort {
+    static struct DasVoldemort {
         int i;
     }
 
-    return [DasVoldermort(i)];
+    return [DasVoldemort(i)];
 }
 
 

@@ -11,8 +11,8 @@ module mirror.ctfe.reflection;
    Returns compile-time reflection information about a D module.
  */
 Module module_(string moduleName)() {
-    import mirror.meta.reflection: ModuleTemplate = Module;
-    import mirror.meta.traits: Fields;
+    import mirror.meta.reflection: ModuleTemplate = Module, FunctionsByOverload, FunctionsBySymbol;
+    import mirror.meta.traits: Fields, PublicMembers;
     import std.meta: staticMap;
     import std.traits: fullyQualifiedName;
 
@@ -40,16 +40,6 @@ Module module_(string moduleName)() {
 
     enum toVariable(alias V) = Variable(fullyQualifiedName!(V.Type), V.identifier);
     ret.variables = [ staticMap!(toVariable, module_.Variables) ];
-
-    enum toAggregate(T) = Aggregate(
-        fullyQualifiedName!T,
-        toKind!T,
-        [ staticMap!(toVariable, Fields!T)],
-    );
-
-    ret.aggregates    = [ staticMap!(toAggregate, module_.Aggregates)    ];
-    ret.allAggregates = [ staticMap!(toAggregate, module_.AllAggregates) ];
-
 
     template toFunction(alias F) {
         import mirror.meta.traits: Parameters;
@@ -104,6 +94,18 @@ Module module_(string moduleName)() {
 
     ret.functionsBySymbol = [ staticMap!(toOverloaded, module_.FunctionsBySymbol) ];
 
+
+    enum toAggregate(T) = Aggregate(
+        fullyQualifiedName!T,
+        toKind!T,
+        [ staticMap!(toVariable, Fields!T)],
+        [ staticMap!(toFunction,   FunctionsByOverload!T) ],
+        [ staticMap!(toOverloaded, FunctionsBySymbol  !T) ],
+    );
+
+    ret.aggregates    = [ staticMap!(toAggregate, module_.Aggregates)    ];
+    ret.allAggregates = [ staticMap!(toAggregate, module_.AllAggregates) ];
+
     return ret;
 }
 
@@ -137,8 +139,8 @@ struct Aggregate {
     string identifier;
     Kind kind;
     Variable[] fields;
-    Function[] functions;  // TODO
-    // TODO: attributes
+    Function[] functionsByOverload;
+    OverloadSet[] functionsBySymbol;
 }
 
 

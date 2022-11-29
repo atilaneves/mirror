@@ -3,6 +3,15 @@ module modules.types;
 
 struct String {
     string value;
+
+    string withPrefix() @safe pure nothrow const {
+        return "pre_" ~ value;
+    }
+
+    string withPrefix(in string prefix) @safe pure nothrow const {
+        return prefix ~ value;
+    }
+
 }
 
 

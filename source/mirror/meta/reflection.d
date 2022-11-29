@@ -151,6 +151,10 @@ template Variable(T, string N, alias V, bool C) {
     enum isConstant = C;
 }
 
+template FunctionsBySymbol(alias parent) {
+    import mirror.meta.traits : PublicMembers;
+    alias FunctionsBySymbol = functionsBySymbol!(parent, PublicMembers!parent);
+}
 
 private template functionsBySymbol(alias parent, publicMembers...) {
 
@@ -204,8 +208,12 @@ template FunctionSymbol(
     }
 }
 
+template FunctionsByOverload(alias parent) {
+    import mirror.meta.traits : PublicMembers;
+    alias FunctionsByOverload = functionsByOverload!(parent, PublicMembers!parent);
+}
 
-package template functionsByOverload(alias parent, publicMembers...) {
+private template functionsByOverload(alias parent, publicMembers...) {
 
     import mirror.meta.traits: memberIsRegularFunction;
     import std.meta: Filter, staticMap;

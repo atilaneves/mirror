@@ -4,7 +4,6 @@ module ut.ctfe.reflection.functions;
 import ut.ctfe.reflection;
 
 
-
 @("callMixin.add1")
 unittest {
     import std.traits: Unqual;
@@ -241,15 +240,15 @@ unittest {
             Function(
                 "modules.functions",
                 0,
-                "voldermort",
-                Type("modules.functions.voldermort.Voldermort", ReturnType!(modules.functions.voldermort).sizeof),
+                "voldemort",
+                Type("modules.functions.voldemort.Voldemort", ReturnType!(modules.functions.voldemort).sizeof),
                 [Parameter(type!int, "i", "", PSC.none)],
             ),
             Function(
                 "modules.functions",
                 0,
-                "voldermortArray",
-                Type("modules.functions.voldermortArray.DasVoldermort[]", ReturnType!(modules.functions.voldermortArray).sizeof),
+                "voldemortArray",
+                Type("modules.functions.voldemortArray.DasVoldemort[]", ReturnType!(modules.functions.voldemortArray).sizeof),
                 [Parameter(type!int, "i", "", PSC.none)],
             ),
             Function(
@@ -383,30 +382,30 @@ unittest {
                 ]
             ),
             OverloadSet(
-                "voldermort",
+                "voldemort",
                 [
                     Function(
                         "modules.functions",
                         0,
-                        "voldermort",
+                        "voldemort",
                         Type(
-                            "modules.functions.voldermort.Voldermort",
-                            ReturnType!(modules.functions.voldermort).sizeof,
+                            "modules.functions.voldemort.Voldemort",
+                            ReturnType!(modules.functions.voldemort).sizeof,
                         ),
                         [Parameter(type!int, "i", "", PSC.none)],
                     ),
                 ]
             ),
             OverloadSet(
-                "voldermortArray",
+                "voldemortArray",
                 [
                     Function(
                         "modules.functions",
                         0,
-                        "voldermortArray",
+                        "voldemortArray",
                         Type(
-                            "modules.functions.voldermortArray.DasVoldermort[]",
-                            ReturnType!(modules.functions.voldermortArray).sizeof,
+                            "modules.functions.voldemortArray.DasVoldemort[]",
+                            ReturnType!(modules.functions.voldemortArray).sizeof,
                         ),
                         [Parameter(type!int, "i", "", PSC.none)],
                     ),
@@ -443,12 +442,12 @@ unittest {
     mod.allAggregates[].shouldBeSameSetAs(
         [
             Aggregate(
-                "modules.functions.voldermort.Voldermort",
+                "modules.functions.voldemort.Voldemort",
                 Aggregate.Kind.struct_,
                 [Variable("int", "i")],
             ),
             Aggregate(
-                "modules.functions.voldermortArray.DasVoldermort",
+                "modules.functions.voldemortArray.DasVoldemort",
                 Aggregate.Kind.struct_,
                 [Variable("int", "i")],
             ),

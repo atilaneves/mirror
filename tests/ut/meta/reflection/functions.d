@@ -19,8 +19,8 @@ import std.meta: AliasSeq;
         FunctionSymbol!(externC, Protection.public_, Linkage.C),
         FunctionSymbol!(externCpp, Protection.public_, Linkage.Cpp),
         FunctionSymbol!(identityInt, Protection.public_, Linkage.D, "identityInt", modules.functions),
-        FunctionSymbol!(voldermort, Protection.public_, Linkage.D),
-        FunctionSymbol!(voldermortArray, Protection.public_, Linkage.D),
+        FunctionSymbol!(voldemort, Protection.public_, Linkage.D),
+        FunctionSymbol!(voldemortArray, Protection.public_, Linkage.D),
         FunctionSymbol!(concatFoo, Protection.public_, Linkage.D),
     );
 
@@ -50,8 +50,8 @@ import std.meta: AliasSeq;
         FunctionOverload!(externC, Protection.public_, Linkage.C),
         FunctionOverload!(externCpp, Protection.public_, Linkage.Cpp),
         FunctionOverload!(identityInt, Protection.public_, Linkage.D, "identityInt", modules.functions),
-        FunctionOverload!(voldermort, Protection.public_, Linkage.D),
-        FunctionOverload!(voldermortArray, Protection.public_, Linkage.D),
+        FunctionOverload!(voldemort, Protection.public_, Linkage.D),
+        FunctionOverload!(voldemortArray, Protection.public_, Linkage.D),
         FunctionOverload!(concatFoo, Protection.public_, Linkage.D),
     );
 
@@ -178,8 +178,8 @@ import std.meta: AliasSeq;
         returnTypes,
         AliasSeq!(
             int, double, double, void, void, void, void, int,
-            ReturnType!(modules.functions.voldermort),
-            ReturnType!(modules.functions.voldermortArray),
+            ReturnType!(modules.functions.voldemort),
+            ReturnType!(modules.functions.voldemortArray),
             string,
         ),
     );
