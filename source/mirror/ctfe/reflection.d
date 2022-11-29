@@ -11,7 +11,7 @@ module mirror.ctfe.reflection;
    Returns compile-time reflection information about a D module.
  */
 Module module_(string moduleName)() {
-    import mirror.meta.reflection: ModuleTemplate = Module, functionsByOverload, functionsBySymbol;
+    import mirror.meta.reflection: ModuleTemplate = Module, FunctionsByOverload, FunctionsBySymbol;
     import mirror.meta.traits: Fields, PublicMembers;
     import std.meta: staticMap;
     import std.traits: fullyQualifiedName;
@@ -99,8 +99,8 @@ Module module_(string moduleName)() {
         fullyQualifiedName!T,
         toKind!T,
         [ staticMap!(toVariable, Fields!T)],
-        [ staticMap!(toFunction,   functionsByOverload!(T, PublicMembers!T)) ],
-        [ staticMap!(toOverloaded, functionsBySymbol  !(T, PublicMembers!T)) ],
+        [ staticMap!(toFunction,   FunctionsByOverload!T) ],
+        [ staticMap!(toOverloaded, FunctionsBySymbol  !T) ],
     );
 
     ret.aggregates    = [ staticMap!(toAggregate, module_.Aggregates)    ];
