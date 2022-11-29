@@ -110,3 +110,12 @@ import ut.ctfe.reflection;
         Variable("double", "y"),
     ];
 }
+
+@("methods")
+@safe pure unittest {
+    import std.algorithm: find;
+    enum mod = module_!"modules.types";
+    const str = mod.aggregates[].find!(a => a.identifier == "modules.types.String")[0];
+    str.functionsByOverload.length.should == 2;
+    str.functionsBySymbol.length.should == 1;
+}

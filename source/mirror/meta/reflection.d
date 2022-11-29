@@ -152,7 +152,7 @@ template Variable(T, string N, alias V, bool C) {
 }
 
 
-private template functionsBySymbol(alias parent, publicMembers...) {
+template functionsBySymbol(alias parent, publicMembers...) {
 
     import mirror.meta.traits: memberIsRegularFunction;
     import std.meta: Filter, staticMap;
@@ -205,7 +205,7 @@ template FunctionSymbol(
 }
 
 
-package template functionsByOverload(alias parent, publicMembers...) {
+template functionsByOverload(alias parent, publicMembers...) {
 
     import mirror.meta.traits: memberIsRegularFunction;
     import std.meta: Filter, staticMap;
