@@ -6,11 +6,16 @@ jobs:
     name: Dub Test
     strategy:
       matrix:
-        os: [ubuntu-20.04, windows-2019, macos-10.15]
+        os:
+          - ubuntu-22.04
+          - windows-2019
+          - macos-11
         dc:
+          - dmd-2.103.1
           - dmd-2.100.0
-          - ldc-1.30.0
           - dmd-2.099.1
+          - ldc-1.32.2
+          - ldc-1.30.0
           - ldc-1.29.0
 
     runs-on: ${{ matrix.os }}
@@ -28,4 +33,4 @@ jobs:
       - name: Build binary
         run: dub build -q
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v3.1.4
