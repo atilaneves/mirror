@@ -7,23 +7,21 @@ jobs:
     strategy:
       matrix:
         os:
-          - ubuntu-22.04
-          - windows-2019
-          - macos-11
+          - ubuntu-24.04
+          - windows-2022
+          - macos-12
         dc:
-          - dmd-2.103.1
-          - dmd-2.100.0
+          - dmd-2.109.1
           - dmd-2.099.1
-          - ldc-1.32.2
-          - ldc-1.30.0
+          - ldc-1.40.0
           - ldc-1.29.0
 
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install D compiler
-        uses: dlang-community/setup-dlang@v1.3.0
+        uses: dlang-community/setup-dlang@v2
         with:
           compiler: ${{ matrix.dc }}
 
@@ -33,4 +31,4 @@ jobs:
       - name: Build binary
         run: dub build -q
 
-      - uses: codecov/codecov-action@v3.1.4
+      - uses: codecov/codecov-action@v5.1.2
