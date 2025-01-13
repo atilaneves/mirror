@@ -5,10 +5,15 @@ import ut;
 import mirror.ctfe.reflection2;
 
 
+@("problems")
+unittest {
+    // just to check there are no compilation errors
+    enum mod = module_!"modules.problems"();
+}
+
+
 @("add1.callMixin")
 unittest {
-    import std.traits: Unqual;
-
     enum mod = module_!"modules.functions"();
     enum add1 = mod.functionsByOverload[0];
     pragma(msg, mod.functionsByOverload);
@@ -20,10 +25,9 @@ unittest {
     mixin(add1.fullyQualifiedName)(2, 3).should == 6;
 }
 
+
 @("add1.equality")
 unittest {
-    import std.traits: Unqual;
-
     enum mod = module_!"modules.functions"();
     enum add1_0 = mod.functionsByOverload[0];
     add1_0.should == Function(
