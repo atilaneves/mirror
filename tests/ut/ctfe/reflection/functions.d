@@ -435,7 +435,6 @@ unittest {
 
 @("functions.allAggregates")
 @safe pure unittest {
-    import std.traits: PSC = ParameterStorageClass;
 
     enum mod = module_!"modules.functions";
 

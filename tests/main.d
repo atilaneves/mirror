@@ -10,6 +10,7 @@ mixin runTestsMain!(
     "ut.ctfe.reflection.types",
     "ut.ctfe.reflection.variables",
     "ut.ctfe.reflection.functions",
+    "ut.ctfe.reflection.functions2",
     "ut.ctfe.reflection.wrap",
     "ut.rtti.oop",
     "ut.rtti.any",
