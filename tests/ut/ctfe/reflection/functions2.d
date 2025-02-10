@@ -3,6 +3,7 @@ module ut.ctfe.reflection.functions2;
 
 import ut;
 import mirror.ctfe.reflection2;
+import std.traits: PSC = ParameterStorageClass;
 
 
 @("problems")
@@ -42,7 +43,7 @@ import mirror.ctfe.reflection2;
 @("functionsByOverload.equality")
 @safe pure unittest {
     enum mod = module_!"modules.functions"();
-    enum functions = mod.functionsByOverload[0..2]; // FIXME
+    enum functions = mod.functionsByOverload[0..4]; // FIXME
 
     functions.should == [
         Function(
@@ -54,10 +55,14 @@ import mirror.ctfe.reflection2;
                 Parameter(
                     Type("int"),
                     "i",
+                    PSC.none,
+                    "void",
                 ),
                 Parameter(
                     Type("int"),
                     "j",
+                    PSC.none,
+                    "void",
                 ),
             ],
         ),
@@ -70,12 +75,49 @@ import mirror.ctfe.reflection2;
                 Parameter(
                     Type("double"),
                     "d0",
+                    PSC.none,
+                    "void",
                 ),
                 Parameter(
                     Type("double"),
                     "d1",
+                    PSC.none,
+                    "void",
                 ),
             ],
+        ),
+        Function(
+            "modules.functions",
+            0,
+            "withDefault",
+            Type("double"),
+            [
+                Parameter(
+                    Type("double"),
+                    "fst",
+                    PSC.none,
+                    "void",
+                ),
+                Parameter(
+                    Type("double"),
+                    "snd",
+                    PSC.none,
+                    "33.3",
+                ),
+            ],
+        ),
+        Function(
+            "modules.functions",
+            0,
+            "storageClasses",
+            Type("void"),
+            [
+                Parameter(Type("int"), "normal", PSC.none, "void"),
+                Parameter(Type("int*"), "returnScope", PSC.return_ | PSC.scope_, "void"),
+                Parameter(Type("int"), "out_", PSC.out_, "void"),
+                Parameter(Type("int"), "ref_", PSC.ref_, "void"),
+                Parameter(Type("int"), "lazy_", PSC.lazy_, "void"),
+            ]
         ),
     ];
 }

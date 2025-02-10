@@ -10,7 +10,8 @@ module mirror.ctfe.reflection2;
 Module module_(string moduleName)() {
 
     // sigh
-    import std.traits: ReturnType, Parameters, ParameterIdentifierTuple;
+    import std.traits: ReturnType, Parameters, ParameterIdentifierTuple,
+        ParameterDefaults, ParameterStorageClassTuple;
 
     Module mod;
 
@@ -30,6 +31,8 @@ Module module_(string moduleName)() {
                     parameters ~= Parameter(
                         type!(Parameters!overload[i]),
                         ParameterIdentifierTuple!overload[i],
+                        ParameterStorageClassTuple!overload[i],
+                        ParameterDefaults!overload[i].stringof,
                     );
                 }
 
@@ -91,6 +94,10 @@ Type type(T)() {
 
 
 struct Parameter {
+    import std.traits: PSC = ParameterStorageClass;
+
     Type type;
     string identifier;
+    PSC storageClass;
+    string default_;
 }
