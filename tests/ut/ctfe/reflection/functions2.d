@@ -42,19 +42,40 @@ import mirror.ctfe.reflection2;
 @("functionsByOverload.equality")
 @safe pure unittest {
     enum mod = module_!"modules.functions"();
-    enum addd_0 = mod.functionsByOverload[0];
-    addd_0.should == Function(
-        "modules.functions",
-        0,
-        "addd",
-        Type("int"),
-    );
+    enum functions = mod.functionsByOverload[0..2]; // FIXME
 
-    enum addd_1= mod.functionsByOverload[1];
-    addd_1.should == Function(
-        "modules.functions",
-        1,
-        "addd",
-        Type("double"),
-    );
+    functions.should == [
+        Function(
+            "modules.functions",
+            0,
+            "addd",
+            Type("int"),
+            [
+                Parameter(
+                    Type("int"),
+                    "i",
+                ),
+                Parameter(
+                    Type("int"),
+                    "j",
+                ),
+            ],
+        ),
+        Function(
+            "modules.functions",
+            1,
+            "addd",
+            Type("double"),
+            [
+                Parameter(
+                    Type("double"),
+                    "d0",
+                ),
+                Parameter(
+                    Type("double"),
+                    "d1",
+                ),
+            ],
+        ),
+    ];
 }
