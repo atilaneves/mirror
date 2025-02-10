@@ -13,7 +13,7 @@ import std.traits: PSC = ParameterStorageClass;
 }
 
 
-@("functionsByOverload.call.0")
+@("functionsByOverload.call.addd.0")
 @safe pure unittest {
     enum mod = module_!"modules.functions"();
     enum addd_0 = mod.functionsByOverload[0];
@@ -26,7 +26,7 @@ import std.traits: PSC = ParameterStorageClass;
     addd_0Sym(2, 3).should == 6;
 }
 
-@("functionsByOverload.call.1")
+@("functionsByOverload.call.addd.1")
 @safe pure unittest {
     enum mod = module_!"modules.functions"();
     enum addd_1 = mod.functionsByOverload[1];

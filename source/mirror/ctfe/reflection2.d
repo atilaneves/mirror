@@ -19,7 +19,8 @@ module mirror.ctfe.reflection2;
 
 Module module_(string moduleName)() {
 
-    // This one is too annoying to inline
+    // This one is too annoying to inline and requires templates
+    // anyway.
     import std.traits: ParameterDefaults;
 
     Module mod;
@@ -73,7 +74,7 @@ Module module_(string moduleName)() {
 }
 
 // look ma, no templates
-private auto phobosPSC(string[] storageClasses) @safe pure nothrow {
+private auto phobosPSC(in string[] storageClasses) @safe pure nothrow {
     import std.traits: PSC = ParameterStorageClass;
 
     auto ret = PSC.none;
