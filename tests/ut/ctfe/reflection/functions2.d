@@ -63,7 +63,7 @@ import std.traits: PSC = ParameterStorageClass;
                 ),
             ],
             "public",
-            "D",
+            Linkage.D,
         ),
         Function(
             "modules.functions.addd",
@@ -82,7 +82,7 @@ import std.traits: PSC = ParameterStorageClass;
                 ),
             ],
             "public",
-            "D",
+            Linkage.D,
         ),
         Function(
             "modules.functions.withDefault",
@@ -102,7 +102,7 @@ import std.traits: PSC = ParameterStorageClass;
                 ),
             ],
             "public",
-            "D",
+            Linkage.D,
         ),
         Function(
             "modules.functions.storageClasses",
@@ -116,7 +116,7 @@ import std.traits: PSC = ParameterStorageClass;
                 Parameter(Type("int"), "lazy_", PSC.lazy_),
             ],
             "public",
-            "D",
+            Linkage.D,
         ),
         Function(
             "modules.functions.exportedFunc",
@@ -124,7 +124,7 @@ import std.traits: PSC = ParameterStorageClass;
             Type("void"),
             [],
             "export",
-            "D",
+            Linkage.D,
         ),
         Function(
             "modules.functions.externC",
@@ -132,7 +132,7 @@ import std.traits: PSC = ParameterStorageClass;
             Type("void"),
             [],
             "public",
-            "C",
+            Linkage.C,
         ),
         Function(
             "modules.functions.externCpp",
@@ -140,7 +140,7 @@ import std.traits: PSC = ParameterStorageClass;
             Type("void"),
             [],
             "public",
-            "C++",
+            Linkage.Cplusplus,
         ),
     ];
 }

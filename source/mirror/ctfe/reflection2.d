@@ -76,7 +76,7 @@ Module module_(string moduleName)() {
                     returnType,
                     parameters,
                     __traits(getVisibility, overload),
-                    __traits(getLinkage, overload),
+                    linkage(__traits(getLinkage, overload)),
                 );
             }}
         }
@@ -122,7 +122,7 @@ struct Function {
     Type returnType;
     Parameter[] parameters;
     string visibility;
-    string linkage;
+    Linkage linkage;
 
     string importMixin() @safe pure nothrow scope const {
         return "static import " ~ moduleName ~ ";";
@@ -142,7 +142,6 @@ struct Function {
         import std.string: split, join;
         return fullyQualifiedName.split(".")[$-1];
     }
-
 }
 
 
@@ -158,4 +157,25 @@ struct Parameter {
     string identifier;
     PSC storageClass;
     string default_;
+}
+
+enum Linkage {
+    D,
+    C,
+    Cplusplus,
+    Windows,
+    ObjectiveC,
+    System,
+}
+
+private Linkage linkage(in string linkage) @safe pure {
+    switch(linkage) with(Linkage) {
+        default: throw new Exception("Unknown linkage " ~ linkage);
+        case "D": return D;
+        case "C": return C;
+        case "C++": return Cplusplus;
+        case "Windows": return Windows;
+        case "ObjectiveC": return ObjectiveC;
+        case "System": return System;
+    }
 }
