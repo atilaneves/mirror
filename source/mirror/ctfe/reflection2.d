@@ -7,6 +7,19 @@
 module mirror.ctfe.reflection2;
 
 
+/*
+  TODO:
+
+  * Remove std.traits dependency (ugh, templates) by copying what
+  the various functions do.
+
+  * Go over the whole list of built-in traits and expose all of it.
+
+  * Unify Type/Function API - instantiate with FQN, use `.moduleName`
+  to get the name of the module.
+*/
+
+
 Module module_(string moduleName)() {
 
     // sigh
