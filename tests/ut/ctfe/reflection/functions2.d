@@ -12,33 +12,45 @@ unittest {
 }
 
 
-@("add1.callMixin")
+@("functionsByOverload.call.0")
 unittest {
     enum mod = module_!"modules.functions"();
-    enum add1 = mod.functionsByOverload[0];
+    enum addd_0 = mod.functionsByOverload[0];
 
-    mixin(add1.importMixin);
-    alias add1Sym = mixin(add1.fullyQualifiedName);
+    mixin(addd_0.importMixin);
+    alias addd_0Sym = mixin(addd_0.fullyQualifiedName);
 
-    add1Sym(1, 2).should == 4;
-    add1Sym(2, 3).should == 6;
+    addd_0Sym(1, 2).should == 4;
+    addd_0Sym(2, 3).should == 6;
+}
+
+@("functionsByOverload.call.1")
+unittest {
+    enum mod = module_!"modules.functions"();
+    enum addd_1 = mod.functionsByOverload[1];
+
+    mixin(addd_1.importMixin);
+    alias addd_1Sym = mixin(addd_1.fullyQualifiedName);
+
+    addd_1Sym(1, 2).should == 4;
+    addd_1Sym(2, 3).should == 6;
 }
 
 
-@("add1.equality")
+@("functionsByOverload.equality")
 unittest {
     enum mod = module_!"modules.functions"();
-    enum add1_0 = mod.functionsByOverload[0];
-    add1_0.should == Function(
+    enum addd_0 = mod.functionsByOverload[0];
+    addd_0.should == Function(
         "modules.functions",
         0,
-        "add1",
+        "addd",
     );
 
-    enum add1_1= mod.functionsByOverload[1];
-    add1_1.should == Function(
+    enum addd_1= mod.functionsByOverload[1];
+    addd_1.should == Function(
         "modules.functions",
         1,
-        "add1",
+        "addd",
     );
 }

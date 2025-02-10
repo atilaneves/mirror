@@ -2,13 +2,13 @@ module modules.functions;
 static import modules.templates;
 
 
-int add1(int i, int j) {
+int addd(int i, int j) {
     return i + j + 1;
 }
 
 
-double add1(double d0, double d1) {
-    return d0 + d1 + 1;
+double addd(double d0, double d1) {
+    return d0 + d1 + 2; // do the wrong thing on purpose
 }
 
 

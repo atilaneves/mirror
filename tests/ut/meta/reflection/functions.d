@@ -12,7 +12,7 @@ import std.meta: AliasSeq;
     import modules.functions;
 
     alias expected = AliasSeq!(
-        FunctionSymbol!(add1, Protection.public_, Linkage.D),
+        FunctionSymbol!(addd, Protection.public_, Linkage.D),
         FunctionSymbol!(withDefault, Protection.public_, Linkage.D),
         FunctionSymbol!(storageClasses, Protection.public_, Linkage.D),
         FunctionSymbol!(exportedFunc, Protection.export_, Linkage.D),
@@ -27,7 +27,7 @@ import std.meta: AliasSeq;
     // pragma(msg, "\n", mod.FunctionsBySymbol.stringof, "\n");
     shouldEqual!(mod.FunctionsBySymbol, expected);
 
-    static assert(mod.FunctionsBySymbol[0].overloads.length == 2); // add1
+    static assert(mod.FunctionsBySymbol[0].overloads.length == 2); // addd
     static foreach(i; 1..expected.length)
         static assert(mod.FunctionsBySymbol[i].overloads.length == 1); // everything else
 }
@@ -38,12 +38,12 @@ import std.meta: AliasSeq;
     alias mod = Module!("modules.functions");
     import modules.functions;
 
-    alias add1Int = __traits(getOverloads, modules.functions, "add1")[0];
-    alias add1Double = __traits(getOverloads, modules.functions, "add1")[1];
+    alias adddInt = __traits(getOverloads, modules.functions, "addd")[0];
+    alias adddDouble = __traits(getOverloads, modules.functions, "addd")[1];
 
     alias expected = AliasSeq!(
-        FunctionOverload!(add1Int, Protection.public_, Linkage.D),
-        FunctionOverload!(add1Double, Protection.public_, Linkage.D, "add1", modules.functions, 1),
+        FunctionOverload!(adddInt, Protection.public_, Linkage.D),
+        FunctionOverload!(adddDouble, Protection.public_, Linkage.D, "addd", modules.functions, 1),
         FunctionOverload!(withDefault, Protection.public_, Linkage.D),
         FunctionOverload!(storageClasses, Protection.public_, Linkage.D),
         FunctionOverload!(exportedFunc, Protection.export_, Linkage.D),
@@ -68,16 +68,16 @@ import std.meta: AliasSeq;
 
 
 
-@("parameters.add1.bySymbol")
+@("parameters.addd.bySymbol")
 @safe pure unittest {
 
     alias mod = Module!("modules.functions");
-    alias add1Int = mod.FunctionsBySymbol[0].overloads[0];
-    alias add1Double = mod.FunctionsBySymbol[0].overloads[1];
+    alias adddInt = mod.FunctionsBySymbol[0].overloads[0];
+    alias adddDouble = mod.FunctionsBySymbol[0].overloads[1];
     alias withDefaults = mod.FunctionsBySymbol[1].overloads[0];
 
     shouldEqual!(
-        add1Int.parameters,
+        adddInt.parameters,
         AliasSeq!(
             Parameter!(int, void, "i"),
             Parameter!(int, void, "j"),
@@ -85,7 +85,7 @@ import std.meta: AliasSeq;
     );
 
     shouldEqual!(
-        add1Double.parameters,
+        adddDouble.parameters,
         AliasSeq!(
             Parameter!(double, void, "d0"),
             Parameter!(double, void, "d1"),
@@ -102,14 +102,14 @@ import std.meta: AliasSeq;
 }
 
 
-@("parameters.add1.byOverload")
+@("parameters.addd.byOverload")
 @safe pure unittest {
     alias mod = Module!("modules.functions");
-    alias add1Int = mod.FunctionsByOverload[0];
-    alias add1Double = mod.FunctionsByOverload[1];
+    alias adddInt = mod.FunctionsByOverload[0];
+    alias adddDouble = mod.FunctionsByOverload[1];
 
     shouldEqual!(
-        add1Int.parameters,
+        adddInt.parameters,
         AliasSeq!(
             Parameter!(int, void, "i"),
             Parameter!(int, void, "j"),
@@ -117,7 +117,7 @@ import std.meta: AliasSeq;
     );
 
     shouldEqual!(
-        add1Double.parameters,
+        adddDouble.parameters,
         AliasSeq!(
             Parameter!(double, void, "d0"),
             Parameter!(double, void, "d1"),

@@ -4,73 +4,73 @@ module ut.ctfe.reflection.functions;
 import ut.ctfe.reflection;
 
 
-@("callMixin.add1")
+@("callMixin.addd")
 unittest {
     import std.traits: Unqual;
 
     enum mod = module_!"modules.functions";
-    enum add1 = mod.functionsByOverload[0];
+    enum addd = mod.functionsByOverload[0];
 
-    mixin(add1.importMixin);
+    mixin(addd.importMixin);
 
-    mixin(add1.fullyQualifiedName, `(1, 2)`).should == 4;
-    mixin(add1.fullyQualifiedName, `(2, 3)`).should == 6;
+    mixin(addd.fullyQualifiedName, `(1, 2)`).should == 4;
+    mixin(addd.fullyQualifiedName, `(2, 3)`).should == 6;
 
     // or, easier...
-    mixin(add1.callMixin(1, 2)).should == 4;
+    mixin(addd.callMixin(1, 2)).should == 4;
     auto arg = 2;
-    mixin(add1.callMixin("arg", 2)).should == 5;
+    mixin(addd.callMixin("arg", 2)).should == 5;
 }
 
 
-@("pointer.byOverload.add1.0")
+@("pointer.byOverload.addd.0")
 unittest {
     enum mod = module_!"modules.functions";
-    enum add1 = mod.functionsByOverload[0];
+    enum addd = mod.functionsByOverload[0];
 
-    mixin(add1.importMixin);
+    mixin(addd.importMixin);
 
-    auto ptr = pointer!add1;
+    auto ptr = pointer!addd;
     static assert(is(typeof(ptr) == int function(int, int)));
 
     ptr(1, 2).should == 4;
     ptr(2, 3).should == 6;
 }
 
-@("pointer.byOverload.add1.1")
+@("pointer.byOverload.addd.1")
 unittest {
     enum mod = module_!"modules.functions";
-    enum add1 = mod.functionsByOverload[1];
+    enum addd = mod.functionsByOverload[1];
 
-    mixin(add1.importMixin);
+    mixin(addd.importMixin);
 
-    auto ptr = pointer!add1;
+    auto ptr = pointer!addd;
     static assert(is(typeof(ptr) == double function(double, double)));
 
-    ptr(1.0, 2.0).should == 4.0;
-    ptr(2.0, 3.0).should == 6.0;
+    ptr(1.0, 2.0).should == 5.0;
+    ptr(2.0, 3.0).should == 7.0;
 }
 
 
-@("pointer.bySymbol.add1")
+@("pointer.bySymbol.addd")
 unittest {
     enum mod = module_!"modules.functions";
-    enum add1 = mod.functionsBySymbol[0];
+    enum addd = mod.functionsBySymbol[0];
 
-    enum add1Int = add1.overloads[0];
-    enum add1Double = add1.overloads[1];
+    enum adddInt = addd.overloads[0];
+    enum adddDouble = addd.overloads[1];
 
-    mixin(add1Int.importMixin);
+    mixin(adddInt.importMixin);
 
-    auto ptrInt = pointer!add1Int;
+    auto ptrInt = pointer!adddInt;
     static assert(is(typeof(ptrInt) == int function(int, int)));
     ptrInt(1, 2).should == 4;
     ptrInt(2, 3).should == 6;
 
-    auto ptrDouble = pointer!add1Double;
+    auto ptrDouble = pointer!adddDouble;
     static assert(is(typeof(ptrDouble) == double function(double, double)));
-    ptrDouble(1.0, 2.0).should == 4.0;
-    ptrDouble(2.0, 3.0).should == 6.0;
+    ptrDouble(1.0, 2.0).should == 5.0;
+    ptrDouble(2.0, 3.0).should == 7.0;
 }
 
 
@@ -90,14 +90,14 @@ unittest {
 }
 
 
-@("pointerMixin.byOverload.add1.0")
+@("pointerMixin.byOverload.addd.0")
 unittest {
     enum mod = module_!"modules.functions";
-    enum add1 = mod.functionsByOverload[0];
+    enum addd = mod.functionsByOverload[0];
 
-    mixin(add1.importMixin);
+    mixin(addd.importMixin);
 
-    auto ptr = mixin(add1.pointerMixin);
+    auto ptr = mixin(addd.pointerMixin);
     static assert(is(typeof(ptr) == int function(int, int)));
 
     ptr(1, 2).should == 4;
@@ -105,40 +105,40 @@ unittest {
 }
 
 
-@("pointerMixin.byOverload.add1.1")
+@("pointerMixin.byOverload.addd.1")
 unittest {
     enum mod = module_!"modules.functions";
-    enum add1 = mod.functionsByOverload[1];
+    enum addd = mod.functionsByOverload[1];
 
-    mixin(add1.importMixin);
+    mixin(addd.importMixin);
 
-    auto ptr = mixin(add1.pointerMixin);
+    auto ptr = mixin(addd.pointerMixin);
     static assert(is(typeof(ptr) == double function(double, double)));
 
-    ptr(1.0, 2.0).should == 4.0;
-    ptr(2.0, 3.0).should == 6.0;
+    ptr(1.0, 2.0).should == 5.0;
+    ptr(2.0, 3.0).should == 7.0;
 }
 
 
-@("pointerMixin.bySymbol.add1")
+@("pointerMixin.bySymbol.addd")
 unittest {
     enum mod = module_!"modules.functions";
-    enum add1 = mod.functionsBySymbol[0];
+    enum addd = mod.functionsBySymbol[0];
 
-    enum add1Int = add1.overloads[0];
-    enum add1Double = add1.overloads[1];
+    enum adddInt = addd.overloads[0];
+    enum adddDouble = addd.overloads[1];
 
-    mixin(add1Int.importMixin);
+    mixin(adddInt.importMixin);
 
-    auto ptrInt = mixin(add1Int.pointerMixin);
+    auto ptrInt = mixin(adddInt.pointerMixin);
     static assert(is(typeof(ptrInt) == int function(int, int)));
     ptrInt(1, 2).should == 4;
     ptrInt(2, 3).should == 6;
 
-    auto ptrDouble = mixin(add1Double.pointerMixin);
+    auto ptrDouble = mixin(adddDouble.pointerMixin);
     static assert(is(typeof(ptrDouble) == double function(double, double)));
-    ptrDouble(1.0, 2.0).should == 4.0;
-    ptrDouble(2.0, 3.0).should == 6.0;
+    ptrDouble(1.0, 2.0).should == 5.0;
+    ptrDouble(2.0, 3.0).should == 7.0;
 }
 
 
@@ -169,7 +169,7 @@ unittest {
             Function(
                 "modules.functions",
                 0,
-                "add1",
+                "addd",
                 Type("int", int.sizeof),
                 [
                     Parameter(type!int, "i"),
@@ -179,7 +179,7 @@ unittest {
             Function(
                 "modules.functions",
                 1,
-                "add1",
+                "addd",
                 Type("double", double.sizeof),
                 [
                     Parameter(type!double, "d0"),
@@ -276,12 +276,12 @@ unittest {
     mod.functionsBySymbol[].shouldBeSameSetAs(
         [
             OverloadSet(
-                "add1",
+                "addd",
                 [
                     Function(
                         "modules.functions",
                         0,
-                        "add1",
+                        "addd",
                         Type("int", int.sizeof),
                         [
                             Parameter(type!int, "i"),
@@ -291,7 +291,7 @@ unittest {
                     Function(
                         "modules.functions",
                         1,
-                        "add1",
+                        "addd",
                         Type("double", double.sizeof),
                         [
                             Parameter(type!double, "d0"),
