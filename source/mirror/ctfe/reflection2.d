@@ -19,6 +19,13 @@ module mirror.ctfe.reflection2;
   * Add unit tests to the module struct.
 
   * Functions by symbol.
+
+  * Function attributes (@safe, etc.)
+
+  * Function UDAs.
+
+  * When doing aggregates, include function return types and
+  parameters, see the old `functions.allAggregates` test.
 */
 
 
