@@ -10,8 +10,7 @@ module mirror.ctfe.reflection2;
 /*
   TODO:
 
-  * Remove std.traits dependency (ugh, templates) by copying what
-  the various functions do.
+  * Remove std.traits.fullyQualifiedName dependency.
 
   * Go over the whole list of built-in traits and expose all of it.
 */
@@ -19,9 +18,7 @@ module mirror.ctfe.reflection2;
 
 Module module_(string moduleName)() {
 
-    // This one is too annoying to inline and requires templates
-    // anyway.
-    import std.traits: ParameterDefaults;
+    import std.algorithm: countUntil;
 
     Module mod;
 
@@ -50,11 +47,23 @@ Module module_(string moduleName)() {
                         else
                             enum paramIdentifier = Ps[i].stringof;
 
+                        enum paramString = Ps[p .. p + 1].stringof;
+                        enum assignIndex = paramString.countUntil(`=`);
+                        static if(assignIndex == -1)
+                            enum default_ = "";
+                        else {
+                            // paramString will be something like:
+                            // `(T id = val)`
+                            // we want default_ in this case to be "val"
+                            static assert(paramString[assignIndex + 1] == ' ');
+                            enum default_ = paramString[assignIndex + 2 .. $-1];
+                        }
+
                         parameters ~= Parameter(
                             type!(Ps[p]),
                             paramIdentifier,
                             phobosPSC([__traits(getParameterStorageClasses, overload, p)]),
-                            ParameterDefaults!overload[p].stringof,
+                            default_,
                         );
                     }}
                 } else
@@ -72,6 +81,7 @@ Module module_(string moduleName)() {
 
     return mod;
 }
+
 
 // look ma, no templates
 private auto phobosPSC(in string[] storageClasses) @safe pure nothrow {

@@ -43,7 +43,7 @@ import std.traits: PSC = ParameterStorageClass;
 @("functionsByOverload.equality")
 @safe pure unittest {
     enum mod = module_!"modules.functions"();
-    enum functions = mod.functionsByOverload[0..4]; // FIXME
+    enum functions = mod.functionsByOverload[0..5]; // FIXME
 
     functions.should == [
         Function(
@@ -55,13 +55,11 @@ import std.traits: PSC = ParameterStorageClass;
                     Type("int"),
                     "i",
                     PSC.none,
-                    "void",
                 ),
                 Parameter(
                     Type("int"),
                     "j",
                     PSC.none,
-                    "void",
                 ),
             ],
         ),
@@ -74,13 +72,11 @@ import std.traits: PSC = ParameterStorageClass;
                     Type("double"),
                     "d0",
                     PSC.none,
-                    "void",
                 ),
                 Parameter(
                     Type("double"),
                     "d1",
                     PSC.none,
-                    "void",
                 ),
             ],
         ),
@@ -93,7 +89,6 @@ import std.traits: PSC = ParameterStorageClass;
                     Type("double"),
                     "fst",
                     PSC.none,
-                    "void",
                 ),
                 Parameter(
                     Type("double"),
@@ -108,12 +103,17 @@ import std.traits: PSC = ParameterStorageClass;
             0,
             Type("void"),
             [
-                Parameter(Type("int"), "normal", PSC.none, "void"),
-                Parameter(Type("int*"), "returnScope", PSC.return_ | PSC.scope_, "void"),
-                Parameter(Type("int"), "out_", PSC.out_, "void"),
-                Parameter(Type("int"), "ref_", PSC.ref_, "void"),
-                Parameter(Type("int"), "lazy_", PSC.lazy_, "void"),
+                Parameter(Type("int"), "normal", PSC.none),
+                Parameter(Type("int*"), "returnScope", PSC.return_ | PSC.scope_),
+                Parameter(Type("int"), "out_", PSC.out_),
+                Parameter(Type("int"), "ref_", PSC.ref_),
+                Parameter(Type("int"), "lazy_", PSC.lazy_),
             ]
+        ),
+        Function(
+            "modules.functions.exportedFunc",
+            0,
+            Type("void"),
         ),
     ];
 }
