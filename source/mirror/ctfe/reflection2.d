@@ -19,6 +19,7 @@ module mirror.ctfe.reflection2;
 Module module_(string moduleName)() {
 
     import std.algorithm: countUntil;
+    import std.traits: fullyQualifiedName;
 
     Module mod;
 
@@ -34,7 +35,7 @@ Module module_(string moduleName)() {
             static foreach(i, overload; __traits(getOverloads, module_, memberName)) {{
 
                 static if(is(typeof(overload) R == return))
-                    enum returnType = type!R;
+                    enum returnType = Type(fullyQualifiedName!R);
                 else
                     static assert(false, "Cannot get return type of " ~ __traits(identifier, overload));
 
@@ -60,7 +61,7 @@ Module module_(string moduleName)() {
                         }
 
                         parameters ~= Parameter(
-                            type!(Ps[p]),
+                            Type(fullyQualifiedName!(Ps[p])),
                             paramIdentifier,
                             phobosPSC([__traits(getParameterStorageClasses, overload, p)]),
                             default_,
@@ -143,11 +144,6 @@ struct Function {
 
 struct Type {
     string fullyQualifiedName;
-}
-
-Type type(T)() {
-    import std.traits: fullyQualifiedName;
-    return Type(fullyQualifiedName!T);
 }
 
 
