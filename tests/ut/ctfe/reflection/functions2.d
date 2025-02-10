@@ -47,6 +47,7 @@ import mirror.ctfe.reflection2;
         "modules.functions",
         0,
         "addd",
+        Type("int"),
     );
 
     enum addd_1= mod.functionsByOverload[1];
@@ -54,5 +55,6 @@ import mirror.ctfe.reflection2;
         "modules.functions",
         1,
         "addd",
+        Type("double"),
     );
 }

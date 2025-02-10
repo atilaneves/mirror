@@ -9,6 +9,8 @@ module mirror.ctfe.reflection2;
 
 Module module_(string moduleName)() {
 
+    import std.traits: ReturnType; // sigh
+
     Module mod;
 
     mixin(`static import `, moduleName, `;`);
@@ -21,7 +23,13 @@ Module module_(string moduleName)() {
     static foreach(memberName; __traits(allMembers, module_)) {
         static if(is(typeof(mixin(fqn(memberName))) == function)) {
             static foreach(i, overload; __traits(getOverloads, module_, memberName)) {
-                mod.functionsByOverload ~= Function(moduleName, i, memberName);
+
+                mod.functionsByOverload ~= Function(
+                    moduleName,
+                    i,
+                    memberName,
+                    type!(ReturnType!overload),
+                );
             }
         }
     }
@@ -40,6 +48,7 @@ struct Function {
     string moduleName;
     size_t overloadIndex;
     string identifier;
+    Type returnType;
 
     string importMixin() @safe pure nothrow scope const {
         return "static import " ~ moduleName ~ ";";
@@ -57,4 +66,14 @@ struct Function {
     string fullyQualifiedName() @safe pure nothrow scope const {
         return moduleName ~ "." ~ identifier;
     }
+}
+
+
+struct Type {
+    string fullyQualifiedName;
+}
+
+Type type(T)() {
+    import std.traits: fullyQualifiedName;
+    return Type(fullyQualifiedName!T);
 }
