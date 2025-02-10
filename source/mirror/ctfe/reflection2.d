@@ -14,9 +14,6 @@ module mirror.ctfe.reflection2;
   the various functions do.
 
   * Go over the whole list of built-in traits and expose all of it.
-
-  * Unify Type/Function API - instantiate with FQN, use `.moduleName`
-  to get the name of the module.
 */
 
 
@@ -63,9 +60,8 @@ Module module_(string moduleName)() {
                     static assert(false, "Cannot get parameters of " ~ __traits(identifier, overload));
 
                 mod.functionsByOverload ~= Function(
-                    moduleName,
+                    moduleName ~ "." ~ memberName,
                     i,
-                    memberName,
                     returnType,
                     parameters,
                 );
@@ -103,9 +99,12 @@ struct Module {
 
 
 struct Function {
-    string moduleName;
+    /**
+       Do NOT use this to get the symbol, it will fail for overloads
+       other than the first one.
+     */
+    string fullyQualifiedName;
     size_t overloadIndex;
-    string identifier;
     Type returnType;
     Parameter[] parameters;
 
@@ -118,13 +117,16 @@ struct Function {
         return text(`__traits(getOverloads, `,  moduleName,  `, "`,  identifier,  `")[`, overloadIndex, `]`);
     }
 
-    /**
-       Do NOT use this to get the symbol, it will fail for overloads
-       other than the first one.
-     */
-    string fullyQualifiedName() @safe pure nothrow scope const {
-        return moduleName ~ "." ~ identifier;
+    string moduleName() @safe pure nothrow scope const {
+        import std.string: split, join;
+        return fullyQualifiedName.split(".")[0 .. $-1].join(".");
     }
+
+    string identifier() @safe pure nothrow scope const {
+        import std.string: split, join;
+        return fullyQualifiedName.split(".")[$-1];
+    }
+
 }
 
 

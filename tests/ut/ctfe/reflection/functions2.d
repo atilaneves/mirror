@@ -47,9 +47,8 @@ import std.traits: PSC = ParameterStorageClass;
 
     functions.should == [
         Function(
-            "modules.functions",
+            "modules.functions.addd",
             0,
-            "addd",
             Type("int"),
             [
                 Parameter(
@@ -67,9 +66,8 @@ import std.traits: PSC = ParameterStorageClass;
             ],
         ),
         Function(
-            "modules.functions",
+            "modules.functions.addd",
             1,
-            "addd",
             Type("double"),
             [
                 Parameter(
@@ -87,9 +85,8 @@ import std.traits: PSC = ParameterStorageClass;
             ],
         ),
         Function(
-            "modules.functions",
+            "modules.functions.withDefault",
             0,
-            "withDefault",
             Type("double"),
             [
                 Parameter(
@@ -107,9 +104,8 @@ import std.traits: PSC = ParameterStorageClass;
             ],
         ),
         Function(
-            "modules.functions",
+            "modules.functions.storageClasses",
             0,
-            "storageClasses",
             Type("void"),
             [
                 Parameter(Type("int"), "normal", PSC.none, "void"),
