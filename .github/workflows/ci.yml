@@ -12,9 +12,7 @@ jobs:
           - macos-12
         dc:
           - dmd-2.109.1
-          - dmd-2.099.1
           - ldc-1.40.0
-          - ldc-1.29.0
 
     runs-on: ${{ matrix.os }}
     steps:
