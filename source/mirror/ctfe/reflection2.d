@@ -76,7 +76,7 @@ Module module_(string moduleName)() {
                     returnType,
                     parameters,
                     __traits(getVisibility, overload),
-                    linkage(__traits(getLinkage, overload)),
+                    __traits(getLinkage, overload),
                 );
             }}
         }
@@ -121,8 +121,8 @@ struct Function {
     size_t overloadIndex;
     Type returnType;
     Parameter[] parameters;
-    string visibility;
-    Linkage linkage;
+    string visibilityStr;
+    string linkageStr;
 
     string importMixin() @safe pure nothrow scope const {
         return "static import " ~ moduleName ~ ";";
@@ -142,6 +142,28 @@ struct Function {
         import std.string: split, join;
         return fullyQualifiedName.split(".")[$-1];
     }
+
+    Visibility visibility() @safe pure scope const {
+        switch(visibilityStr) with(Visibility) {
+            default: throw new Exception("Unknown visibility " ~ visibilityStr);
+                static foreach(vis; ["public", "private", "protected", "export", "package"]) {
+                case vis: return mixin(vis ~ "_");
+            }
+       }
+    }
+
+    Linkage linkage() @safe pure scope const {
+        switch(linkageStr) with(Linkage) {
+            default: throw new Exception("Unknown linkage " ~ linkageStr);
+            case "D": return D;
+            case "C": return C;
+            case "C++": return Cplusplus;
+            case "Windows": return Windows;
+            case "ObjectiveC": return ObjectiveC;
+            case "System": return System;
+        }
+    }
+
 }
 
 
@@ -159,6 +181,15 @@ struct Parameter {
     string default_;
 }
 
+enum Visibility {
+    public_,
+    private_,
+    protected_,
+    export_,
+    package_,
+}
+
+
 enum Linkage {
     D,
     C,
@@ -166,16 +197,4 @@ enum Linkage {
     Windows,
     ObjectiveC,
     System,
-}
-
-private Linkage linkage(in string linkage) @safe pure {
-    switch(linkage) with(Linkage) {
-        default: throw new Exception("Unknown linkage " ~ linkage);
-        case "D": return D;
-        case "C": return C;
-        case "C++": return Cplusplus;
-        case "Windows": return Windows;
-        case "ObjectiveC": return ObjectiveC;
-        case "System": return System;
-    }
 }

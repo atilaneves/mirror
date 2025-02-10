@@ -39,6 +39,20 @@ import std.traits: PSC = ParameterStorageClass;
     addd_1Sym(2, 3).should == 7;
 }
 
+@("visibility.public")
+@safe pure unittest {
+    enum mod = module_!"modules.functions"();
+    enum func = mod.functionsByOverload[0];
+    func.visibility.should == Visibility.public_;
+}
+
+@("visibility.export")
+@safe pure unittest {
+    enum mod = module_!"modules.functions"();
+    enum func = mod.functionsByOverload[4];
+    func.visibility.should == Visibility.export_;
+}
+
 
 @("functionsByOverload.equality")
 @safe pure unittest {
@@ -63,7 +77,7 @@ import std.traits: PSC = ParameterStorageClass;
                 ),
             ],
             "public",
-            Linkage.D,
+            "D",
         ),
         Function(
             "modules.functions.addd",
@@ -82,7 +96,7 @@ import std.traits: PSC = ParameterStorageClass;
                 ),
             ],
             "public",
-            Linkage.D,
+            "D",
         ),
         Function(
             "modules.functions.withDefault",
@@ -102,7 +116,7 @@ import std.traits: PSC = ParameterStorageClass;
                 ),
             ],
             "public",
-            Linkage.D,
+            "D",
         ),
         Function(
             "modules.functions.storageClasses",
@@ -116,7 +130,7 @@ import std.traits: PSC = ParameterStorageClass;
                 Parameter(Type("int"), "lazy_", PSC.lazy_),
             ],
             "public",
-            Linkage.D,
+            "D",
         ),
         Function(
             "modules.functions.exportedFunc",
@@ -124,7 +138,7 @@ import std.traits: PSC = ParameterStorageClass;
             Type("void"),
             [],
             "export",
-            Linkage.D,
+            "D",
         ),
         Function(
             "modules.functions.externC",
@@ -132,7 +146,7 @@ import std.traits: PSC = ParameterStorageClass;
             Type("void"),
             [],
             "public",
-            Linkage.C,
+            "C",
         ),
         Function(
             "modules.functions.externCpp",
@@ -140,7 +154,7 @@ import std.traits: PSC = ParameterStorageClass;
             Type("void"),
             [],
             "public",
-            Linkage.Cplusplus,
+            "C++",
         ),
     ];
 }
