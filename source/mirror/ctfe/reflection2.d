@@ -12,16 +12,16 @@ Module module_(string moduleName)() {
     Module mod;
 
     mixin(`static import `, moduleName, `;`);
-    mixin(`alias module_ = `, moduleName, `;`);
+    alias module_ = mixin(moduleName);
 
     string fqn(string member) {
         return moduleName ~ `.` ~ member;
     }
 
-    static foreach(member; __traits(allMembers, module_)) {
-        static if(is(typeof(mixin(fqn(member))) == function)) {
-            static foreach(i, overload; __traits(getOverloads, module_, member)) {
-                mod.functionsByOverload ~= Function("modules.functions", i, member);
+    static foreach(memberName; __traits(allMembers, module_)) {
+        static if(is(typeof(mixin(fqn(memberName))) == function)) {
+            static foreach(i, overload; __traits(getOverloads, module_, memberName)) {
+                mod.functionsByOverload ~= Function(moduleName, i, memberName);
             }
         }
     }
@@ -37,15 +37,24 @@ struct Module {
 
 
 struct Function {
-    string module_;
+    string moduleName;
     size_t overloadIndex;
     string identifier;
 
     string importMixin() @safe pure nothrow scope const {
-        return "static import " ~ module_ ~ ";";
+        return "static import " ~ moduleName ~ ";";
     }
 
+    string symbolMixin() @safe pure nothrow scope const {
+        import std.conv: text;
+        return text(`__traits(getOverloads, `,  moduleName,  `, "`,  identifier,  `")[`, overloadIndex, `]`);
+    }
+
+    /**
+       Do NOT use this to get the symbol, it will fail for overloads
+       other than the first one.
+     */
     string fullyQualifiedName() @safe pure nothrow scope const {
-        return module_ ~ "." ~ identifier;
+        return moduleName ~ "." ~ identifier;
     }
 }

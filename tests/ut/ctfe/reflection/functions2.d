@@ -6,39 +6,41 @@ import mirror.ctfe.reflection2;
 
 
 @("problems")
-unittest {
+@safe pure unittest {
     // just to check there are no compilation errors
     enum mod = module_!"modules.problems"();
 }
 
 
 @("functionsByOverload.call.0")
-unittest {
+@safe pure unittest {
     enum mod = module_!"modules.functions"();
     enum addd_0 = mod.functionsByOverload[0];
 
     mixin(addd_0.importMixin);
-    alias addd_0Sym = mixin(addd_0.fullyQualifiedName);
+    alias addd_0Sym = mixin(addd_0.symbolMixin);
+    static assert(is(typeof(&addd_0Sym) == int function(int, int) @safe @nogc pure nothrow));
 
     addd_0Sym(1, 2).should == 4;
     addd_0Sym(2, 3).should == 6;
 }
 
 @("functionsByOverload.call.1")
-unittest {
+@safe pure unittest {
     enum mod = module_!"modules.functions"();
     enum addd_1 = mod.functionsByOverload[1];
 
     mixin(addd_1.importMixin);
-    alias addd_1Sym = mixin(addd_1.fullyQualifiedName);
+    alias addd_1Sym = mixin(addd_1.symbolMixin);
+    static assert(is(typeof(&addd_1Sym) == double function(double, double) @safe @nogc pure nothrow));
 
-    addd_1Sym(1, 2).should == 4;
-    addd_1Sym(2, 3).should == 6;
+    addd_1Sym(1, 2).should == 5;
+    addd_1Sym(2, 3).should == 7;
 }
 
 
 @("functionsByOverload.equality")
-unittest {
+@safe pure unittest {
     enum mod = module_!"modules.functions"();
     enum addd_0 = mod.functionsByOverload[0];
     addd_0.should == Function(

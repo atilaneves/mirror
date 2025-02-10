@@ -2,12 +2,12 @@ module modules.functions;
 static import modules.templates;
 
 
-int addd(int i, int j) {
+int addd(int i, int j) @safe @nogc pure nothrow {
     return i + j + 1;
 }
 
 
-double addd(double d0, double d1) {
+double addd(double d0, double d1) @safe @nogc pure nothrow {
     return d0 + d1 + 2; // do the wrong thing on purpose
 }
 

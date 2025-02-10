@@ -31,7 +31,7 @@ unittest {
     mixin(addd.importMixin);
 
     auto ptr = pointer!addd;
-    static assert(is(typeof(ptr) == int function(int, int)));
+    static assert(is(typeof(ptr) == int function(int, int) @safe @nogc pure nothrow));
 
     ptr(1, 2).should == 4;
     ptr(2, 3).should == 6;
@@ -45,7 +45,7 @@ unittest {
     mixin(addd.importMixin);
 
     auto ptr = pointer!addd;
-    static assert(is(typeof(ptr) == double function(double, double)));
+    static assert(is(typeof(ptr) == double function(double, double) @safe @nogc pure nothrow));
 
     ptr(1.0, 2.0).should == 5.0;
     ptr(2.0, 3.0).should == 7.0;
@@ -63,12 +63,12 @@ unittest {
     mixin(adddInt.importMixin);
 
     auto ptrInt = pointer!adddInt;
-    static assert(is(typeof(ptrInt) == int function(int, int)));
+    static assert(is(typeof(ptrInt) == int function(int, int) @safe @nogc pure nothrow));
     ptrInt(1, 2).should == 4;
     ptrInt(2, 3).should == 6;
 
     auto ptrDouble = pointer!adddDouble;
-    static assert(is(typeof(ptrDouble) == double function(double, double)));
+    static assert(is(typeof(ptrDouble) == double function(double, double) @safe @nogc pure nothrow));
     ptrDouble(1.0, 2.0).should == 5.0;
     ptrDouble(2.0, 3.0).should == 7.0;
 }
@@ -98,7 +98,7 @@ unittest {
     mixin(addd.importMixin);
 
     auto ptr = mixin(addd.pointerMixin);
-    static assert(is(typeof(ptr) == int function(int, int)));
+    static assert(is(typeof(ptr) == int function(int, int) @safe @nogc pure nothrow));
 
     ptr(1, 2).should == 4;
     ptr(2, 3).should == 6;
@@ -113,7 +113,7 @@ unittest {
     mixin(addd.importMixin);
 
     auto ptr = mixin(addd.pointerMixin);
-    static assert(is(typeof(ptr) == double function(double, double)));
+    static assert(is(typeof(ptr) == double function(double, double) @safe @nogc pure nothrow));
 
     ptr(1.0, 2.0).should == 5.0;
     ptr(2.0, 3.0).should == 7.0;
@@ -131,12 +131,12 @@ unittest {
     mixin(adddInt.importMixin);
 
     auto ptrInt = mixin(adddInt.pointerMixin);
-    static assert(is(typeof(ptrInt) == int function(int, int)));
+    static assert(is(typeof(ptrInt) == int function(int, int) @safe @nogc pure nothrow));
     ptrInt(1, 2).should == 4;
     ptrInt(2, 3).should == 6;
 
     auto ptrDouble = mixin(adddDouble.pointerMixin);
-    static assert(is(typeof(ptrDouble) == double function(double, double)));
+    static assert(is(typeof(ptrDouble) == double function(double, double) @safe @nogc pure nothrow));
     ptrDouble(1.0, 2.0).should == 5.0;
     ptrDouble(2.0, 3.0).should == 7.0;
 }
