@@ -76,6 +76,7 @@ Module module_(string moduleName)() {
                     returnType,
                     parameters,
                     __traits(getVisibility, overload),
+                    __traits(getLinkage, overload),
                 );
             }}
         }
@@ -121,6 +122,7 @@ struct Function {
     Type returnType;
     Parameter[] parameters;
     string visibility;
+    string linkage;
 
     string importMixin() @safe pure nothrow scope const {
         return "static import " ~ moduleName ~ ";";

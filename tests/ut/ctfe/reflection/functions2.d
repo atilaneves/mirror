@@ -43,7 +43,7 @@ import std.traits: PSC = ParameterStorageClass;
 @("functionsByOverload.equality")
 @safe pure unittest {
     enum mod = module_!"modules.functions"();
-    enum functions = mod.functionsByOverload[0..5]; // FIXME
+    enum functions = mod.functionsByOverload[0..7]; // FIXME
 
     functions.should == [
         Function(
@@ -63,6 +63,7 @@ import std.traits: PSC = ParameterStorageClass;
                 ),
             ],
             "public",
+            "D",
         ),
         Function(
             "modules.functions.addd",
@@ -81,6 +82,7 @@ import std.traits: PSC = ParameterStorageClass;
                 ),
             ],
             "public",
+            "D",
         ),
         Function(
             "modules.functions.withDefault",
@@ -100,6 +102,7 @@ import std.traits: PSC = ParameterStorageClass;
                 ),
             ],
             "public",
+            "D",
         ),
         Function(
             "modules.functions.storageClasses",
@@ -113,6 +116,7 @@ import std.traits: PSC = ParameterStorageClass;
                 Parameter(Type("int"), "lazy_", PSC.lazy_),
             ],
             "public",
+            "D",
         ),
         Function(
             "modules.functions.exportedFunc",
@@ -120,6 +124,23 @@ import std.traits: PSC = ParameterStorageClass;
             Type("void"),
             [],
             "export",
+            "D",
+        ),
+        Function(
+            "modules.functions.externC",
+            0,
+            Type("void"),
+            [],
+            "public",
+            "C",
+        ),
+        Function(
+            "modules.functions.externCpp",
+            0,
+            Type("void"),
+            [],
+            "public",
+            "C++",
         ),
     ];
 }
