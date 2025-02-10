@@ -75,6 +75,7 @@ Module module_(string moduleName)() {
                     i,
                     returnType,
                     parameters,
+                    __traits(getVisibility, overload),
                 );
             }}
         }
@@ -119,6 +120,7 @@ struct Function {
     size_t overloadIndex;
     Type returnType;
     Parameter[] parameters;
+    string visibility;
 
     string importMixin() @safe pure nothrow scope const {
         return "static import " ~ moduleName ~ ";";

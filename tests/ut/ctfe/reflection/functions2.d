@@ -62,6 +62,7 @@ import std.traits: PSC = ParameterStorageClass;
                     PSC.none,
                 ),
             ],
+            "public",
         ),
         Function(
             "modules.functions.addd",
@@ -79,6 +80,7 @@ import std.traits: PSC = ParameterStorageClass;
                     PSC.none,
                 ),
             ],
+            "public",
         ),
         Function(
             "modules.functions.withDefault",
@@ -97,6 +99,7 @@ import std.traits: PSC = ParameterStorageClass;
                     "33.3",
                 ),
             ],
+            "public",
         ),
         Function(
             "modules.functions.storageClasses",
@@ -108,12 +111,15 @@ import std.traits: PSC = ParameterStorageClass;
                 Parameter(Type("int"), "out_", PSC.out_),
                 Parameter(Type("int"), "ref_", PSC.ref_),
                 Parameter(Type("int"), "lazy_", PSC.lazy_),
-            ]
+            ],
+            "public",
         ),
         Function(
             "modules.functions.exportedFunc",
             0,
             Type("void"),
+            [],
+            "export",
         ),
     ];
 }
