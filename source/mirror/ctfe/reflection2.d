@@ -22,9 +22,8 @@ module mirror.ctfe.reflection2;
 
 Module module_(string moduleName)() {
 
-    // sigh
-    import std.traits: ReturnType, Parameters, ParameterIdentifierTuple,
-        ParameterDefaults, ParameterStorageClassTuple;
+    // This one is too annoying to inline
+    import std.traits: ParameterDefaults;
 
     Module mod;
 
@@ -39,21 +38,35 @@ Module module_(string moduleName)() {
         static if(is(typeof(mixin(fqn(memberName))) == function)) {
             static foreach(i, overload; __traits(getOverloads, module_, memberName)) {{
 
+                static if(is(typeof(overload) R == return))
+                    enum returnType = type!R;
+                else
+                    static assert(false, "Cannot get return type of " ~ __traits(identifier, overload));
+
                 Parameter[] parameters;
-                static foreach(i; 0 .. Parameters!overload.length) {
-                    parameters ~= Parameter(
-                        type!(Parameters!overload[i]),
-                        ParameterIdentifierTuple!overload[i],
-                        ParameterStorageClassTuple!overload[i],
-                        ParameterDefaults!overload[i].stringof,
-                    );
-                }
+                static if(is(typeof(overload) Ps == __parameters)) {
+                    static foreach(p; 0 .. Ps.length) {{
+
+                        static if(is(typeof(__traits(identifier, Ps[p .. p + 1]))))
+                            enum paramIdentifier = __traits(identifier, Ps[p .. p + 1]);
+                        else
+                            enum paramIdentifier = Ps[i].stringof;
+
+                        parameters ~= Parameter(
+                            type!(Ps[p]),
+                            paramIdentifier,
+                            phobosPSC([__traits(getParameterStorageClasses, overload, p)]),
+                            ParameterDefaults!overload[p].stringof,
+                        );
+                    }}
+                } else
+                    static assert(false, "Cannot get parameters of " ~ __traits(identifier, overload));
 
                 mod.functionsByOverload ~= Function(
                     moduleName,
                     i,
                     memberName,
-                    type!(ReturnType!overload),
+                    returnType,
                     parameters,
                 );
             }}
@@ -63,6 +76,25 @@ Module module_(string moduleName)() {
     return mod;
 }
 
+// look ma, no templates
+private auto phobosPSC(string[] storageClasses) @safe pure nothrow {
+    import std.traits: PSC = ParameterStorageClass;
+
+    auto ret = PSC.none;
+
+    foreach(storageClass; storageClasses) {
+        final switch(storageClass) with(PSC) {
+            case "scope":  ret |= scope_;  break;
+            case "in":     ret |= in_;     break;
+            case "out":    ret |= out_;    break;
+            case "ref":    ret |= ref_;    break;
+            case "lazy":   ret |= lazy_;   break;
+            case "return": ret |= return_; break;
+        }
+    }
+
+    return ret;
+}
 
 struct Module {
     string identifier;
