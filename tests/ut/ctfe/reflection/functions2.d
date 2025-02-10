@@ -16,13 +16,12 @@ unittest {
 unittest {
     enum mod = module_!"modules.functions"();
     enum add1 = mod.functionsByOverload[0];
-    pragma(msg, mod.functionsByOverload);
 
-    pragma(msg, add1.importMixin);
     mixin(add1.importMixin);
+    alias add1Sym = mixin(add1.fullyQualifiedName);
 
-    mixin(add1.fullyQualifiedName)(1, 2).should == 4;
-    mixin(add1.fullyQualifiedName)(2, 3).should == 6;
+    add1Sym(1, 2).should == 4;
+    add1Sym(2, 3).should == 6;
 }
 
 
@@ -42,5 +41,4 @@ unittest {
         1,
         "add1",
     );
-
 }
