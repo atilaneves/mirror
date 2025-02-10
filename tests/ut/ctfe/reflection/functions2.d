@@ -57,7 +57,7 @@ import std.traits: PSC = ParameterStorageClass;
 @("functionsByOverload.equality")
 @safe pure unittest {
     enum mod = module_!"modules.functions"();
-    enum functions = mod.functionsByOverload[0..7]; // FIXME
+    enum functions = mod.functionsByOverload;
 
     functions.should == [
         Function(
@@ -156,5 +156,41 @@ import std.traits: PSC = ParameterStorageClass;
             "public",
             "C++",
         ),
+        Function(
+            "modules.functions.identityInt",
+            0,
+            Type("int"),
+            [Parameter(Type("int"), "x", PSC.none,)],
+            "public",
+            "D",
+        ),
+        Function(
+            "modules.functions.voldemort",
+            0,
+            Type("modules.functions.voldemort.Voldemort"),
+            [Parameter(Type("int"), "i", PSC.none)],
+            "public",
+            "D",
+        ),
+        Function(
+            "modules.functions.voldemortArray",
+            0,
+            Type("modules.functions.voldemortArray.DasVoldemort[]"),
+            [Parameter(Type("int"), "i", PSC.none)],
+            "public",
+            "D",
+        ),
+            Function(
+                "modules.functions.concatFoo",
+                0,
+                Type("string"),
+                [
+                    Parameter(Type("string"), "s0", PSC.none),
+                    Parameter(Type("int"),    "i",  PSC.none),
+                    Parameter(Type("string"), "s1", PSC.none),
+                ],
+                "public",
+                "D",
+            ),
     ];
 }

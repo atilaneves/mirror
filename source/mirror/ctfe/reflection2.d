@@ -13,6 +13,12 @@ module mirror.ctfe.reflection2;
   * Remove std.traits.fullyQualifiedName dependency.
 
   * Go over the whole list of built-in traits and expose all of it.
+
+  * Add static constructors to the module struct.
+
+  * Add unit tests to the module struct.
+
+  * Functions by symbol.
 */
 
 
@@ -31,7 +37,7 @@ Module module_(string moduleName)() {
     }
 
     static foreach(memberName; __traits(allMembers, module_)) {
-        static if(is(typeof(mixin(fqn(memberName))) == function)) {
+        static if(is(typeof(mixin(fqn(memberName))) == function) && isRegularFunction(memberName)) {
             static foreach(i, overload; __traits(getOverloads, module_, memberName)) {{
 
                 static if(is(typeof(overload) R == return))
@@ -85,6 +91,12 @@ Module module_(string moduleName)() {
     return mod;
 }
 
+private bool isRegularFunction(in string memberName) @safe pure nothrow {
+    import std.algorithm: startsWith;
+        return
+            !memberName.startsWith("_sharedStaticCtor") &&
+            !memberName.startsWith("_staticCtor");
+}
 
 // look ma, no templates
 private auto phobosPSC(in string[] storageClasses) @safe pure nothrow {
