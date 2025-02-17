@@ -240,22 +240,12 @@ struct Function {
     string linkageStr;
 
     string importMixin() @safe pure nothrow scope const {
-        return "static import " ~ moduleName ~ ";";
+        return "static import " ~ this.moduleName ~ ";";
     }
 
     string symbolMixin() @safe pure nothrow scope const {
         import std.conv: text;
-        return text(`__traits(getOverloads, `,  moduleName,  `, "`,  identifier,  `")[`, overloadIndex, `]`);
-    }
-
-    string moduleName() @safe pure nothrow scope const {
-        import std.string: split, join;
-        return fullyQualifiedName.split(".")[0 .. $-1].join(".");
-    }
-
-    string identifier() @safe pure nothrow scope const {
-        import std.string: split, join;
-        return fullyQualifiedName.split(".")[$-1];
+        return text(`__traits(getOverloads, `,  this.moduleName,  `, "`,  this.identifier,  `")[`, overloadIndex, `]`);
     }
 
     Visibility visibility() @safe pure scope const {
@@ -337,16 +327,6 @@ struct Aggregate {
             }
         }
     }
-
-    string moduleName() @safe pure nothrow scope const {
-        import std.string: split, join;
-        return fullyQualifiedName.split(".")[0 .. $-1].join(".");
-    }
-
-    string identifier() @safe pure nothrow scope const {
-        import std.string: split, join;
-        return fullyQualifiedName.split(".")[$-1];
-    }
 }
 
 struct Variable {
@@ -370,4 +350,15 @@ private bool isTypeVariable(T)() {
         && !is(T == void)  // can happen with templates
         && is(typeof(T.init))
         ;
+}
+
+
+string moduleName(T)(auto ref T obj) {
+    import std.string: split, join;
+    return obj.fullyQualifiedName.split(".")[0 .. $-1].join(".");
+}
+
+string identifier(T)(auto ref T obj) {
+    import std.string: split, join;
+    return obj.fullyQualifiedName.split(".")[$-1];
 }
