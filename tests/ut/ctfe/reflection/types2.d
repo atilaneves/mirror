@@ -76,3 +76,14 @@ import mirror.ctfe.reflection2;
             [Variable(Type("int[]"), "modules.problems.gInts")],
         );
 }
+
+
+@ShouldFail
+@("fields.String")
+@safe pure unittest {
+    enum mod = module_!"modules.types";
+    auto string_ = mod.aggregates[0];
+    string_.fields.should == [
+        Variable(Type("string"), "value"),
+    ];
+}

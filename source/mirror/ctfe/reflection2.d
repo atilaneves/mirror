@@ -99,9 +99,12 @@ Module module_(string moduleName)() {
                     );
                 }}
             } else static if(is(symbol) && isUDT!symbol) {
+                Variable[] fields;
+
                 mod.aggregates ~= Aggregate(
                     fqn(memberName),
                     Aggregate.toKind!symbol,
+                    fields,
                 );
             } else static if(isVariable!symbol) {
                 mod.variables ~= Variable(
@@ -276,6 +279,7 @@ struct Aggregate {
 
     string fullyQualifiedName;
     Kind kind;
+    Variable[] fields;
 
     static Kind toKind(T)() {
         with(Kind) {
@@ -302,7 +306,7 @@ struct Variable {
     string fullyQualifiedName;
 }
 
-bool isVariable(alias symbol)() {
+private bool isVariable(alias symbol)() {
     return
         is(typeof(symbol))
         && !is(typeof(symbol) == function)
