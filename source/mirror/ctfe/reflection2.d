@@ -46,58 +46,12 @@ Module module_(string moduleName)() {
 
     static foreach(memberName; __traits(allMembers, module_)) {{
 
-        static if(isVisible!(moduleName, memberName)) {
+        alias symbol = __traits(getMember, module_, memberName);
 
-            alias symbol = mixin(fqn(memberName));
+        static if(isVisible!symbol) {
 
             static if(is(typeof(symbol) == function) && isRegularFunction(memberName)) {
-                static foreach(i, overload; __traits(getOverloads, module_, memberName)) {{
-
-                    static if(is(typeof(overload) R == return))
-                        enum returnType = Type(fullyQualifiedName!R);
-                    else
-                        static assert(false, "Cannot get return type of " ~ __traits(identifier, overload));
-
-                    Parameter[] parameters;
-                    static if(is(typeof(overload) Ps == __parameters)) {
-                        static foreach(p; 0 .. Ps.length) {{
-
-                            static if(is(typeof(__traits(identifier, Ps[p .. p + 1]))))
-                                enum paramIdentifier = __traits(identifier, Ps[p .. p + 1]);
-                            else
-                                enum paramIdentifier = Ps[i].stringof;
-
-                            enum paramString = Ps[p .. p + 1].stringof;
-                            enum assignIndex = paramString.countUntil(`=`);
-                            static if(assignIndex == -1)
-                                enum default_ = "";
-                            else {
-                                // paramString will be something like:
-                                // `(T id = val)`
-                                // we want default_ in this case to be "val"
-                                static assert(paramString[assignIndex + 1] == ' ');
-                                enum default_ = paramString[assignIndex + 2 .. $-1];
-                            }
-
-                            parameters ~= Parameter(
-                                Type(fullyQualifiedName!(Ps[p])),
-                                paramIdentifier,
-                                phobosPSC([__traits(getParameterStorageClasses, overload, p)]),
-                                default_,
-                            );
-                        }}
-                    } else
-                        static assert(false, "Cannot get parameters of " ~ __traits(identifier, overload));
-
-                    mod.functionsByOverload ~= Function(
-                        moduleName ~ "." ~ memberName,
-                        i,
-                        returnType,
-                        parameters,
-                        __traits(getVisibility, overload),
-                        __traits(getLinkage, overload),
-                    );
-                }}
+                mod.functionsByOverload ~= overloads!(module_, symbol, memberName);
             } else static if(is(symbol) && isUDT!symbol) {
                 Variable[] fields;
 
@@ -120,18 +74,69 @@ Module module_(string moduleName)() {
     return mod;
 }
 
-private bool isVisible(string moduleName, string memberName)() {
-    mixin(`static import `, moduleName, `;`);
-    enum fqn = moduleName ~ "." ~ memberName;
-    static if(__traits(compiles, mixin(`{ alias symbol = `, fqn, `; }`))) {
-        alias symbol = mixin(fqn);
-        static if(__traits(compiles,  __traits(getVisibility, symbol))) {
-            enum vis = __traits(getVisibility, symbol);
-            return vis == "public" || vis == "export";
-        } else
-            return true; // basic type
+private bool isVisible(alias symbol)() {
+    static if(__traits(compiles, __traits(getVisibility, symbol))) {
+        enum vis = __traits(getVisibility, symbol);
+        return vis == "public" || vis == "export";
     } else
-        return false;
+        return true; // basic type (probably)
+}
+
+private Function[] overloads(alias module_, alias symbol, string memberName)() {
+    import std.traits: fullyQualifiedName;
+    import std.algorithm: countUntil;
+
+    Function[] ret;
+
+    static foreach(i, overload; __traits(getOverloads, module_, memberName)) {{
+
+        static if(is(typeof(overload) R == return))
+            enum returnType = Type(fullyQualifiedName!R);
+        else
+            static assert(false, "Cannot get return type of " ~ __traits(identifier, overload));
+
+        Parameter[] parameters;
+        static if(is(typeof(overload) Ps == __parameters)) {
+            static foreach(p; 0 .. Ps.length) {{
+
+                static if(is(typeof(__traits(identifier, Ps[p .. p + 1]))))
+                    enum paramIdentifier = __traits(identifier, Ps[p .. p + 1]);
+                else
+                    enum paramIdentifier = Ps[i].stringof;
+
+                enum paramString = Ps[p .. p + 1].stringof;
+                enum assignIndex = paramString.countUntil(`=`);
+                static if(assignIndex == -1)
+                    enum default_ = "";
+                else {
+                    // paramString will be something like:
+                    // `(T id = val)`
+                    // we want default_ in this case to be "val"
+                    static assert(paramString[assignIndex + 1] == ' ');
+                    enum default_ = paramString[assignIndex + 2 .. $-1];
+                }
+
+                parameters ~= Parameter(
+                    Type(fullyQualifiedName!(Ps[p])),
+                    paramIdentifier,
+                    phobosPSC([__traits(getParameterStorageClasses, overload, p)]),
+                    default_,
+                );
+            }}
+        } else
+            static assert(false, "Cannot get parameters of " ~ __traits(identifier, overload));
+
+        ret ~= Function(
+            fullyQualifiedName!module_ ~ "." ~ memberName,
+            i,
+            returnType,
+            parameters,
+            __traits(getVisibility, overload),
+            __traits(getLinkage, overload),
+        );
+    }}
+
+    return ret;
 }
 
 private bool isRegularFunction(in string memberName) @safe pure nothrow {
