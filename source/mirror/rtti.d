@@ -6,7 +6,7 @@ module mirror.rtti;
 
 /**
    Initialise a `Types` variable (module-level, static struct
-   variable, ...)  with runtime type information for the given types.
+   variable, ...) with runtime type information for the given types.
  */
 mixin template typesVar(alias symbol, T...) {
     shared static this() nothrow {
@@ -69,7 +69,7 @@ struct Types {
     inout(RuntimeTypeInfo) rtti(T)(auto ref T obj) inout {
         import std.traits: isPointer;
 
-        static if(is(T == class)) {
+        static if(is(T == super)) {
             if(obj is null)
                 throw new Exception("Cannot get RTTI from null object");
         }
