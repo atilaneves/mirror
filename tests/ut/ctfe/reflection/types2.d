@@ -97,3 +97,13 @@ import mirror.ctfe.reflection2;
         Variable(Type("double"), "y"),
     ];
 }
+
+
+@("methods")
+@safe pure unittest {
+    import std.algorithm: find, map;
+    enum mod = module_!"modules.types";
+    const str = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.String")[0];
+    str.functionsByOverload.map!(a => a.identifier).should == ["withPrefix", "withPrefix"];
+    //str.functionsBySymbol.length.should == 1; // FIXME
+}

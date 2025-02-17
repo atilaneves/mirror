@@ -81,41 +81,49 @@ private bool isVisible(alias symbol)() {
         return true; // basic type (probably)
 }
 
-private Aggregate aggregate(alias symbol)() {
+private Aggregate aggregate(alias agg)() {
     import std.traits: fullyQualifiedName;
 
     Variable[] fields;
+    Function[] functionsByOverload;
 
-    static foreach(fieldName; __traits(allMembers, symbol)) {{
+    static foreach(memberName; __traits(allMembers, agg)) {{
         // although this is fine even for a class, trying to pass this in
-        // as a template parameter will fail. Using `symbol.init` doesn't
+        // as a template parameter will fail. Using `agg.init` doesn't
         // work either.
-        alias field = __traits(getMember, symbol, fieldName);
+        alias member = __traits(getMember, agg, memberName);
+
         // FIXME:
         // This is repeating the logic in `isVariable` but
         // I don't know how to pass this in to the
         // function.
-        static if(is(typeof(symbol.init)) && !is(TypeOf!field == function))
+        static if(is(typeof(agg.init)) && !is(TypeOf!member == function))
             fields ~= Variable(
-                Type(fullyQualifiedName!(TypeOf!field)),
-                fieldName,
+                Type(fullyQualifiedName!(TypeOf!member)),
+                memberName,
             );
+        else static if(is(typeof(member) == function))
+            functionsByOverload ~= overloads!(agg, member, memberName);
     }}
 
     return Aggregate(
-        fullyQualifiedName!symbol,
-        Aggregate.toKind!symbol,
+        fullyQualifiedName!agg,
+        Aggregate.toKind!agg,
         fields,
+        functionsByOverload,
     );
 }
 
-private Function[] overloads(alias module_, alias symbol, string memberName)() {
+private Function[] overloads(alias parent, alias symbol, string memberName)() {
     import std.traits: fullyQualifiedName;
     import std.algorithm: countUntil;
 
     Function[] ret;
 
-    static foreach(i, overload; __traits(getOverloads, module_, memberName)) {{
+    // FIXME
+    //static assert(__traits(identifier, symbol) == memberName);
+
+    static foreach(i, overload; __traits(getOverloads, parent, memberName)) {{
 
         static if(is(typeof(overload) R == return))
             enum returnType = Type(fullyQualifiedName!R);
@@ -154,7 +162,7 @@ private Function[] overloads(alias module_, alias symbol, string memberName)() {
             static assert(false, "Cannot get parameters of " ~ __traits(identifier, overload));
 
         ret ~= Function(
-            fullyQualifiedName!module_ ~ "." ~ memberName,
+            fullyQualifiedName!parent ~ "." ~ memberName,
             i,
             returnType,
             parameters,
@@ -312,6 +320,7 @@ struct Aggregate {
     string fullyQualifiedName;
     Kind kind;
     Variable[] fields;
+    Function[] functionsByOverload;
 
     static Kind toKind(T)() {
         with(Kind) {
