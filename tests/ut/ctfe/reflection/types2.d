@@ -86,3 +86,14 @@ import mirror.ctfe.reflection2;
         Variable(Type("string"), "value"),
     ];
 }
+
+@("fields.Point")
+@safe pure unittest {
+    import std.algorithm: find;
+    enum mod = module_!"modules.types";
+    auto point = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.Point")[0];
+    point.fields.should == [
+        Variable(Type("double"), "x"),
+        Variable(Type("double"), "y"),
+    ];
+}
