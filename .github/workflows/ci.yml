@@ -9,7 +9,7 @@ jobs:
         os:
           - ubuntu-24.04
           - windows-2022
-          - macos-12
+          #- macos-12
         dc:
           - dmd-2.109.1
           - ldc-1.40.0
