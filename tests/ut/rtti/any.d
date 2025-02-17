@@ -13,12 +13,15 @@ import mirror.rtti;
 @("rtti.null.object")
 @safe unittest {
     static class Class {}
+    static interface Interface{}
     Object o;
     Class c;
+    Interface i;
 
     with(types!Class) {
         rtti(o).shouldThrowWithMessage("Cannot get RTTI from null object");
         rtti(c).shouldThrowWithMessage("Cannot get RTTI from null object");
+        rtti(i).shouldThrowWithMessage("Cannot get RTTI from null object");
     }
 }
 
