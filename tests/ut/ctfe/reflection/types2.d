@@ -64,3 +64,15 @@ import mirror.ctfe.reflection2;
         NameAndKind("modules.types.Union", Aggregate.Kind.union_),
     ];
 }
+
+@("problems")
+@safe pure unittest {
+    module_!"modules.problems".should ==
+        Module(
+            "modules.problems",
+            [],
+            [],
+            [],
+            [Variable(Type("int[]"), "modules.problems.gInts")],
+        );
+}

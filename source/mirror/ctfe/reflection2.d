@@ -103,6 +103,11 @@ Module module_(string moduleName)() {
                     fqn(memberName),
                     Aggregate.toKind!symbol,
                 );
+            } else static if(isVariable!symbol) {
+                mod.variables ~= Variable(
+                    Type(fullyQualifiedName!(typeof(symbol))),
+                    fqn(memberName),
+                );
             }
         }
     }}
@@ -168,6 +173,7 @@ struct Module {
     Function[] functionsByOverload;
     Aggregate[] aggregates;     /// only the ones defined in the module.
     Aggregate[] allAggregates;  /// includes all function return types.
+    Variable[] variables;
 }
 
 
@@ -289,4 +295,18 @@ struct Aggregate {
         import std.string: split, join;
         return fullyQualifiedName.split(".")[$-1];
     }
+}
+
+struct Variable {
+    Type type;
+    string fullyQualifiedName;
+}
+
+bool isVariable(alias symbol)() {
+    return
+        is(typeof(symbol))
+        && !is(typeof(symbol) == function)
+        && !is(typeof(symbol) == void)  // can happen with templates
+        && is(typeof(symbol.init))
+        ;
 }
