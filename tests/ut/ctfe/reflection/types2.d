@@ -78,7 +78,6 @@ import mirror.ctfe.reflection2;
 }
 
 
-@ShouldFail
 @("fields.String")
 @safe pure unittest {
     enum mod = module_!"modules.types";

@@ -53,14 +53,32 @@ Module module_(string moduleName)() {
             static if(is(typeof(symbol) == function) && isRegularFunction(memberName)) {
                 mod.functionsByOverload ~= overloads!(module_, symbol, memberName);
             } else static if(is(symbol) && isUDT!symbol) {
+
                 Variable[] fields;
+
+                static foreach(fieldName; __traits(allMembers, symbol)) {{
+                    pragma(msg, "symbol: ", fqn(memberName), " field: ", fieldName);
+                    // although this is fine even for a class, trying to pass this in
+                    // as a template parameter will fail. Using `symbol.init` doesn't
+                    // work either.
+                    alias field = __traits(getMember, symbol, fieldName);
+                    // FIXME:
+                    // This is repeating the logic in `isVariable` but
+                    // I don't know how to pass this in to the
+                    // function.
+                    static if(is(typeof(symbol.init)) && !is(TypeOf!field == function))
+                        fields ~= Variable(
+                            Type(fullyQualifiedName!(TypeOf!field)),
+                            fieldName,
+                        );
+                }}
 
                 mod.aggregates ~= Aggregate(
                     fqn(memberName),
                     Aggregate.toKind!symbol,
                     fields,
                 );
-            } else static if(isVariable!symbol) {
+            } else static if(isSymbolVariable!symbol) {
                 mod.variables ~= Variable(
                     Type(fullyQualifiedName!(typeof(symbol))),
                     fqn(memberName),
@@ -72,6 +90,15 @@ Module module_(string moduleName)() {
     mod.allAggregates = mod.aggregates;  // FIXME
 
     return mod;
+}
+
+private template TypeOf(alias T) {
+    static if(is(T))
+        alias TypeOf = T;
+    else static if(__traits(compiles, typeof(T)))
+        alias TypeOf = typeof(T);
+    else
+        alias TypeOf = void;
 }
 
 private bool isVisible(alias symbol)() {
@@ -311,11 +338,20 @@ struct Variable {
     string fullyQualifiedName;
 }
 
-private bool isVariable(alias symbol)() {
+private bool isSymbolVariable(alias symbol)() {
     return
-        is(typeof(symbol))
+            is(typeof(symbol))
         && !is(typeof(symbol) == function)
         && !is(typeof(symbol) == void)  // can happen with templates
         && is(typeof(symbol.init))
+        ;
+}
+
+private bool isTypeVariable(T)() {
+    return
+        is(T)
+        && !is(T == function)
+        && !is(T == void)  // can happen with templates
+        && is(typeof(T.init))
         ;
 }
