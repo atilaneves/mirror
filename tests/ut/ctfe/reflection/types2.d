@@ -103,7 +103,14 @@ import mirror.ctfe.reflection2;
 @safe pure unittest {
     import std.algorithm: find, map;
     enum mod = module_!"modules.types";
-    const str = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.String")[0];
+    enum str = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.String")[0];
     str.functionsByOverload.map!(a => a.identifier).should == ["withPrefix", "withPrefix"];
+
+    enum withPrefix0Info = str.functionsByOverload[0];
+    enum withPrefix1Info = str.functionsByOverload[1];
+    // FIXME
+    //mixin(withPrefix0Info.importMixin);
+    //alias withPrefix0 = mixin(str.functionsByOverload[0].symbolMixin);
+
     //str.functionsBySymbol.length.should == 1; // FIXME
 }

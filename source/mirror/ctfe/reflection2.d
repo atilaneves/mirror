@@ -12,27 +12,30 @@ module mirror.ctfe.reflection2;
 
   * Remove std.traits.fullyQualifiedName dependency.
 
-  * Go over the whole list of built-in traits and expose all of it.
-
   * Add static constructors to the module struct.
 
   * Add unit tests to the module struct.
 
   * Functions by symbol and not just by overload.
 
-  * Function attributes (@safe, etc.)
-
-  * Function UDAs.
-
   * When doing aggregates, include function return types and
     parameters, see the old `functions.allAggregates` test.
 
-  * Private fields in structs/classes/etc.
+  * Add private fields to test structs/classes/etc.
 
-  * Visibility for variables/fields.
+  * Add types to test structs/classes/etc.
+
+  * Add enums to test structs/classes/etc.
+
+  * Visibility for variables/fields?
 
   * Resolve inconsistency between module-level variables having FQNs
     and aggregate-level ones not.
+
+  * Make sure everything that can be reflected on can be accessed by
+    its symbol, so that all traits work. That is: have
+    `mixin(foo.symbolMixin)` always work (it doesn't right now for
+    methods).
 */
 
 
