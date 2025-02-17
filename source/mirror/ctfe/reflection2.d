@@ -40,48 +40,20 @@ Module module_(string moduleName)() {
     mixin(`static import `, moduleName, `;`);
     alias module_ = mixin(moduleName);
 
-    static fqn(string memberName) {
-        return moduleName ~ `.` ~ memberName;
-    }
-
     static foreach(memberName; __traits(allMembers, module_)) {{
 
         alias symbol = __traits(getMember, module_, memberName);
 
         static if(isVisible!symbol) {
 
-            static if(is(typeof(symbol) == function) && isRegularFunction(memberName)) {
+            static if(is(typeof(symbol) == function) && isRegularFunction(memberName))
                 mod.functionsByOverload ~= overloads!(module_, symbol, memberName);
-            } else static if(is(symbol) && isUDT!symbol) {
-
-                Variable[] fields;
-
-                static foreach(fieldName; __traits(allMembers, symbol)) {{
-                    pragma(msg, "symbol: ", fqn(memberName), " field: ", fieldName);
-                    // although this is fine even for a class, trying to pass this in
-                    // as a template parameter will fail. Using `symbol.init` doesn't
-                    // work either.
-                    alias field = __traits(getMember, symbol, fieldName);
-                    // FIXME:
-                    // This is repeating the logic in `isVariable` but
-                    // I don't know how to pass this in to the
-                    // function.
-                    static if(is(typeof(symbol.init)) && !is(TypeOf!field == function))
-                        fields ~= Variable(
-                            Type(fullyQualifiedName!(TypeOf!field)),
-                            fieldName,
-                        );
-                }}
-
-                mod.aggregates ~= Aggregate(
-                    fqn(memberName),
-                    Aggregate.toKind!symbol,
-                    fields,
-                );
-            } else static if(isSymbolVariable!symbol) {
+            else static if(is(symbol) && isUDT!symbol)
+                mod.aggregates ~= aggregate!symbol;
+            else static if(isSymbolVariable!symbol) {
                 mod.variables ~= Variable(
                     Type(fullyQualifiedName!(typeof(symbol))),
-                    fqn(memberName),
+                    fullyQualifiedName!symbol,
                 );
             }
         }
@@ -107,6 +79,34 @@ private bool isVisible(alias symbol)() {
         return vis == "public" || vis == "export";
     } else
         return true; // basic type (probably)
+}
+
+private Aggregate aggregate(alias symbol)() {
+    import std.traits: fullyQualifiedName;
+
+    Variable[] fields;
+
+    static foreach(fieldName; __traits(allMembers, symbol)) {{
+        // although this is fine even for a class, trying to pass this in
+        // as a template parameter will fail. Using `symbol.init` doesn't
+        // work either.
+        alias field = __traits(getMember, symbol, fieldName);
+        // FIXME:
+        // This is repeating the logic in `isVariable` but
+        // I don't know how to pass this in to the
+        // function.
+        static if(is(typeof(symbol.init)) && !is(TypeOf!field == function))
+            fields ~= Variable(
+                Type(fullyQualifiedName!(TypeOf!field)),
+                fieldName,
+            );
+    }}
+
+    return Aggregate(
+        fullyQualifiedName!symbol,
+        Aggregate.toKind!symbol,
+        fields,
+    );
 }
 
 private Function[] overloads(alias module_, alias symbol, string memberName)() {
