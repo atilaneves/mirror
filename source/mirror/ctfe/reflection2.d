@@ -30,6 +30,9 @@ module mirror.ctfe.reflection2;
   * Private fields in structs/classes/etc.
 
   * Visibility for variables/fields.
+
+  * Resolve inconsistency between module-level variables having FQNs
+    and aggregate-level ones not.
 */
 
 
