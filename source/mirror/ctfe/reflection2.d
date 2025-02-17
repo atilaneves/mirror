@@ -26,6 +26,10 @@ module mirror.ctfe.reflection2;
 
   * When doing aggregates, include function return types and
     parameters, see the old `functions.allAggregates` test.
+
+  * Private fields in structs/classes/etc.
+
+  * Visibility for variables/fields.
 */
 
 
