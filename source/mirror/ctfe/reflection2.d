@@ -18,14 +18,14 @@ module mirror.ctfe.reflection2;
 
   * Add unit tests to the module struct.
 
-  * Functions by symbol.
+  * Functions by symbol and not just by overload.
 
   * Function attributes (@safe, etc.)
 
   * Function UDAs.
 
   * When doing aggregates, include function return types and
-  parameters, see the old `functions.allAggregates` test.
+    parameters, see the old `functions.allAggregates` test.
 */
 
 
@@ -40,63 +40,90 @@ Module module_(string moduleName)() {
     mixin(`static import `, moduleName, `;`);
     alias module_ = mixin(moduleName);
 
-    string fqn(string member) {
-        return moduleName ~ `.` ~ member;
+    static fqn(string memberName) {
+        return moduleName ~ `.` ~ memberName;
     }
 
-    static foreach(memberName; __traits(allMembers, module_)) {
-        static if(is(typeof(mixin(fqn(memberName))) == function) && isRegularFunction(memberName)) {
-            static foreach(i, overload; __traits(getOverloads, module_, memberName)) {{
+    static foreach(memberName; __traits(allMembers, module_)) {{
 
-                static if(is(typeof(overload) R == return))
-                    enum returnType = Type(fullyQualifiedName!R);
-                else
-                    static assert(false, "Cannot get return type of " ~ __traits(identifier, overload));
+        static if(isVisible!(moduleName, memberName)) {
 
-                Parameter[] parameters;
-                static if(is(typeof(overload) Ps == __parameters)) {
-                    static foreach(p; 0 .. Ps.length) {{
+            alias symbol = mixin(fqn(memberName));
 
-                        static if(is(typeof(__traits(identifier, Ps[p .. p + 1]))))
-                            enum paramIdentifier = __traits(identifier, Ps[p .. p + 1]);
-                        else
-                            enum paramIdentifier = Ps[i].stringof;
+            static if(is(typeof(symbol) == function) && isRegularFunction(memberName)) {
+                static foreach(i, overload; __traits(getOverloads, module_, memberName)) {{
 
-                        enum paramString = Ps[p .. p + 1].stringof;
-                        enum assignIndex = paramString.countUntil(`=`);
-                        static if(assignIndex == -1)
-                            enum default_ = "";
-                        else {
-                            // paramString will be something like:
-                            // `(T id = val)`
-                            // we want default_ in this case to be "val"
-                            static assert(paramString[assignIndex + 1] == ' ');
-                            enum default_ = paramString[assignIndex + 2 .. $-1];
-                        }
+                    static if(is(typeof(overload) R == return))
+                        enum returnType = Type(fullyQualifiedName!R);
+                    else
+                        static assert(false, "Cannot get return type of " ~ __traits(identifier, overload));
 
-                        parameters ~= Parameter(
-                            Type(fullyQualifiedName!(Ps[p])),
-                            paramIdentifier,
-                            phobosPSC([__traits(getParameterStorageClasses, overload, p)]),
-                            default_,
-                        );
-                    }}
-                } else
-                    static assert(false, "Cannot get parameters of " ~ __traits(identifier, overload));
+                    Parameter[] parameters;
+                    static if(is(typeof(overload) Ps == __parameters)) {
+                        static foreach(p; 0 .. Ps.length) {{
 
-                mod.functionsByOverload ~= Function(
-                    moduleName ~ "." ~ memberName,
-                    i,
-                    returnType,
-                    parameters,
-                    __traits(getVisibility, overload),
-                    __traits(getLinkage, overload),
+                            static if(is(typeof(__traits(identifier, Ps[p .. p + 1]))))
+                                enum paramIdentifier = __traits(identifier, Ps[p .. p + 1]);
+                            else
+                                enum paramIdentifier = Ps[i].stringof;
+
+                            enum paramString = Ps[p .. p + 1].stringof;
+                            enum assignIndex = paramString.countUntil(`=`);
+                            static if(assignIndex == -1)
+                                enum default_ = "";
+                            else {
+                                // paramString will be something like:
+                                // `(T id = val)`
+                                // we want default_ in this case to be "val"
+                                static assert(paramString[assignIndex + 1] == ' ');
+                                enum default_ = paramString[assignIndex + 2 .. $-1];
+                            }
+
+                            parameters ~= Parameter(
+                                Type(fullyQualifiedName!(Ps[p])),
+                                paramIdentifier,
+                                phobosPSC([__traits(getParameterStorageClasses, overload, p)]),
+                                default_,
+                            );
+                        }}
+                    } else
+                        static assert(false, "Cannot get parameters of " ~ __traits(identifier, overload));
+
+                    mod.functionsByOverload ~= Function(
+                        moduleName ~ "." ~ memberName,
+                        i,
+                        returnType,
+                        parameters,
+                        __traits(getVisibility, overload),
+                        __traits(getLinkage, overload),
+                    );
+                }}
+            } else static if(is(symbol) && isUDT!symbol) {
+                mod.aggregates ~= Aggregate(
+                    fqn(memberName),
+                    Aggregate.toKind!symbol,
                 );
-            }}
+            }
         }
-    }
+    }}
+
+    mod.allAggregates = mod.aggregates;  // FIXME
 
     return mod;
+}
+
+private bool isVisible(string moduleName, string memberName)() {
+    mixin(`static import `, moduleName, `;`);
+    enum fqn = moduleName ~ "." ~ memberName;
+    static if(__traits(compiles, mixin(`{ alias symbol = `, fqn, `; }`))) {
+        alias symbol = mixin(fqn);
+        static if(__traits(compiles,  __traits(getVisibility, symbol))) {
+            enum vis = __traits(getVisibility, symbol);
+            return vis == "public" || vis == "export";
+        } else
+            return true; // basic type
+    } else
+        return false;
 }
 
 private bool isRegularFunction(in string memberName) @safe pure nothrow {
@@ -104,6 +131,16 @@ private bool isRegularFunction(in string memberName) @safe pure nothrow {
         return
             !memberName.startsWith("_sharedStaticCtor") &&
             !memberName.startsWith("_staticCtor");
+}
+
+private bool isUDT(Type)() {
+    return
+        is(Type == enum) ||
+        is(Type == struct) ||
+        is(Type == class) ||
+        is(Type == interface) ||
+        is(Type == union)
+        ;
 }
 
 // look ma, no templates
@@ -129,6 +166,8 @@ private auto phobosPSC(in string[] storageClasses) @safe pure nothrow {
 struct Module {
     string identifier;
     Function[] functionsByOverload;
+    Aggregate[] aggregates;     /// only the ones defined in the module.
+    Aggregate[] allAggregates;  /// includes all function return types.
 }
 
 
@@ -217,4 +256,37 @@ enum Linkage {
     Windows,
     ObjectiveC,
     System,
+}
+
+struct Aggregate {
+
+    enum Kind {
+        enum_,
+        struct_,
+        class_,
+        interface_,
+        union_,
+    }
+
+    string fullyQualifiedName;
+    Kind kind;
+
+    static Kind toKind(T)() {
+        with(Kind) {
+            static foreach(k; ["enum", "struct", "class", "interface", "union"]) {
+                static if(mixin(`is(T == `, k, `)`))
+                    return mixin(k ~ "_");
+            }
+        }
+    }
+
+    string moduleName() @safe pure nothrow scope const {
+        import std.string: split, join;
+        return fullyQualifiedName.split(".")[0 .. $-1].join(".");
+    }
+
+    string identifier() @safe pure nothrow scope const {
+        import std.string: split, join;
+        return fullyQualifiedName.split(".")[$-1];
+    }
 }
