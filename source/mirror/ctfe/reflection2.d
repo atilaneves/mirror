@@ -35,6 +35,7 @@ Module module_(string moduleName)() {
     import std.traits: fullyQualifiedName;
 
     Module mod;
+    mod.identifier = moduleName;
 
     mixin(`static import `, moduleName, `;`);
     alias module_ = mixin(moduleName);
