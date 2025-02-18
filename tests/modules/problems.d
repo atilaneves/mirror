@@ -20,3 +20,8 @@ version = OopsVersion;
 
 
 int[] gInts;
+
+public struct PrivateFields {
+    private int i;
+    public string s;
+}

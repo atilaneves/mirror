@@ -45,6 +45,7 @@ import mirror.ctfe.reflection2;
         NameAndKind("modules.types.Outer", Aggregate.Kind.struct_),
         NameAndKind("modules.types.Char", Aggregate.Kind.enum_),
         NameAndKind("modules.types.Union", Aggregate.Kind.union_),
+        NameAndKind("modules.types.RussianDoll", Aggregate.Kind.struct_),
     ];
 
     mod.allAggregates.map!xform.should == [
@@ -62,6 +63,7 @@ import mirror.ctfe.reflection2;
         NameAndKind("modules.types.Outer", Aggregate.Kind.struct_),
         NameAndKind("modules.types.Char", Aggregate.Kind.enum_),
         NameAndKind("modules.types.Union", Aggregate.Kind.union_),
+        NameAndKind("modules.types.RussianDoll", Aggregate.Kind.struct_),
     ];
 }
 
@@ -71,8 +73,26 @@ import mirror.ctfe.reflection2;
         Module(
             "modules.problems",
             [],
-            [],
-            [],
+            [
+                Aggregate(
+                    "modules.problems.PrivateFields",
+                    Aggregate.Kind.struct_,
+                    [
+                        Variable(Type("int"), "i"),
+                        Variable(Type("string"), "s"),
+                    ]
+                ),
+            ],
+            [
+                Aggregate(
+                    "modules.problems.PrivateFields",
+                    Aggregate.Kind.struct_,
+                    [
+                        Variable(Type("int"), "i"),
+                        Variable(Type("string"), "s"),
+                    ]
+                ),
+            ],
             [Variable(Type("int[]"), "modules.problems.gInts")],
         );
 }
@@ -99,7 +119,7 @@ import mirror.ctfe.reflection2;
 }
 
 
-@("methods")
+@("methods.String")
 @safe pure unittest {
     import std.algorithm: find, map;
     enum mod = module_!"modules.types";
@@ -108,9 +128,22 @@ import mirror.ctfe.reflection2;
 
     enum withPrefix0Info = str.functionsByOverload[0];
     enum withPrefix1Info = str.functionsByOverload[1];
-    // FIXME
-    //mixin(withPrefix0Info.importMixin);
-    //alias withPrefix0 = mixin(str.functionsByOverload[0].symbolMixin);
+    mixin(withPrefix0Info.importMixin);
+
+    alias withPrefix0 = mixin(withPrefix0Info.symbolMixin);
+    static assert(is(typeof(&withPrefix0) == typeof(&__traits(getOverloads, modules.types.String, "withPrefix")[0])));
+
+    alias withPrefix1 = mixin(withPrefix1Info.symbolMixin);
+    static assert(is(typeof(&withPrefix1) == typeof(&__traits(getOverloads, modules.types.String, "withPrefix")[1])));
 
     //str.functionsBySymbol.length.should == 1; // FIXME
+}
+
+@("methods.RussianDoll")
+@safe pure unittest {
+    import std.algorithm: find, map;
+    enum mod = module_!"modules.types";
+    enum str = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.RussianDoll")[0];
+    // FIXME
+    // need to recurse over inner defined types to get to the method.
 }

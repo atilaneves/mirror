@@ -4,14 +4,13 @@ module modules.types;
 struct String {
     string value;
 
-    string withPrefix() @safe pure nothrow const {
+    string withPrefix() @safe pure nothrow scope const {
         return "pre_" ~ value;
     }
 
-    string withPrefix(in string prefix) @safe pure nothrow const {
+    string withPrefix(in string prefix) @safe pure nothrow scope const {
         return prefix ~ value;
     }
-
 }
 
 
@@ -94,4 +93,15 @@ enum Char: char {
 
 union Union {
 
+}
+
+struct RussianDoll {
+    struct Mid {
+        struct Inner {
+            int i;
+            int twice() @safe @nogc pure nothrow scope const {
+                return i * 2;
+            }
+        }
+    }
 }

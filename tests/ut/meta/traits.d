@@ -35,6 +35,7 @@ import std.meta: AliasSeq;
                          modules.types.EvenInner,
                          modules.types.Inner2,
                          modules.types.Outer,
+                         modules.types.RussianDoll,
                      )
                  ),
                   structs.stringof);
