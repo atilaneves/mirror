@@ -46,6 +46,7 @@ import ut.ctfe.reflection;
         NameAndKind("modules.types.Outer", Aggregate.Kind.struct_),
         NameAndKind("modules.types.Char", Aggregate.Kind.enum_),
         NameAndKind("modules.types.Union", Aggregate.Kind.union_),
+        NameAndKind("modules.types.RussianDoll", Aggregate.Kind.struct_),
     ];
 
     mod.allAggregates.map!xform.should == [
@@ -63,6 +64,7 @@ import ut.ctfe.reflection;
         NameAndKind("modules.types.Outer", Aggregate.Kind.struct_),
         NameAndKind("modules.types.Char", Aggregate.Kind.enum_),
         NameAndKind("modules.types.Union", Aggregate.Kind.union_),
+        NameAndKind("modules.types.RussianDoll", Aggregate.Kind.struct_),
     ];
 }
 
@@ -72,8 +74,26 @@ import ut.ctfe.reflection;
     module_!"modules.problems".should ==
         Module(
             "modules.problems",
-            [],
-            [],
+            [
+                Aggregate(
+                    "modules.problems.PrivateFields",
+                    Aggregate.Kind.struct_,
+                    [
+                        Variable("int", "i"),
+                        Variable("string", "s"),
+                    ]
+                ),
+            ],
+            [
+                Aggregate(
+                    "modules.problems.PrivateFields",
+                    Aggregate.Kind.struct_,
+                    [
+                        Variable("int", "i"),
+                        Variable("string", "s"),
+                    ]
+                ),
+            ],
             [Variable("int[]", "gInts")],
             []
         );

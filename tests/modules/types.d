@@ -94,3 +94,14 @@ enum Char: char {
 union Union {
 
 }
+
+struct RussianDoll {
+    struct Mid {
+        struct Inner {
+            int i;
+            int twice() @safe @nogc pure nothrow scope const {
+                return i * 2;
+            }
+        }
+    }
+}

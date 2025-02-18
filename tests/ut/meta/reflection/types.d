@@ -37,6 +37,7 @@ import ut.meta.reflection;
             "Outer",
             "Char",
             "Union",
+            "RussianDoll",
         ]
     );
 }
@@ -45,7 +46,7 @@ import ut.meta.reflection;
 @("problems")
 @safe pure unittest {
     alias mod = Module!"modules.problems";
-    typeNames!mod.shouldBeEmpty;
+    typeNames!mod.should == ["PrivateFields"];
 }
 
 
