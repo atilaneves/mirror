@@ -4,14 +4,13 @@ module modules.types;
 struct String {
     string value;
 
-    string withPrefix() @safe pure nothrow const {
+    string withPrefix() @safe pure nothrow scope const {
         return "pre_" ~ value;
     }
 
-    string withPrefix(in string prefix) @safe pure nothrow const {
+    string withPrefix(in string prefix) @safe pure nothrow scope const {
         return prefix ~ value;
     }
-
 }
 
 

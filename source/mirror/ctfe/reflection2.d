@@ -125,7 +125,7 @@ private Aggregate aggregate(alias agg)() {
 }
 
 private Function[] overloads(alias parent, alias symbol, string memberName)() {
-    import std.traits: fullyQualifiedName;
+    import std.traits: fullyQualifiedName, moduleName;
     import std.algorithm: countUntil;
 
     Function[] ret;
@@ -172,6 +172,8 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
             static assert(false, "Cannot get parameters of " ~ __traits(identifier, overload));
 
         ret ~= Function(
+            moduleName!parent,
+            __traits(fullyQualifiedName, parent),
             fullyQualifiedName!parent ~ "." ~ memberName,
             i,
             returnType,
@@ -231,6 +233,8 @@ struct Module {
 
 
 struct Function {
+    string moduleName;
+    string parent;
     /**
        Do NOT use this to get the symbol, it will fail for overloads
        other than the first one.
@@ -248,7 +252,7 @@ struct Function {
 
     string symbolMixin() @safe pure nothrow scope const {
         import std.conv: text;
-        return text(`__traits(getOverloads, `,  this.moduleName,  `, "`,  this.identifier,  `")[`, overloadIndex, `]`);
+        return text(`__traits(getOverloads, `,  this.parent,  `, "`,  this.identifier,  `")[`, overloadIndex, `]`);
     }
 
     Visibility visibility() @safe pure scope const {
@@ -271,7 +275,6 @@ struct Function {
             case "System": return System;
         }
     }
-
 }
 
 

@@ -108,9 +108,13 @@ import mirror.ctfe.reflection2;
 
     enum withPrefix0Info = str.functionsByOverload[0];
     enum withPrefix1Info = str.functionsByOverload[1];
-    // FIXME
-    //mixin(withPrefix0Info.importMixin);
-    //alias withPrefix0 = mixin(str.functionsByOverload[0].symbolMixin);
+    mixin(withPrefix0Info.importMixin);
+
+    alias withPrefix0 = mixin(withPrefix0Info.symbolMixin);
+    static assert(is(typeof(&withPrefix0) == typeof(&__traits(getOverloads, modules.types.String, "withPrefix")[0])));
+
+    alias withPrefix1 = mixin(withPrefix1Info.symbolMixin);
+    static assert(is(typeof(&withPrefix1) == typeof(&__traits(getOverloads, modules.types.String, "withPrefix")[1])));
 
     //str.functionsBySymbol.length.should == 1; // FIXME
 }

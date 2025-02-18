@@ -62,6 +62,8 @@ import std.traits: PSC = ParameterStorageClass;
 
     functions.should == [
         Function(
+            "modules.functions",
+            "modules.functions",
             "modules.functions.addd",
             0,
             Type("int"),
@@ -81,6 +83,8 @@ import std.traits: PSC = ParameterStorageClass;
             "D",
         ),
         Function(
+            "modules.functions",
+            "modules.functions",
             "modules.functions.addd",
             1,
             Type("double"),
@@ -100,6 +104,8 @@ import std.traits: PSC = ParameterStorageClass;
             "D",
         ),
         Function(
+            "modules.functions",
+            "modules.functions",
             "modules.functions.withDefault",
             0,
             Type("double"),
@@ -120,6 +126,8 @@ import std.traits: PSC = ParameterStorageClass;
             "D",
         ),
         Function(
+            "modules.functions",
+            "modules.functions",
             "modules.functions.storageClasses",
             0,
             Type("void"),
@@ -134,6 +142,8 @@ import std.traits: PSC = ParameterStorageClass;
             "D",
         ),
         Function(
+            "modules.functions",
+            "modules.functions",
             "modules.functions.exportedFunc",
             0,
             Type("void"),
@@ -142,6 +152,8 @@ import std.traits: PSC = ParameterStorageClass;
             "D",
         ),
         Function(
+            "modules.functions",
+            "modules.functions",
             "modules.functions.externC",
             0,
             Type("void"),
@@ -150,6 +162,8 @@ import std.traits: PSC = ParameterStorageClass;
             "C",
         ),
         Function(
+            "modules.functions",
+            "modules.functions",
             "modules.functions.externCpp",
             0,
             Type("void"),
@@ -158,6 +172,8 @@ import std.traits: PSC = ParameterStorageClass;
             "C++",
         ),
         Function(
+            "modules.functions",
+            "modules.functions",
             "modules.functions.identityInt",
             0,
             Type("int"),
@@ -166,6 +182,8 @@ import std.traits: PSC = ParameterStorageClass;
             "D",
         ),
         Function(
+            "modules.functions",
+            "modules.functions",
             "modules.functions.voldemort",
             0,
             Type("modules.functions.voldemort.Voldemort"),
@@ -174,6 +192,8 @@ import std.traits: PSC = ParameterStorageClass;
             "D",
         ),
         Function(
+            "modules.functions",
+            "modules.functions",
             "modules.functions.voldemortArray",
             0,
             Type("modules.functions.voldemortArray.DasVoldemort[]"),
@@ -181,17 +201,19 @@ import std.traits: PSC = ParameterStorageClass;
             "public",
             "D",
         ),
-            Function(
-                "modules.functions.concatFoo",
-                0,
-                Type("string"),
-                [
-                    Parameter(Type("string"), "s0", PSC.none),
-                    Parameter(Type("int"),    "i",  PSC.none),
-                    Parameter(Type("string"), "s1", PSC.none),
+        Function(
+            "modules.functions",
+            "modules.functions",
+            "modules.functions.concatFoo",
+            0,
+            Type("string"),
+            [
+                Parameter(Type("string"), "s0", PSC.none),
+                Parameter(Type("int"),    "i",  PSC.none),
+                Parameter(Type("string"), "s1", PSC.none),
                 ],
-                "public",
-                "D",
-            ),
+            "public",
+            "D",
+        ),
     ];
 }
