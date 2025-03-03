@@ -75,8 +75,7 @@ private auto reflect(alias container, T)() {
     static if(__traits(hasMember, T, "kind"))
         ret.kind = Aggregate.toKind!container;
     ret.variables ~= variables;
-    static if(__traits(hasMember, T, "aggregates"))
-        ret.aggregates = aggregates;
+    ret.aggregates = aggregates;
     ret.functionsByOverload = functionsByOverload;
     ret.functionsBySymbol = functionsBySymbol;
 
