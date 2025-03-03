@@ -73,6 +73,7 @@ import mirror.ctfe.reflection2;
         Module(
             "modules.problems",
             [],
+            [],
             [
                 Aggregate(
                     "modules.problems.PrivateFields",

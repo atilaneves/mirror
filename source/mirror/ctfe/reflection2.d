@@ -56,9 +56,10 @@ Module module_(string moduleName)() {
 
         static if(isVisible!symbol) {
 
-            static if(is(typeof(symbol) == function) && isRegularFunction(memberName))
-                mod.functionsByOverload ~= overloads!(module_, symbol, memberName);
-            else static if(is(symbol) && isUDT!symbol)
+            static if(is(typeof(symbol) == function) && isRegularFunction(memberName)) {
+                mod.functionsByOverload ~= overloads  !(module_, symbol, memberName);
+                mod.functionsBySymbol   ~= overloadSet!(module_, symbol, memberName);
+            } else static if(is(symbol) && isUDT!symbol)
                 mod.aggregates ~= aggregate!symbol;
             else static if(isSymbolVariable!symbol) {
                 mod.variables ~= Variable(
@@ -124,6 +125,11 @@ private Aggregate aggregate(alias agg)() {
     );
 }
 
+private OverloadSet overloadSet(alias parent, alias symbol, string memberName)() {
+    auto functions = overloads!(parent, symbol, memberName);
+    return OverloadSet(__traits(fullyQualifiedName, parent) ~ "." ~ memberName, functions);
+}
+
 private Function[] overloads(alias parent, alias symbol, string memberName)() {
     import std.traits: fullyQualifiedName, moduleName;
     import std.algorithm: countUntil;
@@ -186,6 +192,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
     return ret;
 }
 
+
 private bool isRegularFunction(in string memberName) @safe pure nothrow {
     import std.algorithm: startsWith;
         return
@@ -226,11 +233,22 @@ private auto phobosPSC(in string[] storageClasses) @safe pure nothrow {
 struct Module {
     string identifier;
     Function[] functionsByOverload;
+    OverloadSet[] functionsBySymbol;
     Aggregate[] aggregates;     /// only the ones defined in the module.
     Aggregate[] allAggregates;  /// includes all function return types.
     Variable[] variables;
 }
 
+struct OverloadSet {
+    string fullyQualifiedName;
+    Function[] overloads;
+
+    invariant { assert(overloads.length > 0); }
+
+    string importMixin() @safe pure nothrow const scope {
+        return overloads[0].importMixin;
+    }
+}
 
 struct Function {
     string moduleName;

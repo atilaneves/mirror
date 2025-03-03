@@ -40,6 +40,24 @@ import std.traits: PSC = ParameterStorageClass;
     addd_1Sym(2, 3).should == 7;
 }
 
+@("functionsBySymbol.call.addd")
+@safe pure unittest {
+    enum mod = module_!"modules.functions"();
+    enum addd = mod.functionsBySymbol[0];
+    static assert(addd.identifier == "addd");
+
+    mixin(addd.importMixin);
+    alias addd_0Sym = mixin(addd.overloads[0].symbolMixin);
+    alias addd_1Sym = mixin(addd.overloads[1].symbolMixin);
+
+    static assert(is(typeof(&addd_0Sym) == int function(int, int) @safe @nogc pure nothrow));
+    static assert(is(typeof(&addd_1Sym) == double function(double, double) @safe @nogc pure nothrow));
+
+    addd_1Sym(1, 2).should == 5;
+    addd_1Sym(2, 3).should == 7;
+}
+
+
 @("visibility.public")
 @safe pure unittest {
     enum mod = module_!"modules.functions"();
