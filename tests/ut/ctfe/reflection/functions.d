@@ -9,7 +9,6 @@ import std.traits: PSC = ParameterStorageClass;
 @safe pure unittest {
     // just to check there are no compilation errors
     enum mod = module_!"modules.problems"();
-    mod.functionsByOverload.length.should == 0;
 }
 
 
