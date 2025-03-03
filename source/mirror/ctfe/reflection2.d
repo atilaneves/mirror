@@ -16,8 +16,6 @@ module mirror.ctfe.reflection2;
 
   * Add unit tests to the module struct.
 
-  * Functions by symbol and not just by overload.
-
   * When doing aggregates, include function return types and
     parameters, see the old `functions.allAggregates` test.
 
@@ -56,9 +54,10 @@ Module module_(string moduleName)() {
 
         static if(isVisible!symbol) {
 
-            static if(is(typeof(symbol) == function) && isRegularFunction(memberName))
-                mod.functionsByOverload ~= overloads!(module_, symbol, memberName);
-            else static if(is(symbol) && isUDT!symbol)
+            static if(is(typeof(symbol) == function) && isRegularFunction(memberName)) {
+                mod.functionsByOverload ~= overloads  !(module_, symbol, memberName);
+                mod.functionsBySymbol   ~= overloadSet!(module_, symbol, memberName);
+            } else static if(is(symbol) && isUDT!symbol)
                 mod.aggregates ~= aggregate!symbol;
             else static if(isSymbolVariable!symbol) {
                 mod.variables ~= Variable(
@@ -96,6 +95,7 @@ private Aggregate aggregate(alias agg)() {
 
     Variable[] fields;
     Function[] functionsByOverload;
+    OverloadSet[] functionsBySymbol;
 
     static foreach(memberName; __traits(allMembers, agg)) {{
         // although this is fine even for a class, trying to pass this in
@@ -112,8 +112,10 @@ private Aggregate aggregate(alias agg)() {
                 Type(fullyQualifiedName!(TypeOf!member)),
                 memberName,
             );
-        else static if(is(typeof(member) == function))
-            functionsByOverload ~= overloads!(agg, member, memberName);
+        else static if(is(typeof(member) == function)) {
+            functionsByOverload ~= overloads  !(agg, member, memberName);
+            functionsBySymbol   ~= overloadSet!(agg, member, memberName);
+        }
     }}
 
     return Aggregate(
@@ -121,7 +123,13 @@ private Aggregate aggregate(alias agg)() {
         Aggregate.toKind!agg,
         fields,
         functionsByOverload,
+        functionsBySymbol,
     );
+}
+
+private OverloadSet overloadSet(alias parent, alias symbol, string memberName)() {
+    auto functions = overloads!(parent, symbol, memberName);
+    return OverloadSet(__traits(fullyQualifiedName, parent) ~ "." ~ memberName, functions);
 }
 
 private Function[] overloads(alias parent, alias symbol, string memberName)() {
@@ -186,6 +194,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
     return ret;
 }
 
+
 private bool isRegularFunction(in string memberName) @safe pure nothrow {
     import std.algorithm: startsWith;
         return
@@ -226,11 +235,22 @@ private auto phobosPSC(in string[] storageClasses) @safe pure nothrow {
 struct Module {
     string identifier;
     Function[] functionsByOverload;
+    OverloadSet[] functionsBySymbol;
     Aggregate[] aggregates;     /// only the ones defined in the module.
     Aggregate[] allAggregates;  /// includes all function return types.
     Variable[] variables;
 }
 
+struct OverloadSet {
+    string fullyQualifiedName;
+    Function[] overloads;
+
+    invariant { assert(overloads.length > 0); }
+
+    string importMixin() @safe pure nothrow const scope {
+        return overloads[0].importMixin;
+    }
+}
 
 struct Function {
     string moduleName;
@@ -324,6 +344,7 @@ struct Aggregate {
     Kind kind;
     Variable[] fields;
     Function[] functionsByOverload;
+    OverloadSet[] functionsBySymbol;
 
     static Kind toKind(T)() {
         with(Kind) {

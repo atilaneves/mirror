@@ -73,6 +73,7 @@ import mirror.ctfe.reflection2;
         Module(
             "modules.problems",
             [],
+            [],
             [
                 Aggregate(
                     "modules.problems.PrivateFields",
@@ -136,7 +137,8 @@ import mirror.ctfe.reflection2;
     alias withPrefix1 = mixin(withPrefix1Info.symbolMixin);
     static assert(is(typeof(&withPrefix1) == typeof(&__traits(getOverloads, modules.types.String, "withPrefix")[1])));
 
-    //str.functionsBySymbol.length.should == 1; // FIXME
+    str.functionsBySymbol.map!(a => a.identifier).should == ["withPrefix"];
+    str.functionsBySymbol.length.should == 1;
 }
 
 @("methods.RussianDoll")
