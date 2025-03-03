@@ -6,26 +6,26 @@ import ut.ctfe.reflection;
 
 @("empty")
 @safe pure unittest {
-    module_!"modules.empty".should == Module("modules.empty");
+    module_!"modules.empty".aggregates.length.should == 0;
 }
 
 @("imports")
 @safe pure unittest {
-    module_!"modules.imports".should == Module("modules.imports");
+    module_!"modules.imports".aggregates.length.should == 0;
 }
 
 @("nameskinds")
 @safe pure unittest {
     import std.algorithm: map;
 
-    enum mod = module_!"modules.types";
+    static immutable mod = module_!"modules.types";
 
     static struct NameAndKind {
         string id;
         Aggregate.Kind kind;
     }
 
-    static NameAndKind xform(Aggregate a) {
+    static NameAndKind xform(in Aggregate a) {
         return NameAndKind(a.fullyQualifiedName, a.kind);
     }
 
@@ -69,39 +69,49 @@ import ut.ctfe.reflection;
 @("problems")
 @safe pure unittest {
     import std.array: front;
-    import std.algorithm: find;
+    import std.conv: text;
+    import std.algorithm: find, map;
 
-    enum mod = module_!"modules.problems";
+    static immutable mod = module_!"modules.problems";
 
-    mod.aggregates.find!(a => a.identifier == "PrivateFields")[0].should ==
-        Aggregate(
-            "modules.problems.PrivateFields",
-            Aggregate.Kind.struct_,
-            [
-                Variable(Type("int"), "modules.problems.PrivateFields.i"),
-                Variable(Type("string"), "modules.problems.PrivateFields.s"),
-                ]
-        );
+    auto actual = mod.aggregates.find!(a => a.identifier == "PrivateFields")[0];
+    actual.fullyQualifiedName.should == "modules.problems.PrivateFields";
+    actual.kind.should == Aggregate.Kind.struct_;
+    actual.variables.map!(v => text(v.fullyQualifiedName, `: `, v.type.fullyQualifiedName)).should == [
+        "modules.problems.PrivateFields.i: int",
+        "modules.problems.PrivateFields.s: string",
+    ];
+
+    actual.variables[0].visibility.should == Visibility.private_;
+    actual.variables[1].visibility.should == Visibility.public_;
 }
 
 
 @("fields.String")
 @safe pure unittest {
-    enum mod = module_!"modules.types";
+    import std.conv: text;
+    import std.algorithm: map;
+
+    static immutable mod = module_!"modules.types";
     auto string_ = mod.aggregates[0];
-    string_.fields.should == [
-        Variable(Type("string"), "modules.types.String.value"),
+
+    string_.variables.map!(v => text(v.fullyQualifiedName, `: `, v.type.fullyQualifiedName)).should == [
+        "modules.types.String.value: string",
     ];
+
+    string_.variables[0].visibility.should == Visibility.public_;
 }
 
 @("fields.Point")
 @safe pure unittest {
-    import std.algorithm: find;
-    enum mod = module_!"modules.types";
+    import std.algorithm: find, map;
+    import std.conv: text;
+
+    static immutable mod = module_!"modules.types";
     auto point = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.Point")[0];
-    point.fields.should == [
-        Variable(Type("double"), "modules.types.Point.x"),
-        Variable(Type("double"), "modules.types.Point.y"),
+    point.variables.map!(v => text(v.fullyQualifiedName, `: `, v.type.fullyQualifiedName)).should == [
+        "modules.types.Point.x: double",
+        "modules.types.Point.y: double",
     ];
 }
 
@@ -109,12 +119,14 @@ import ut.ctfe.reflection;
 @("methods.String")
 @safe pure unittest {
     import std.algorithm: find, map;
-    enum mod = module_!"modules.types";
-    enum str = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.String")[0];
-    str.functionsByOverload.map!(a => a.identifier).should == ["withPrefix", "withPrefix"];
+    import std.array: array;
 
-    enum withPrefix0Info = str.functionsByOverload[0];
-    enum withPrefix1Info = str.functionsByOverload[1];
+    static immutable mod = module_!"modules.types";
+    static immutable str = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.String")[0];
+    str.functionsByOverload.map!(a => a.identifier).array.should == ["withPrefix", "withPrefix"];
+
+    static immutable withPrefix0Info = str.functionsByOverload[0];
+    static immutable withPrefix1Info = str.functionsByOverload[1];
     mixin(withPrefix0Info.importMixin);
 
     alias withPrefix0 = mixin(withPrefix0Info.aliasMixin);
@@ -130,8 +142,11 @@ import ut.ctfe.reflection;
 @("methods.RussianDoll")
 @safe pure unittest {
     import std.algorithm: find, map;
-    enum mod = module_!"modules.types";
-    enum str = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.RussianDoll")[0];
+    static immutable mod = module_!"modules.types";
+    static immutable info = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.RussianDoll")[0];
+    static import modules.types;
+    alias T = mixin(info.aliasMixin);
+    static assert(is(T == modules.types.RussianDoll));
     // FIXME
     // need to recurse over inner defined types to get to the method.
 }

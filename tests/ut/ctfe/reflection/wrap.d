@@ -9,8 +9,8 @@ unittest {
     import blub;
     import std.format: format;
 
-    enum mod = module_!"modules.functions";
-    enum add1 = mod.functionsByOverload[0];
+    static immutable mod = module_!"modules.functions";
+    static immutable add1 = mod.functionsByOverload[0];
 
     enum mixinStr = blubWrapperMixin(add1);
     //pragma(msg, mixinStr);
@@ -22,7 +22,7 @@ unittest {
 // Returns a string to be mixed in that defines a function `wrap`
 // That calls converts blub types to D ones, calls `function_` then
 // converts the result from D to blub.
-private string blubWrapperMixin(Function function_) @safe pure {
+private string blubWrapperMixin(in Function function_) @safe pure {
     assert(__ctfe);
 
     import std.array: join;

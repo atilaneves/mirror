@@ -10,18 +10,16 @@ module mirror.ctfe.reflection;
 /*
   TODO:
 
+  * All built-in traits.
+
   * Add static constructors to the module struct.
 
   * When doing aggregates, include function return types and
     parameters, see the old `functions.allAggregates` test.
 
-  * Add visibility to struct fields.
-
   * Add types to test structs/classes/etc.
 
   * Add enums to test structs/classes/etc.
-
-  * Visibility for variables/fields?
 
   * Fix default values.
 */
@@ -37,58 +35,77 @@ Module module_(string moduleName)() {
     return mod;
 }
 
-private T reflect(alias parent, T)() {
+private auto reflect(alias container, T)() {
+    import std.traits: moduleName;
+
     Variable[] variables;
     Function[] functionsByOverload;
     OverloadSet[] functionsBySymbol;
     Aggregate[] aggregates;
     UnitTest[] unitTests;
 
-    static foreach(memberName; __traits(allMembers, parent)) {{
+    static foreach(memberName; __traits(allMembers, container)) {{
 
         // although this is fine even for a class, trying to pass this in
         // as a template parameter will fail. Using `agg.init` doesn't
         // work either.
-        alias member = __traits(getMember, parent, memberName);
+        alias member = __traits(getMember, container, memberName);
 
         static if(is(typeof(member) == function) && isRegularFunction(memberName)) {
-            functionsByOverload ~= overloads  !(parent, member, memberName);
-            functionsBySymbol   ~= overloadSet!(parent, member, memberName);
+            functionsByOverload ~= overloads  !(container, member, memberName);
+            functionsBySymbol   ~= overloadSet!(container, member, memberName);
         } else static if(is(member) && isUDT!member)
             aggregates ~= reflect!(member, Aggregate);
         // the first part only works for aggregates and isSymbolVariable only works for modules
-        else static if((is(typeof(parent.init)) && !is(TypeOf!member == function)) || isSymbolVariable!member) {
-            variables ~= Variable(
-                Type(__traits(fullyQualifiedName, typeof(member))),
-                __traits(fullyQualifiedName, member),
-            );
+        else static if((is(typeof(container.init)) && !is(TypeOf!member == function)) || isSymbolVariable!member) {
+            auto var = newMember!(container, memberName, Variable);
+            var.type = Type(__traits(fullyQualifiedName, typeof(member)));
+
+            variables ~= var;
         }
     }}
 
-    T ret;
-    ret.fullyQualifiedName = __traits(fullyQualifiedName, parent);
+    auto ret = newMember!(container, T);
+
     static if(__traits(hasMember, T, "kind"))
-        ret.kind = Aggregate.toKind!parent;
-    static if(__traits(hasMember, T, "fields"))
-        ret.fields ~= variables;
-    else
-        ret.variables ~= variables;
-    static if(__traits(hasMember, T, "aggregates"))
-        ret.aggregates = aggregates;
+        ret.kind = Aggregate.toKind!container;
+    ret.variables ~= variables;
+    ret.aggregates = aggregates;
     ret.functionsByOverload = functionsByOverload;
     ret.functionsBySymbol = functionsBySymbol;
 
-    static foreach(i, ut; __traits(getUnitTests, parent)) {
-        ret.unitTests ~= UnitTest(
-            __traits(fullyQualifiedName, ut),
-            __traits(fullyQualifiedName, parent),
-            i,
-        );
-    }
-
+    static foreach(i, ut; __traits(getUnitTests, container)) {{
+        auto unitTest = newMember!(ut, UnitTest);
+        unitTest.index = i;
+        ret.unitTests ~= unitTest;
+    }}
 
     return ret;
 }
+
+private auto newMember(alias member, T)() {
+    mixin(newMemberImpl);
+}
+
+private auto newMember(alias parent, string identifier, T)() {
+    alias member = __traits(getMember, parent, identifier);
+    mixin(newMemberImpl);
+}
+
+private string newMemberImpl() @safe pure {
+    return q{
+        import std.traits: moduleName;
+        auto ret = new T;
+        ret.fullyQualifiedName = __traits(fullyQualifiedName, member);
+        ret.parent = __traits(fullyQualifiedName, __traits(parent, member));
+        ret.moduleName = moduleName!member;
+        ret.visibilityStr = __traits(getVisibility, member);
+        static if(__traits(compiles, __traits(getLinkage, member)))
+            ret.linkageStr = __traits(getLinkage, member);
+        return ret;
+    };
+}
+
 
 private template TypeOf(alias T) {
     static if(is(T))
@@ -148,16 +165,13 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         } else
             static assert(false, "Cannot get parameters of " ~ __traits(fullyQualifiedName, overload));
 
-        ret ~= Function(
-            moduleName!parent,
-            __traits(fullyQualifiedName, parent),
-            __traits(fullyQualifiedName, parent) ~ "." ~ memberName,
-            i,
-            returnType,
-            parameters,
-            __traits(getVisibility, overload),
-            __traits(getLinkage, overload),
-        );
+        auto func = newMember!(overload, Function);
+        // override the fqn from `newMember` above since we want overriden methods
+        func.fullyQualifiedName = __traits(fullyQualifiedName, parent) ~ "." ~ memberName;
+        func.overloadIndex = i;
+        func.returnType = returnType;
+        func.parameters = parameters;
+        ret ~= func;
     }}
 
     return ret;
@@ -201,60 +215,34 @@ private auto phobosPSC(in string[] storageClasses) @safe pure nothrow {
     return ret;
 }
 
-struct Module {
+abstract class Member {
     string fullyQualifiedName;
-    Function[] functionsByOverload;
-    OverloadSet[] functionsBySymbol;
-    Aggregate[] aggregates;     /// only the ones defined in the module.
-    Aggregate[] allAggregates;  /// includes all function return types.
-    Variable[] variables;
-    UnitTest[] unitTests;
-}
-
-struct OverloadSet {
-    string fullyQualifiedName;
-    Function[] overloads;
-
-    invariant { assert(overloads.length > 0); }
-
-    string importMixin() @safe pure nothrow const scope {
-        return overloads[0].importMixin;
-    }
-}
-
-struct Function {
     string moduleName;
     string parent;
-    /**
-       Do NOT use this to get the symbol, it will fail for overloads
-       other than the first one.
-     */
-    string fullyQualifiedName;
-    size_t overloadIndex;
-    Type returnType;
-    Parameter[] parameters;
     string visibilityStr;
     string linkageStr;
 
-    string importMixin() @safe pure nothrow scope const {
-        return "static import " ~ this.moduleName ~ ";";
+    abstract string aliasMixin() @safe pure scope const;
+
+    final string identifier() @safe pure scope const {
+        import std.string: split;
+        return fullyQualifiedName.split(".")[$-1];
     }
 
-    string aliasMixin() @safe pure nothrow scope const {
-        import std.conv: text;
-        return text(`__traits(getOverloads, `,  this.parent,  `, "`,  this.identifier,  `")[`, overloadIndex, `]`);
+    final string importMixin() @safe pure scope const {
+        return `static import ` ~ moduleName ~ `;`;
     }
 
-    Visibility visibility() @safe pure scope const {
+    final Visibility visibility() @safe pure scope const {
         switch(visibilityStr) with(Visibility) {
-            default: throw new Exception("Unknown visibility " ~ visibilityStr);
+            default: throw new Exception("Unknown visibility " ~ visibilityStr ~ " " ~ typeid(this).toString);
                 static foreach(vis; ["public", "private", "protected", "export", "package"]) {
                 case vis: return mixin(vis ~ "_");
             }
        }
     }
 
-    Linkage linkage() @safe pure scope const {
+    final Linkage linkage() @safe pure scope const {
         switch(linkageStr) with(Linkage) {
             default: throw new Exception("Unknown linkage " ~ linkageStr);
             case "D": return D;
@@ -264,6 +252,73 @@ struct Function {
             case "ObjectiveC": return ObjectiveC;
             case "System": return System;
         }
+    }
+}
+
+
+class Container: Member {
+
+    Function[] functionsByOverload;
+    OverloadSet[] functionsBySymbol;
+    Aggregate[] aggregates; /// only the ones defined in the module.
+    Variable[] variables;
+    UnitTest[] unitTests;
+}
+
+class Module: Container {
+
+    Aggregate[] allAggregates; /// includes all function return types.
+
+    override string aliasMixin() @safe pure scope const {
+        return fullyQualifiedName;
+    }
+}
+
+class Aggregate: Container {
+
+    enum Kind {
+        enum_,
+        struct_,
+        class_,
+        interface_,
+        union_,
+    }
+
+    Kind kind;
+
+    static Kind toKind(T)() {
+        with(Kind) {
+            static foreach(k; ["enum", "struct", "class", "interface", "union"]) {
+                static if(mixin(`is(T == `, k, `)`))
+                    return mixin(k ~ "_");
+            }
+        }
+    }
+
+    override string aliasMixin() @safe pure scope const {
+        return `__traits(getMember, ` ~ parent ~ `, "` ~ identifier ~ `")`;
+    }
+}
+
+struct OverloadSet {
+    string fullyQualifiedName;
+    Function[] overloads;
+
+    invariant { assert(overloads.length > 0); }
+
+    string importMixin() @safe pure const scope {
+        return overloads[0].importMixin;
+    }
+}
+
+class Function: Member {
+    size_t overloadIndex;
+    Type returnType;
+    Parameter[] parameters;
+
+    override string aliasMixin() @safe pure scope const {
+        import std.conv: text;
+        return text(`__traits(getOverloads, `,  this.parent,  `, "`,  this.identifier,  `")[`, overloadIndex, `]`);
     }
 }
 
@@ -300,36 +355,13 @@ enum Linkage {
     System,
 }
 
-struct Aggregate {
 
-    enum Kind {
-        enum_,
-        struct_,
-        class_,
-        interface_,
-        union_,
-    }
-
-    string fullyQualifiedName;
-    Kind kind;
-    Variable[] fields;
-    Function[] functionsByOverload;
-    OverloadSet[] functionsBySymbol;
-    UnitTest[] unitTests;
-
-    static Kind toKind(T)() {
-        with(Kind) {
-            static foreach(k; ["enum", "struct", "class", "interface", "union"]) {
-                static if(mixin(`is(T == `, k, `)`))
-                    return mixin(k ~ "_");
-            }
-        }
-    }
-}
-
-struct Variable {
+class Variable: Member {
     Type type;
-    string fullyQualifiedName;
+
+    override string aliasMixin() @safe pure scope const {
+        return `__traits(getMember, ` ~ parent ~ `, "` ~ this.identifier ~ `")`;
+    }
 }
 
 private bool isSymbolVariable(alias symbol)() {
@@ -362,16 +394,10 @@ string identifier(T)(auto ref T obj) {
 }
 
 
-struct UnitTest {
-    string fullyQualifiedName;
-    string parent;
+class UnitTest: Member {
     size_t index;
 
-    string importMixin() @safe pure nothrow scope const {
-        return "static import " ~ this.moduleName ~ ";";
-    }
-
-    string aliasMixin() @safe pure nothrow scope const {
+    override string aliasMixin() @safe pure nothrow scope const {
         import std.conv: text;
         return text(`__traits(getUnitTests, `, parent, `)[`, index, `]`);
     }

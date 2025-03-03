@@ -6,15 +6,16 @@ import ut.ctfe.reflection;
 
 @("variables")
 @safe pure unittest {
-    enum mod = module_!("modules.variables");
-    mod.variables[].shouldBeSameSetAs(
-        [
-            Variable(Type("int"), "modules.variables.gInt"),
-            Variable(Type("immutable(double)"), "modules.variables.gDouble"),
-            Variable(Type("modules.variables.Struct"), "modules.variables.gStruct"),
-            Variable(Type("int"), "modules.variables.CONSTANT_INT"),
-            Variable(Type("string"), "modules.variables.CONSTANT_STRING"),
-            Variable(Type("immutable(int)"), "modules.variables.gImmutableInt"),
-        ]
-    );
+    import std.conv: text;
+    import std.algorithm: map;
+
+    static immutable mod = module_!("modules.variables");
+    mod.variables.map!(v => text(v.fullyQualifiedName, `: `, v.type.fullyQualifiedName)).should ~ [
+        "modules.variables.gInt: int",
+        "modules.variables.gDouble: immutable(double)",
+        "modules.variables.gStruct: modules.variables.Struct",
+        "modules.variables.CONSTANT_INT: int",
+        "modules.variables.CONSTANT_STRING: string",
+        "modules.variables.gImmutableInt: immutable(int)",
+    ];
 }
