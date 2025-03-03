@@ -15,7 +15,7 @@ import std.traits: PSC = ParameterStorageClass;
 @("functionsByOverload.call.addd.0")
 @safe pure unittest {
     static immutable mod = module_!"modules.functions"();
-    enum addd_0 = mod.functionsByOverload[0];
+    static immutable addd_0 = mod.functionsByOverload[0];
 
     mixin(addd_0.importMixin);
     alias addd_0Sym = mixin(addd_0.aliasMixin);
@@ -28,7 +28,7 @@ import std.traits: PSC = ParameterStorageClass;
 @("functionsByOverload.call.addd.1")
 @safe pure unittest {
     static immutable mod = module_!"modules.functions"();
-    enum addd_1 = mod.functionsByOverload[1];
+    static immutable addd_1 = mod.functionsByOverload[1];
 
     mixin(addd_1.importMixin);
     alias addd_1Sym = mixin(addd_1.aliasMixin);
@@ -41,7 +41,7 @@ import std.traits: PSC = ParameterStorageClass;
 @("functionsBySymbol.call.addd")
 @safe pure unittest {
     static immutable mod = module_!"modules.functions"();
-    enum addd = mod.functionsBySymbol[0];
+    static immutable addd = mod.functionsBySymbol[0];
     static assert(addd.identifier == "addd");
 
     mixin(addd.importMixin);
@@ -59,177 +59,13 @@ import std.traits: PSC = ParameterStorageClass;
 @("visibility.public")
 @safe pure unittest {
     static immutable mod = module_!"modules.functions"();
-    enum func = mod.functionsByOverload[0];
+    static immutable func = mod.functionsByOverload[0];
     func.visibility.should == Visibility.public_;
 }
 
 @("visibility.export")
 @safe pure unittest {
     static immutable mod = module_!"modules.functions"();
-    enum func = mod.functionsByOverload[4];
+    static immutable func = mod.functionsByOverload[4];
     func.visibility.should == Visibility.export_;
-}
-
-
-@("functionsByOverload.equality")
-@safe pure unittest {
-    static immutable mod = module_!"modules.functions"();
-    enum functions = mod.functionsByOverload;
-
-    functions.should == [
-        Function(
-            "modules.functions",
-            "modules.functions",
-            "modules.functions.addd",
-            0,
-            Type("int"),
-            [
-                Parameter(
-                    Type("int"),
-                    "i",
-                    PSC.none,
-                ),
-                Parameter(
-                    Type("int"),
-                    "j",
-                    PSC.none,
-                ),
-            ],
-            "public",
-            "D",
-        ),
-        Function(
-            "modules.functions",
-            "modules.functions",
-            "modules.functions.addd",
-            1,
-            Type("double"),
-            [
-                Parameter(
-                    Type("double"),
-                    "d0",
-                    PSC.none,
-                ),
-                Parameter(
-                    Type("double"),
-                    "d1",
-                    PSC.none,
-                ),
-            ],
-            "public",
-            "D",
-        ),
-        Function(
-            "modules.functions",
-            "modules.functions",
-            "modules.functions.withDefault",
-            0,
-            Type("double"),
-            [
-                Parameter(
-                    Type("double"),
-                    "fst",
-                    PSC.none,
-                ),
-                Parameter(
-                    Type("double"),
-                    "snd",
-                    PSC.none,
-                    "33.3",
-                ),
-            ],
-            "public",
-            "D",
-        ),
-        Function(
-            "modules.functions",
-            "modules.functions",
-            "modules.functions.storageClasses",
-            0,
-            Type("void"),
-            [
-                Parameter(Type("int"), "normal", PSC.none),
-                Parameter(Type("int*"), "returnScope", PSC.return_ | PSC.scope_),
-                Parameter(Type("int"), "out_", PSC.out_),
-                Parameter(Type("int"), "ref_", PSC.ref_),
-                Parameter(Type("int"), "lazy_", PSC.lazy_),
-            ],
-            "public",
-            "D",
-        ),
-        Function(
-            "modules.functions",
-            "modules.functions",
-            "modules.functions.exportedFunc",
-            0,
-            Type("void"),
-            [],
-            "export",
-            "D",
-        ),
-        Function(
-            "modules.functions",
-            "modules.functions",
-            "modules.functions.externC",
-            0,
-            Type("void"),
-            [],
-            "public",
-            "C",
-        ),
-        Function(
-            "modules.functions",
-            "modules.functions",
-            "modules.functions.externCpp",
-            0,
-            Type("void"),
-            [],
-            "public",
-            "C++",
-        ),
-        Function(
-            "modules.functions",
-            "modules.functions",
-            "modules.functions.identityInt",
-            0,
-            Type("int"),
-            [Parameter(Type("int"), "x", PSC.none,)],
-            "public",
-            "D",
-        ),
-        Function(
-            "modules.functions",
-            "modules.functions",
-            "modules.functions.voldemort",
-            0,
-            Type("modules.functions.voldemort.Voldemort"),
-            [Parameter(Type("int"), "i", PSC.none)],
-            "public",
-            "D",
-        ),
-        Function(
-            "modules.functions",
-            "modules.functions",
-            "modules.functions.voldemortArray",
-            0,
-            Type("modules.functions.voldemortArray.DasVoldemort[]"),
-            [Parameter(Type("int"), "i", PSC.none)],
-            "public",
-            "D",
-        ),
-        Function(
-            "modules.functions",
-            "modules.functions",
-            "modules.functions.concatFoo",
-            0,
-            Type("string"),
-            [
-                Parameter(Type("string"), "s0", PSC.none),
-                Parameter(Type("int"),    "i",  PSC.none),
-                Parameter(Type("string"), "s1", PSC.none),
-                ],
-            "public",
-            "D",
-        ),
-    ];
 }

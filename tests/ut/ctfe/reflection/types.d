@@ -107,12 +107,14 @@ import ut.ctfe.reflection;
 @("methods.String")
 @safe pure unittest {
     import std.algorithm: find, map;
+    import std.array: array;
+
     static immutable mod = module_!"modules.types";
     static immutable str = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.String")[0];
-    str.functionsByOverload.map!(a => a.identifier).should == ["withPrefix", "withPrefix"];
+    str.functionsByOverload.map!(a => a.identifier).array.should == ["withPrefix", "withPrefix"];
 
-    enum withPrefix0Info = str.functionsByOverload[0];
-    enum withPrefix1Info = str.functionsByOverload[1];
+    static immutable withPrefix0Info = str.functionsByOverload[0];
+    static immutable withPrefix1Info = str.functionsByOverload[1];
     mixin(withPrefix0Info.importMixin);
 
     alias withPrefix0 = mixin(withPrefix0Info.aliasMixin);

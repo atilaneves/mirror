@@ -149,16 +149,16 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         } else
             static assert(false, "Cannot get parameters of " ~ __traits(fullyQualifiedName, overload));
 
-        ret ~= Function(
-            moduleName!parent,
-            __traits(fullyQualifiedName, parent),
-            __traits(fullyQualifiedName, parent) ~ "." ~ memberName,
-            i,
-            returnType,
-            parameters,
-            __traits(getVisibility, overload),
-            __traits(getLinkage, overload),
-        );
+        auto func = new Function;
+        func.fullyQualifiedName = __traits(fullyQualifiedName, parent) ~ "." ~ memberName;
+        func.moduleName = moduleName!parent;
+        func.parent = __traits(fullyQualifiedName, parent);
+        func.overloadIndex = i;
+        func.returnType = returnType;
+        func.parameters = parameters;
+        func.visibilityStr = __traits(getVisibility, overload);
+        func.linkageStr = __traits(getLinkage, overload);
+        ret ~= func;
     }}
 
     return ret;
@@ -221,7 +221,9 @@ abstract class Member {
     // abstract Linkage linkage() @safe pure scope const;
 }
 
+
 class Container: Member {
+
     Function[] functionsByOverload;
     OverloadSet[] functionsBySymbol;
     Aggregate[] aggregates; /// only the ones defined in the module.
@@ -230,6 +232,7 @@ class Container: Member {
 }
 
 class Module: Container {
+
     Aggregate[] allAggregates; /// includes all function return types.
 
     override string aliasMixin() @safe pure scope const {
@@ -269,30 +272,19 @@ struct OverloadSet {
 
     invariant { assert(overloads.length > 0); }
 
-    string importMixin() @safe pure nothrow const scope {
+    string importMixin() @safe pure const scope {
         return overloads[0].importMixin;
     }
 }
 
-struct Function {
-    string moduleName;
-    string parent;
-    /**
-       Do NOT use this to get the symbol, it will fail for overlodtads
-       other than the first one.
-     */
-    string fullyQualifiedName;
+class Function: Member {
     size_t overloadIndex;
     Type returnType;
     Parameter[] parameters;
     string visibilityStr;
     string linkageStr;
 
-    string importMixin() @safe pure nothrow scope const {
-        return "static import " ~ this.moduleName ~ ";";
-    }
-
-    string aliasMixin() @safe pure nothrow scope const {
+    override string aliasMixin() @safe pure scope const {
         import std.conv: text;
         return text(`__traits(getOverloads, `,  this.parent,  `, "`,  this.identifier,  `")[`, overloadIndex, `]`);
     }
