@@ -16,8 +16,6 @@ module mirror.ctfe.reflection2;
 
   * Add unit tests to the module struct.
 
-  * Functions by symbol and not just by overload.
-
   * When doing aggregates, include function return types and
     parameters, see the old `functions.allAggregates` test.
 
@@ -97,6 +95,7 @@ private Aggregate aggregate(alias agg)() {
 
     Variable[] fields;
     Function[] functionsByOverload;
+    OverloadSet[] functionsBySymbol;
 
     static foreach(memberName; __traits(allMembers, agg)) {{
         // although this is fine even for a class, trying to pass this in
@@ -113,8 +112,10 @@ private Aggregate aggregate(alias agg)() {
                 Type(fullyQualifiedName!(TypeOf!member)),
                 memberName,
             );
-        else static if(is(typeof(member) == function))
-            functionsByOverload ~= overloads!(agg, member, memberName);
+        else static if(is(typeof(member) == function)) {
+            functionsByOverload ~= overloads  !(agg, member, memberName);
+            functionsBySymbol   ~= overloadSet!(agg, member, memberName);
+        }
     }}
 
     return Aggregate(
@@ -122,6 +123,7 @@ private Aggregate aggregate(alias agg)() {
         Aggregate.toKind!agg,
         fields,
         functionsByOverload,
+        functionsBySymbol,
     );
 }
 
@@ -342,6 +344,7 @@ struct Aggregate {
     Kind kind;
     Variable[] fields;
     Function[] functionsByOverload;
+    OverloadSet[] functionsBySymbol;
 
     static Kind toKind(T)() {
         with(Kind) {
