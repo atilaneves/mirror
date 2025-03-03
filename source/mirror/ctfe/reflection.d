@@ -79,13 +79,14 @@ private auto reflect(alias container, T)() {
     ret.functionsByOverload = functionsByOverload;
     ret.functionsBySymbol = functionsBySymbol;
 
-    static foreach(i, ut; __traits(getUnitTests, container)) {
-        ret.unitTests ~= UnitTest(
-            __traits(fullyQualifiedName, ut),
-            __traits(fullyQualifiedName, container),
-            i,
-        );
-    }
+    static foreach(i, ut; __traits(getUnitTests, container)) {{
+        auto unitTest = new UnitTest;
+        unitTest.fullyQualifiedName = __traits(fullyQualifiedName, ut);
+        unitTest.parent = __traits(fullyQualifiedName, __traits(parent, ut));
+        unitTest.moduleName = moduleName!ut;
+        unitTest.index = i;
+        ret.unitTests ~= unitTest;
+    }}
 
 
     return ret;
@@ -380,16 +381,10 @@ string identifier(T)(auto ref T obj) {
 }
 
 
-struct UnitTest {
-    string fullyQualifiedName;
-    string parent;
+class UnitTest: Member {
     size_t index;
 
-    string importMixin() @safe pure nothrow scope const {
-        return "static import " ~ this.moduleName ~ ";";
-    }
-
-    string aliasMixin() @safe pure nothrow scope const {
+    override string aliasMixin() @safe pure nothrow scope const {
         import std.conv: text;
         return text(`__traits(getUnitTests, `, parent, `)[`, index, `]`);
     }
