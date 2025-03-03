@@ -6,7 +6,7 @@ import ut.ctfe.reflection;
 
 @("variables")
 @safe pure unittest {
-    enum mod = module_!("modules.variables");
+    static immutable mod = module_!("modules.variables");
     mod.variables[].shouldBeSameSetAs(
         [
             Variable(Type("int"), "modules.variables.gInt"),

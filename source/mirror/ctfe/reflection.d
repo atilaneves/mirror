@@ -37,7 +37,9 @@ Module module_(string moduleName)() {
     return mod;
 }
 
-private T reflect(alias parent, T)() {
+private auto reflect(alias parent, T)() {
+    import std.traits: moduleName;
+
     Variable[] variables;
     Function[] functionsByOverload;
     OverloadSet[] functionsBySymbol;
@@ -65,8 +67,10 @@ private T reflect(alias parent, T)() {
         }
     }}
 
-    T ret;
+    auto ret = new T;
     ret.fullyQualifiedName = __traits(fullyQualifiedName, parent);
+    ret.moduleName = moduleName!parent;
+
     static if(__traits(hasMember, T, "kind"))
         ret.kind = Aggregate.toKind!parent;
     static if(__traits(hasMember, T, "fields"))
@@ -201,14 +205,31 @@ private auto phobosPSC(in string[] storageClasses) @safe pure nothrow {
     return ret;
 }
 
-struct Module {
+abstract class Member {
     string fullyQualifiedName;
+    string moduleName;
+    string parent;
+
+    final string importMixin() @safe pure scope const {
+        return `static import ` ~ moduleName ~ `;`;
+    }
+
+    abstract string aliasMixin() @safe pure scope const;
+    // abstract Visibility visibility() @safe pure scope const;
+    // abstract Linkage linkage() @safe pure scope const;
+}
+
+class Module: Member {
     Function[] functionsByOverload;
     OverloadSet[] functionsBySymbol;
     Aggregate[] aggregates;     /// only the ones defined in the module.
     Aggregate[] allAggregates;  /// includes all function return types.
     Variable[] variables;
     UnitTest[] unitTests;
+
+    override string aliasMixin() @safe pure scope const {
+        return fullyQualifiedName;
+    }
 }
 
 struct OverloadSet {
@@ -226,7 +247,7 @@ struct Function {
     string moduleName;
     string parent;
     /**
-       Do NOT use this to get the symbol, it will fail for overloads
+       Do NOT use this to get the symbol, it will fail for overlodtads
        other than the first one.
      */
     string fullyQualifiedName;
@@ -300,7 +321,7 @@ enum Linkage {
     System,
 }
 
-struct Aggregate {
+class Aggregate: Member {
 
     enum Kind {
         enum_,
@@ -310,7 +331,6 @@ struct Aggregate {
         union_,
     }
 
-    string fullyQualifiedName;
     Kind kind;
     Variable[] fields;
     Function[] functionsByOverload;
@@ -326,7 +346,7 @@ struct Aggregate {
         }
     }
 
-    string aliasMixin() @safe pure nothrow scope const {
+    override string aliasMixin() @safe pure nothrow scope const {
         return `__traits(getMember, ` ~ this.moduleName ~ `, "` ~ this.identifier ~ `")`;
     }
 }

@@ -8,7 +8,7 @@ import ut.ctfe.reflection;
 @safe pure unittest {
     import std.algorithm: map;
 
-    enum mod = module_!"modules.extra"();
+    static immutable mod = module_!"modules.extra"();
 
     mod.unitTests.map!(a => a.fullyQualifiedName).should == [
         "modules.extra.__unittest_L3_C12",

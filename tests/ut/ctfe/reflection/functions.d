@@ -8,13 +8,13 @@ import std.traits: PSC = ParameterStorageClass;
 @("problems")
 @safe pure unittest {
     // just to check there are no compilation errors
-    enum mod = module_!"modules.problems"();
+    static immutable mod = module_!"modules.problems"();
 }
 
 
 @("functionsByOverload.call.addd.0")
 @safe pure unittest {
-    enum mod = module_!"modules.functions"();
+    static immutable mod = module_!"modules.functions"();
     enum addd_0 = mod.functionsByOverload[0];
 
     mixin(addd_0.importMixin);
@@ -27,7 +27,7 @@ import std.traits: PSC = ParameterStorageClass;
 
 @("functionsByOverload.call.addd.1")
 @safe pure unittest {
-    enum mod = module_!"modules.functions"();
+    static immutable mod = module_!"modules.functions"();
     enum addd_1 = mod.functionsByOverload[1];
 
     mixin(addd_1.importMixin);
@@ -40,7 +40,7 @@ import std.traits: PSC = ParameterStorageClass;
 
 @("functionsBySymbol.call.addd")
 @safe pure unittest {
-    enum mod = module_!"modules.functions"();
+    static immutable mod = module_!"modules.functions"();
     enum addd = mod.functionsBySymbol[0];
     static assert(addd.identifier == "addd");
 
@@ -58,14 +58,14 @@ import std.traits: PSC = ParameterStorageClass;
 
 @("visibility.public")
 @safe pure unittest {
-    enum mod = module_!"modules.functions"();
+    static immutable mod = module_!"modules.functions"();
     enum func = mod.functionsByOverload[0];
     func.visibility.should == Visibility.public_;
 }
 
 @("visibility.export")
 @safe pure unittest {
-    enum mod = module_!"modules.functions"();
+    static immutable mod = module_!"modules.functions"();
     enum func = mod.functionsByOverload[4];
     func.visibility.should == Visibility.export_;
 }
@@ -73,7 +73,7 @@ import std.traits: PSC = ParameterStorageClass;
 
 @("functionsByOverload.equality")
 @safe pure unittest {
-    enum mod = module_!"modules.functions"();
+    static immutable mod = module_!"modules.functions"();
     enum functions = mod.functionsByOverload;
 
     functions.should == [

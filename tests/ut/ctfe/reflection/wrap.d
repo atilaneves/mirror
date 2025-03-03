@@ -9,7 +9,7 @@ unittest {
     import blub;
     import std.format: format;
 
-    enum mod = module_!"modules.functions";
+    static immutable mod = module_!"modules.functions";
     enum add1 = mod.functionsByOverload[0];
 
     enum mixinStr = blubWrapperMixin(add1);
