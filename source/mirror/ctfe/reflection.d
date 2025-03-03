@@ -60,17 +60,19 @@ private auto reflect(alias container, T)() {
             aggregates ~= reflect!(member, Aggregate);
         // the first part only works for aggregates and isSymbolVariable only works for modules
         else static if((is(typeof(container.init)) && !is(TypeOf!member == function)) || isSymbolVariable!member) {
-            variables ~= Variable(
-                Type(__traits(fullyQualifiedName, typeof(member))),
-                __traits(fullyQualifiedName, member),
-            );
+            // passing `member` as a template param doesn't work, so... repeat
+            //auto var = newMember!(__traits(getMember, container, memberName), Variable);
+            auto var = new Variable;
+            var.fullyQualifiedName = __traits(fullyQualifiedName, member);
+            var.parent = __traits(fullyQualifiedName, __traits(parent, member));
+            var.moduleName = moduleName!member;
+            var.type = Type(__traits(fullyQualifiedName, typeof(member)));
+
+            variables ~= var;
         }
     }}
 
-    auto ret = new T;
-    ret.fullyQualifiedName = __traits(fullyQualifiedName, container);
-    ret.moduleName = moduleName!container;
-    ret.parent = __traits(fullyQualifiedName, __traits(parent, container));
+    auto ret = newMember!(container, T);
 
     static if(__traits(hasMember, T, "kind"))
         ret.kind = Aggregate.toKind!container;
@@ -80,10 +82,7 @@ private auto reflect(alias container, T)() {
     ret.functionsBySymbol = functionsBySymbol;
 
     static foreach(i, ut; __traits(getUnitTests, container)) {{
-        auto unitTest = new UnitTest;
-        unitTest.fullyQualifiedName = __traits(fullyQualifiedName, ut);
-        unitTest.parent = __traits(fullyQualifiedName, __traits(parent, ut));
-        unitTest.moduleName = moduleName!ut;
+        auto unitTest = newMember!(ut, UnitTest);
         unitTest.index = i;
         ret.unitTests ~= unitTest;
     }}
@@ -91,6 +90,18 @@ private auto reflect(alias container, T)() {
 
     return ret;
 }
+
+private auto newMember(alias symbol, T)() {
+    import std.traits: moduleName;
+
+    auto ret = new T;
+    ret.fullyQualifiedName = __traits(fullyQualifiedName, symbol);
+    ret.parent = __traits(fullyQualifiedName, __traits(parent, symbol));
+    ret.moduleName = moduleName!symbol;
+
+    return ret;
+}
+
 
 private template TypeOf(alias T) {
     static if(is(T))
@@ -346,9 +357,12 @@ enum Linkage {
 }
 
 
-struct Variable {
+class Variable: Member {
     Type type;
-    string fullyQualifiedName;
+
+    override string aliasMixin() @safe pure scope const {
+        return `__traits(getMember, ` ~ parent ~ `, "` ~ this.identifier ~ `")`;
+    }
 }
 
 private bool isSymbolVariable(alias symbol)() {

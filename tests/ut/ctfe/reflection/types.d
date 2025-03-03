@@ -69,37 +69,44 @@ import ut.ctfe.reflection;
 @("problems")
 @safe pure unittest {
     import std.array: front;
-    import std.algorithm: find;
+    import std.conv: text;
+    import std.algorithm: find, map;
 
     static immutable mod = module_!"modules.problems";
 
     auto actual = mod.aggregates.find!(a => a.identifier == "PrivateFields")[0];
     actual.fullyQualifiedName.should == "modules.problems.PrivateFields";
     actual.kind.should == Aggregate.Kind.struct_;
-    actual.variables.should == [
-        Variable(Type("int"), "modules.problems.PrivateFields.i"),
-        Variable(Type("string"), "modules.problems.PrivateFields.s"),
+    actual.variables.map!(v => text(v.fullyQualifiedName, `: `, v.type.fullyQualifiedName)).should == [
+        "modules.problems.PrivateFields.i: int",
+        "modules.problems.PrivateFields.s: string",
     ];
 }
 
 
 @("fields.String")
 @safe pure unittest {
+    import std.conv: text;
+    import std.algorithm: map;
+
     static immutable mod = module_!"modules.types";
     auto string_ = mod.aggregates[0];
-    string_.variables.should == [
-        Variable(Type("string"), "modules.types.String.value"),
+
+    string_.variables.map!(v => text(v.fullyQualifiedName, `: `, v.type.fullyQualifiedName)).should == [
+        "modules.types.String.value: string",
     ];
 }
 
 @("fields.Point")
 @safe pure unittest {
-    import std.algorithm: find;
+    import std.algorithm: find, map;
+    import std.conv: text;
+
     static immutable mod = module_!"modules.types";
     auto point = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.Point")[0];
-    point.variables.should == [
-        Variable(Type("double"), "modules.types.Point.x"),
-        Variable(Type("double"), "modules.types.Point.y"),
+    point.variables.map!(v => text(v.fullyQualifiedName, `: `, v.type.fullyQualifiedName)).should == [
+        "modules.types.Point.x: double",
+        "modules.types.Point.y: double",
     ];
 }
 
