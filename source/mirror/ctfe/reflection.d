@@ -70,6 +70,7 @@ private auto reflect(alias parent, T)() {
     auto ret = new T;
     ret.fullyQualifiedName = __traits(fullyQualifiedName, parent);
     ret.moduleName = moduleName!parent;
+    ret.parent = __traits(fullyQualifiedName, __traits(parent, parent));
 
     static if(__traits(hasMember, T, "kind"))
         ret.kind = Aggregate.toKind!parent;
@@ -210,6 +211,11 @@ abstract class Member {
     string moduleName;
     string parent;
 
+    final string identifier() @safe pure scope const {
+        import std.string: split;
+        return fullyQualifiedName.split(".")[$-1];
+    }
+
     final string importMixin() @safe pure scope const {
         return `static import ` ~ moduleName ~ `;`;
     }
@@ -229,6 +235,36 @@ class Module: Member {
 
     override string aliasMixin() @safe pure scope const {
         return fullyQualifiedName;
+    }
+}
+
+class Aggregate: Member {
+
+    enum Kind {
+        enum_,
+        struct_,
+        class_,
+        interface_,
+        union_,
+    }
+
+    Kind kind;
+    Variable[] fields;
+    Function[] functionsByOverload;
+    OverloadSet[] functionsBySymbol;
+    UnitTest[] unitTests;
+
+    static Kind toKind(T)() {
+        with(Kind) {
+            static foreach(k; ["enum", "struct", "class", "interface", "union"]) {
+                static if(mixin(`is(T == `, k, `)`))
+                    return mixin(k ~ "_");
+            }
+        }
+    }
+
+    override string aliasMixin() @safe pure scope const {
+        return `__traits(getMember, ` ~ parent ~ `, "` ~ identifier ~ `")`;
     }
 }
 
@@ -321,35 +357,6 @@ enum Linkage {
     System,
 }
 
-class Aggregate: Member {
-
-    enum Kind {
-        enum_,
-        struct_,
-        class_,
-        interface_,
-        union_,
-    }
-
-    Kind kind;
-    Variable[] fields;
-    Function[] functionsByOverload;
-    OverloadSet[] functionsBySymbol;
-    UnitTest[] unitTests;
-
-    static Kind toKind(T)() {
-        with(Kind) {
-            static foreach(k; ["enum", "struct", "class", "interface", "union"]) {
-                static if(mixin(`is(T == `, k, `)`))
-                    return mixin(k ~ "_");
-            }
-        }
-    }
-
-    override string aliasMixin() @safe pure nothrow scope const {
-        return `__traits(getMember, ` ~ this.moduleName ~ `, "` ~ this.identifier ~ `")`;
-    }
-}
 
 struct Variable {
     Type type;
