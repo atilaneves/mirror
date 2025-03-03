@@ -15,13 +15,9 @@ module mirror.ctfe.reflection;
   * When doing aggregates, include function return types and
     parameters, see the old `functions.allAggregates` test.
 
-  * Add visibility to struct fields.
-
   * Add types to test structs/classes/etc.
 
   * Add enums to test structs/classes/etc.
-
-  * Visibility for variables/fields?
 
   * Fix default values.
 */

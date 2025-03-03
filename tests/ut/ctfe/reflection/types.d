@@ -81,6 +81,9 @@ import ut.ctfe.reflection;
         "modules.problems.PrivateFields.i: int",
         "modules.problems.PrivateFields.s: string",
     ];
+
+    actual.variables[0].visibility.should == Visibility.private_;
+    actual.variables[1].visibility.should == Visibility.public_;
 }
 
 
@@ -95,6 +98,8 @@ import ut.ctfe.reflection;
     string_.variables.map!(v => text(v.fullyQualifiedName, `: `, v.type.fullyQualifiedName)).should == [
         "modules.types.String.value: string",
     ];
+
+    string_.variables[0].visibility.should == Visibility.public_;
 }
 
 @("fields.Point")
