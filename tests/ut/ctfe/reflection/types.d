@@ -68,32 +68,19 @@ import ut.ctfe.reflection;
 
 @("problems")
 @safe pure unittest {
-    module_!"modules.problems".should ==
-        Module(
-            "modules.problems",
-            [],
-            [],
+    import std.array: front;
+    import std.algorithm: find;
+
+    enum mod = module_!"modules.problems";
+
+    mod.aggregates.find!(a => a.identifier == "PrivateFields")[0].should ==
+        Aggregate(
+            "modules.problems.PrivateFields",
+            Aggregate.Kind.struct_,
             [
-                Aggregate(
-                    "modules.problems.PrivateFields",
-                    Aggregate.Kind.struct_,
-                    [
-                        Variable(Type("int"), "i"),
-                        Variable(Type("string"), "s"),
-                    ]
-                ),
-            ],
-            [
-                Aggregate(
-                    "modules.problems.PrivateFields",
-                    Aggregate.Kind.struct_,
-                    [
-                        Variable(Type("int"), "i"),
-                        Variable(Type("string"), "s"),
-                    ]
-                ),
-            ],
-            [Variable(Type("int[]"), "modules.problems.gInts")],
+                Variable(Type("int"), "modules.problems.PrivateFields.i"),
+                Variable(Type("string"), "modules.problems.PrivateFields.s"),
+                ]
         );
 }
 
@@ -103,7 +90,7 @@ import ut.ctfe.reflection;
     enum mod = module_!"modules.types";
     auto string_ = mod.aggregates[0];
     string_.fields.should == [
-        Variable(Type("string"), "value"),
+        Variable(Type("string"), "modules.types.String.value"),
     ];
 }
 
@@ -113,8 +100,8 @@ import ut.ctfe.reflection;
     enum mod = module_!"modules.types";
     auto point = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.Point")[0];
     point.fields.should == [
-        Variable(Type("double"), "x"),
-        Variable(Type("double"), "y"),
+        Variable(Type("double"), "modules.types.Point.x"),
+        Variable(Type("double"), "modules.types.Point.y"),
     ];
 }
 

@@ -25,49 +25,61 @@ module mirror.ctfe.reflection;
 
   * Visibility for variables/fields?
 
-  * Resolve inconsistency between module-level variables having FQNs
-    and aggregate-level ones not.
-
-  * Refactor aggregate so it uses the same code as a module. Aggregates
-    can also have types defined within them.
-
   * Fix default values.
 */
 
 
 Module module_(string moduleName)() {
 
-    import std.algorithm: countUntil;
-
-    Module mod;
-    mod.fullyQualifiedName = moduleName;
-
     mixin(`static import `, moduleName, `;`);
     alias module_ = mixin(moduleName);
-
-    static foreach(memberName; __traits(allMembers, module_)) {{
-
-        alias symbol = __traits(getMember, module_, memberName);
-
-        static if(isVisible!symbol) {
-
-            static if(is(typeof(symbol) == function) && isRegularFunction(memberName)) {
-                mod.functionsByOverload ~= overloads  !(module_, symbol, memberName);
-                mod.functionsBySymbol   ~= overloadSet!(module_, symbol, memberName);
-            } else static if(is(symbol) && isUDT!symbol)
-                mod.aggregates ~= aggregate!symbol;
-            else static if(isSymbolVariable!symbol) {
-                mod.variables ~= Variable(
-                    Type(__traits(fullyQualifiedName, typeof(symbol))),
-                    __traits(fullyQualifiedName, symbol),
-                );
-            }
-        }
-    }}
-
+    auto mod = reflect!(module_, Module);
     mod.allAggregates = mod.aggregates;  // FIXME
 
     return mod;
+}
+
+private T reflect(alias parent, T)() {
+    Variable[] variables;
+    Function[] functionsByOverload;
+    OverloadSet[] functionsBySymbol;
+    Aggregate[] aggregates;
+
+    static foreach(memberName; __traits(allMembers, parent)) {{
+
+        // although this is fine even for a class, trying to pass this in
+        // as a template parameter will fail. Using `agg.init` doesn't
+        // work either.
+        alias member = __traits(getMember, parent, memberName);
+
+        static if(is(typeof(member) == function) && isRegularFunction(memberName)) {
+            functionsByOverload ~= overloads  !(parent, member, memberName);
+            functionsBySymbol   ~= overloadSet!(parent, member, memberName);
+        } else static if(is(member) && isUDT!member)
+            aggregates ~= reflect!(member, Aggregate);
+        // the first part only works for aggregates and isSymbolVariable only works for modules
+        else static if((is(typeof(parent.init)) && !is(TypeOf!member == function)) || isSymbolVariable!member) {
+            variables ~= Variable(
+                Type(__traits(fullyQualifiedName, typeof(member))),
+                __traits(fullyQualifiedName, member),
+            );
+        }
+    }}
+
+    T ret;
+    ret.fullyQualifiedName = __traits(fullyQualifiedName, parent);
+    static if(__traits(hasMember, T, "kind"))
+        ret.kind = Aggregate.toKind!parent;
+    static if(__traits(hasMember, T, "fields"))
+        ret.fields ~= variables;
+    else
+        ret.variables ~= variables;
+    static if(__traits(hasMember, T, "aggregates"))
+        ret.aggregates = aggregates;
+    ret.functionsByOverload = functionsByOverload;
+    ret.functionsBySymbol = functionsBySymbol;
+
+    return ret;
 }
 
 private template TypeOf(alias T) {
@@ -77,49 +89,6 @@ private template TypeOf(alias T) {
         alias TypeOf = typeof(T);
     else
         alias TypeOf = void;
-}
-
-private bool isVisible(alias symbol)() {
-    static if(__traits(compiles, __traits(getVisibility, symbol))) {
-        enum vis = __traits(getVisibility, symbol);
-        return vis == "public" || vis == "export";
-    } else
-        return true; // basic type (probably)
-}
-
-private Aggregate aggregate(alias agg)() {
-    Variable[] fields;
-    Function[] functionsByOverload;
-    OverloadSet[] functionsBySymbol;
-
-    static foreach(memberName; __traits(allMembers, agg)) {{
-        // although this is fine even for a class, trying to pass this in
-        // as a template parameter will fail. Using `agg.init` doesn't
-        // work either.
-        alias member = __traits(getMember, agg, memberName);
-
-        // FIXME:
-        // This is repeating the logic in `isVariable` but
-        // I don't know how to pass this in to the
-        // function.
-        static if(is(typeof(agg.init)) && !is(TypeOf!member == function))
-            fields ~= Variable(
-                Type(__traits(fullyQualifiedName, TypeOf!member)),
-                memberName,
-            );
-        else static if(is(typeof(member) == function)) {
-            functionsByOverload ~= overloads  !(agg, member, memberName);
-            functionsBySymbol   ~= overloadSet!(agg, member, memberName);
-        }
-    }}
-
-    return Aggregate(
-        __traits(fullyQualifiedName, agg),
-        Aggregate.toKind!agg,
-        fields,
-        functionsByOverload,
-        functionsBySymbol,
-    );
 }
 
 private OverloadSet overloadSet(alias parent, alias symbol, string memberName)() {
