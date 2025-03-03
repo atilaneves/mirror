@@ -10,8 +10,6 @@ module mirror.ctfe.reflection;
 /*
   TODO:
 
-  * Remove std.traits.fullyQualifiedName dependency.
-
   * Add static constructors to the module struct.
 
   * Add unit tests to the module struct.
@@ -34,13 +32,14 @@ module mirror.ctfe.reflection;
     its symbol, so that all traits work. That is: have
     `mixin(foo.symbolMixin)` always work (it doesn't right now for
     methods).
+
+  * Fix default values.
 */
 
 
 Module module_(string moduleName)() {
 
     import std.algorithm: countUntil;
-    import std.traits: fullyQualifiedName;
 
     Module mod;
     mod.identifier = moduleName;
@@ -61,8 +60,8 @@ Module module_(string moduleName)() {
                 mod.aggregates ~= aggregate!symbol;
             else static if(isSymbolVariable!symbol) {
                 mod.variables ~= Variable(
-                    Type(fullyQualifiedName!(typeof(symbol))),
-                    fullyQualifiedName!symbol,
+                    Type(__traits(fullyQualifiedName, typeof(symbol))),
+                    __traits(fullyQualifiedName, symbol),
                 );
             }
         }
@@ -91,8 +90,6 @@ private bool isVisible(alias symbol)() {
 }
 
 private Aggregate aggregate(alias agg)() {
-    import std.traits: fullyQualifiedName;
-
     Variable[] fields;
     Function[] functionsByOverload;
     OverloadSet[] functionsBySymbol;
@@ -109,7 +106,7 @@ private Aggregate aggregate(alias agg)() {
         // function.
         static if(is(typeof(agg.init)) && !is(TypeOf!member == function))
             fields ~= Variable(
-                Type(fullyQualifiedName!(TypeOf!member)),
+                Type(__traits(fullyQualifiedName, TypeOf!member)),
                 memberName,
             );
         else static if(is(typeof(member) == function)) {
@@ -119,7 +116,7 @@ private Aggregate aggregate(alias agg)() {
     }}
 
     return Aggregate(
-        fullyQualifiedName!agg,
+        __traits(fullyQualifiedName, agg),
         Aggregate.toKind!agg,
         fields,
         functionsByOverload,
@@ -133,7 +130,7 @@ private OverloadSet overloadSet(alias parent, alias symbol, string memberName)()
 }
 
 private Function[] overloads(alias parent, alias symbol, string memberName)() {
-    import std.traits: fullyQualifiedName, moduleName;
+    import std.traits: moduleName;
     import std.algorithm: countUntil;
 
     Function[] ret;
@@ -144,7 +141,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
     static foreach(i, overload; __traits(getOverloads, parent, memberName)) {{
 
         static if(is(typeof(overload) R == return))
-            enum returnType = Type(fullyQualifiedName!R);
+            enum returnType = Type(__traits(fullyQualifiedName, R));
         else
             static assert(false, "Cannot get return type of " ~ __traits(identifier, overload));
 
@@ -170,7 +167,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
                 }
 
                 parameters ~= Parameter(
-                    Type(fullyQualifiedName!(Ps[p])),
+                    Type(__traits(fullyQualifiedName, Ps[p])),
                     paramIdentifier,
                     phobosPSC([__traits(getParameterStorageClasses, overload, p)]),
                     default_,
@@ -182,7 +179,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         ret ~= Function(
             moduleName!parent,
             __traits(fullyQualifiedName, parent),
-            fullyQualifiedName!parent ~ "." ~ memberName,
+            __traits(fullyQualifiedName, parent) ~ "." ~ memberName,
             i,
             returnType,
             parameters,
