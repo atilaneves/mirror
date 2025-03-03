@@ -98,6 +98,8 @@ private string newMemberImpl() @safe pure {
         ret.parent = __traits(fullyQualifiedName, __traits(parent, member));
         ret.moduleName = moduleName!member;
         ret.visibilityStr = __traits(getVisibility, member);
+        static if(__traits(compiles, __traits(getLinkage, member)))
+            ret.linkageStr = __traits(getLinkage, member);
         return ret;
     };
 }
@@ -167,7 +169,6 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         func.overloadIndex = i;
         func.returnType = returnType;
         func.parameters = parameters;
-        func.linkageStr = __traits(getLinkage, overload);
         ret ~= func;
     }}
 
@@ -217,6 +218,7 @@ abstract class Member {
     string moduleName;
     string parent;
     string visibilityStr;
+    string linkageStr;
 
     abstract string aliasMixin() @safe pure scope const;
 
@@ -238,7 +240,17 @@ abstract class Member {
        }
     }
 
-    // abstract Linkage linkage() @safe pure scope const;
+    final Linkage linkage() @safe pure scope const {
+        switch(linkageStr) with(Linkage) {
+            default: throw new Exception("Unknown linkage " ~ linkageStr);
+            case "D": return D;
+            case "C": return C;
+            case "C++": return Cplusplus;
+            case "Windows": return Windows;
+            case "ObjectiveC": return ObjectiveC;
+            case "System": return System;
+        }
+    }
 }
 
 
@@ -301,23 +313,10 @@ class Function: Member {
     size_t overloadIndex;
     Type returnType;
     Parameter[] parameters;
-    string linkageStr;
 
     override string aliasMixin() @safe pure scope const {
         import std.conv: text;
         return text(`__traits(getOverloads, `,  this.parent,  `, "`,  this.identifier,  `")[`, overloadIndex, `]`);
-    }
-
-    Linkage linkage() @safe pure scope const {
-        switch(linkageStr) with(Linkage) {
-            default: throw new Exception("Unknown linkage " ~ linkageStr);
-            case "D": return D;
-            case "C": return C;
-            case "C++": return Cplusplus;
-            case "Windows": return Windows;
-            case "ObjectiveC": return ObjectiveC;
-            case "System": return System;
-        }
     }
 }
 
