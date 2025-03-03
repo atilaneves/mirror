@@ -131,7 +131,10 @@ import ut.ctfe.reflection;
 @safe pure unittest {
     import std.algorithm: find, map;
     enum mod = module_!"modules.types";
-    enum str = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.RussianDoll")[0];
+    enum info = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.RussianDoll")[0];
+    static import modules.types;
+    alias T = mixin(info.aliasMixin);
+    static assert(is(T == modules.types.RussianDoll));
     // FIXME
     // need to recurse over inner defined types to get to the method.
 }

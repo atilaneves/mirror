@@ -325,6 +325,10 @@ struct Aggregate {
             }
         }
     }
+
+    string aliasMixin() @safe pure nothrow scope const {
+        return `__traits(getMember, ` ~ this.moduleName ~ `, "` ~ this.identifier ~ `")`;
+    }
 }
 
 struct Variable {
