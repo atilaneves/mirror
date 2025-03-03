@@ -10,6 +10,8 @@ module mirror.ctfe.reflection;
 /*
   TODO:
 
+  * All built-in traits.
+
   * Add static constructors to the module struct.
 
   * When doing aggregates, include function return types and
