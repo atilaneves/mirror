@@ -1,4 +1,4 @@
-module ut.ctfe.reflection.variables2;
+module ut.ctfe.reflection.variables;
 
 
 import ut.ctfe.reflection;

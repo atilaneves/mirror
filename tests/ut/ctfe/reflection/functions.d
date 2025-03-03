@@ -1,4 +1,4 @@
-module ut.ctfe.reflection.functions2;
+module ut.ctfe.reflection.functions;
 
 
 import ut.ctfe.reflection;

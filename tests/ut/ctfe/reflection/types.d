@@ -1,4 +1,4 @@
-module ut.ctfe.reflection.types2;
+module ut.ctfe.reflection.types;
 
 
 import ut.ctfe.reflection;

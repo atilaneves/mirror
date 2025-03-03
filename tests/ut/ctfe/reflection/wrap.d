@@ -1,4 +1,4 @@
-module ut.ctfe.reflection.wrap2;
+module ut.ctfe.reflection.wrap;
 
 
 import ut.ctfe.reflection;
