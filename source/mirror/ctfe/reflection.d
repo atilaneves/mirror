@@ -37,7 +37,7 @@ Module module_(string moduleName)() {
     return mod;
 }
 
-private auto reflect(alias parent, T)() {
+private auto reflect(alias container, T)() {
     import std.traits: moduleName;
 
     Variable[] variables;
@@ -46,20 +46,20 @@ private auto reflect(alias parent, T)() {
     Aggregate[] aggregates;
     UnitTest[] unitTests;
 
-    static foreach(memberName; __traits(allMembers, parent)) {{
+    static foreach(memberName; __traits(allMembers, container)) {{
 
         // although this is fine even for a class, trying to pass this in
         // as a template parameter will fail. Using `agg.init` doesn't
         // work either.
-        alias member = __traits(getMember, parent, memberName);
+        alias member = __traits(getMember, container, memberName);
 
         static if(is(typeof(member) == function) && isRegularFunction(memberName)) {
-            functionsByOverload ~= overloads  !(parent, member, memberName);
-            functionsBySymbol   ~= overloadSet!(parent, member, memberName);
+            functionsByOverload ~= overloads  !(container, member, memberName);
+            functionsBySymbol   ~= overloadSet!(container, member, memberName);
         } else static if(is(member) && isUDT!member)
             aggregates ~= reflect!(member, Aggregate);
         // the first part only works for aggregates and isSymbolVariable only works for modules
-        else static if((is(typeof(parent.init)) && !is(TypeOf!member == function)) || isSymbolVariable!member) {
+        else static if((is(typeof(container.init)) && !is(TypeOf!member == function)) || isSymbolVariable!member) {
             variables ~= Variable(
                 Type(__traits(fullyQualifiedName, typeof(member))),
                 __traits(fullyQualifiedName, member),
@@ -68,25 +68,22 @@ private auto reflect(alias parent, T)() {
     }}
 
     auto ret = new T;
-    ret.fullyQualifiedName = __traits(fullyQualifiedName, parent);
-    ret.moduleName = moduleName!parent;
-    ret.parent = __traits(fullyQualifiedName, __traits(parent, parent));
+    ret.fullyQualifiedName = __traits(fullyQualifiedName, container);
+    ret.moduleName = moduleName!container;
+    ret.parent = __traits(fullyQualifiedName, __traits(parent, container));
 
     static if(__traits(hasMember, T, "kind"))
-        ret.kind = Aggregate.toKind!parent;
-    static if(__traits(hasMember, T, "fields"))
-        ret.fields ~= variables;
-    else
-        ret.variables ~= variables;
+        ret.kind = Aggregate.toKind!container;
+    ret.variables ~= variables;
     static if(__traits(hasMember, T, "aggregates"))
         ret.aggregates = aggregates;
     ret.functionsByOverload = functionsByOverload;
     ret.functionsBySymbol = functionsBySymbol;
 
-    static foreach(i, ut; __traits(getUnitTests, parent)) {
+    static foreach(i, ut; __traits(getUnitTests, container)) {
         ret.unitTests ~= UnitTest(
             __traits(fullyQualifiedName, ut),
-            __traits(fullyQualifiedName, parent),
+            __traits(fullyQualifiedName, container),
             i,
         );
     }
@@ -225,20 +222,23 @@ abstract class Member {
     // abstract Linkage linkage() @safe pure scope const;
 }
 
-class Module: Member {
+class Container: Member {
     Function[] functionsByOverload;
     OverloadSet[] functionsBySymbol;
-    Aggregate[] aggregates;     /// only the ones defined in the module.
-    Aggregate[] allAggregates;  /// includes all function return types.
+    Aggregate[] aggregates; /// only the ones defined in the module.
     Variable[] variables;
     UnitTest[] unitTests;
+}
+
+class Module: Container {
+    Aggregate[] allAggregates; /// includes all function return types.
 
     override string aliasMixin() @safe pure scope const {
         return fullyQualifiedName;
     }
 }
 
-class Aggregate: Member {
+class Aggregate: Container {
 
     enum Kind {
         enum_,
@@ -249,10 +249,6 @@ class Aggregate: Member {
     }
 
     Kind kind;
-    Variable[] fields;
-    Function[] functionsByOverload;
-    OverloadSet[] functionsBySymbol;
-    UnitTest[] unitTests;
 
     static Kind toKind(T)() {
         with(Kind) {

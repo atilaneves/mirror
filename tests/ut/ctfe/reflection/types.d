@@ -76,7 +76,7 @@ import ut.ctfe.reflection;
     auto actual = mod.aggregates.find!(a => a.identifier == "PrivateFields")[0];
     actual.fullyQualifiedName.should == "modules.problems.PrivateFields";
     actual.kind.should == Aggregate.Kind.struct_;
-    actual.fields.should == [
+    actual.variables.should == [
         Variable(Type("int"), "modules.problems.PrivateFields.i"),
         Variable(Type("string"), "modules.problems.PrivateFields.s"),
     ];
@@ -87,7 +87,7 @@ import ut.ctfe.reflection;
 @safe pure unittest {
     static immutable mod = module_!"modules.types";
     auto string_ = mod.aggregates[0];
-    string_.fields.should == [
+    string_.variables.should == [
         Variable(Type("string"), "modules.types.String.value"),
     ];
 }
@@ -97,7 +97,7 @@ import ut.ctfe.reflection;
     import std.algorithm: find;
     static immutable mod = module_!"modules.types";
     auto point = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.Point")[0];
-    point.fields.should == [
+    point.variables.should == [
         Variable(Type("double"), "modules.types.Point.x"),
         Variable(Type("double"), "modules.types.Point.y"),
     ];
