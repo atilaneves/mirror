@@ -60,7 +60,6 @@ private auto reflect(alias container, T)() {
             aggregates ~= reflect!(member, Aggregate);
         // the first part only works for aggregates and isSymbolVariable only works for modules
         else static if((is(typeof(container.init)) && !is(TypeOf!member == function)) || isSymbolVariable!member) {
-            // passing `member` as a template param doesn't work, so... repeat
             auto var = newMember!(container, memberName, Variable);
             var.type = Type(__traits(fullyQualifiedName, typeof(member)));
 
@@ -87,27 +86,24 @@ private auto reflect(alias container, T)() {
     return ret;
 }
 
-private auto newMember(alias symbol, T)() {
-    import std.traits: moduleName;
-
-    auto ret = new T;
-    ret.fullyQualifiedName = __traits(fullyQualifiedName, symbol);
-    ret.parent = __traits(fullyQualifiedName, __traits(parent, symbol));
-    ret.moduleName = moduleName!symbol;
-
-    return ret;
+private auto newMember(alias member, T)() {
+    mixin(newMemberImpl);
 }
 
 private auto newMember(alias parent, string identifier, T)() {
-    import std.traits: moduleName;
-
     alias member = __traits(getMember, parent, identifier);
-    auto ret = new T;
-    ret.fullyQualifiedName = __traits(fullyQualifiedName, member);
-    ret.parent = __traits(fullyQualifiedName, __traits(parent, member));
-    ret.moduleName = moduleName!member;
+    mixin(newMemberImpl);
+}
 
-    return ret;
+private string newMemberImpl() @safe pure {
+    return q{
+        import std.traits: moduleName;
+        auto ret = new T;
+        ret.fullyQualifiedName = __traits(fullyQualifiedName, member);
+        ret.parent = __traits(fullyQualifiedName, __traits(parent, member));
+        ret.moduleName = moduleName!member;
+        return ret;
+    };
 }
 
 
