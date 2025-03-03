@@ -11,6 +11,7 @@ mixin runTestsMain!(
     "ut.ctfe.reflection.variables",
     "ut.ctfe.reflection.functions",
     "ut.ctfe.reflection.wrap",
+    "ut.ctfe.reflection.extra",
     "ut.rtti.oop",
     "ut.rtti.any",
 );
