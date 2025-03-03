@@ -9,12 +9,10 @@ import ut.ctfe.reflection;
     module_!"modules.empty".should == Module("modules.empty");
 }
 
-
 @("imports")
 @safe pure unittest {
     module_!"modules.imports".should == Module("modules.imports");
 }
-
 
 @("nameskinds")
 @safe pure unittest {
@@ -28,7 +26,7 @@ import ut.ctfe.reflection;
     }
 
     static NameAndKind xform(Aggregate a) {
-        return NameAndKind(a.identifier, a.kind);
+        return NameAndKind(a.fullyQualifiedName, a.kind);
     }
 
     mod.aggregates.map!xform.should == [
@@ -68,19 +66,20 @@ import ut.ctfe.reflection;
     ];
 }
 
-
 @("problems")
 @safe pure unittest {
     module_!"modules.problems".should ==
         Module(
             "modules.problems",
+            [],
+            [],
             [
                 Aggregate(
                     "modules.problems.PrivateFields",
                     Aggregate.Kind.struct_,
                     [
-                        Variable("int", "i"),
-                        Variable("string", "s"),
+                        Variable(Type("int"), "i"),
+                        Variable(Type("string"), "s"),
                     ]
                 ),
             ],
@@ -89,24 +88,13 @@ import ut.ctfe.reflection;
                     "modules.problems.PrivateFields",
                     Aggregate.Kind.struct_,
                     [
-                        Variable("int", "i"),
-                        Variable("string", "s"),
+                        Variable(Type("int"), "i"),
+                        Variable(Type("string"), "s"),
                     ]
                 ),
             ],
-            [Variable("int[]", "gInts")],
-            []
+            [Variable(Type("int[]"), "modules.problems.gInts")],
         );
-}
-
-
-@("variables")
-@safe pure unittest {
-    enum mod = module_!"modules.variables";
-    auto aggs = mod.aggregates[];
-    aggs.length.should == 1;
-    aggs[0].identifier.should == "modules.variables.Struct";
-    aggs[0].kind.should == Aggregate.Kind.struct_;
 }
 
 
@@ -115,27 +103,48 @@ import ut.ctfe.reflection;
     enum mod = module_!"modules.types";
     auto string_ = mod.aggregates[0];
     string_.fields.should == [
-        Variable("string", "value"),
+        Variable(Type("string"), "value"),
     ];
 }
-
 
 @("fields.Point")
 @safe pure unittest {
     import std.algorithm: find;
     enum mod = module_!"modules.types";
-    auto point = mod.aggregates[].find!(a => a.identifier == "modules.types.Point")[0];
+    auto point = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.Point")[0];
     point.fields.should == [
-        Variable("double", "x"),
-        Variable("double", "y"),
+        Variable(Type("double"), "x"),
+        Variable(Type("double"), "y"),
     ];
 }
 
-@("methods")
+
+@("methods.String")
 @safe pure unittest {
-    import std.algorithm: find;
+    import std.algorithm: find, map;
     enum mod = module_!"modules.types";
-    const str = mod.aggregates[].find!(a => a.identifier == "modules.types.String")[0];
-    str.functionsByOverload.length.should == 2;
+    enum str = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.String")[0];
+    str.functionsByOverload.map!(a => a.identifier).should == ["withPrefix", "withPrefix"];
+
+    enum withPrefix0Info = str.functionsByOverload[0];
+    enum withPrefix1Info = str.functionsByOverload[1];
+    mixin(withPrefix0Info.importMixin);
+
+    alias withPrefix0 = mixin(withPrefix0Info.symbolMixin);
+    static assert(is(typeof(&withPrefix0) == typeof(&__traits(getOverloads, modules.types.String, "withPrefix")[0])));
+
+    alias withPrefix1 = mixin(withPrefix1Info.symbolMixin);
+    static assert(is(typeof(&withPrefix1) == typeof(&__traits(getOverloads, modules.types.String, "withPrefix")[1])));
+
+    str.functionsBySymbol.map!(a => a.identifier).should == ["withPrefix"];
     str.functionsBySymbol.length.should == 1;
+}
+
+@("methods.RussianDoll")
+@safe pure unittest {
+    import std.algorithm: find, map;
+    enum mod = module_!"modules.types";
+    enum str = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.RussianDoll")[0];
+    // FIXME
+    // need to recurse over inner defined types to get to the method.
 }

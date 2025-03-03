@@ -9,12 +9,12 @@ import ut.ctfe.reflection;
     enum mod = module_!("modules.variables");
     mod.variables[].shouldBeSameSetAs(
         [
-            Variable("int", "gInt"),
-            Variable("immutable(double)", "gDouble"),
-            Variable("modules.variables.Struct", "gStruct"),
-            Variable("int", "CONSTANT_INT"),
-            Variable("string", "CONSTANT_STRING"),
-            Variable("immutable(int)", "gImmutableInt"),
+            Variable(Type("int"), "modules.variables.gInt"),
+            Variable(Type("immutable(double)"), "modules.variables.gDouble"),
+            Variable(Type("modules.variables.Struct"), "modules.variables.gStruct"),
+            Variable(Type("int"), "modules.variables.CONSTANT_INT"),
+            Variable(Type("string"), "modules.variables.CONSTANT_STRING"),
+            Variable(Type("immutable(int)"), "modules.variables.gImmutableInt"),
         ]
     );
 }
