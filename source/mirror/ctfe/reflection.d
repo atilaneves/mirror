@@ -82,7 +82,6 @@ private auto reflect(alias container, T)() {
         ret.unitTests ~= unitTest;
     }}
 
-
     return ret;
 }
 
@@ -102,6 +101,7 @@ private string newMemberImpl() @safe pure {
         ret.fullyQualifiedName = __traits(fullyQualifiedName, member);
         ret.parent = __traits(fullyQualifiedName, __traits(parent, member));
         ret.moduleName = moduleName!member;
+        ret.visibilityStr = __traits(getVisibility, member);
         return ret;
     };
 }
@@ -165,14 +165,12 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         } else
             static assert(false, "Cannot get parameters of " ~ __traits(fullyQualifiedName, overload));
 
-        auto func = new Function;
+        auto func = newMember!(overload, Function);
+        // override the fqn from `newMember` above since we want overriden methods
         func.fullyQualifiedName = __traits(fullyQualifiedName, parent) ~ "." ~ memberName;
-        func.moduleName = moduleName!parent;
-        func.parent = __traits(fullyQualifiedName, parent);
         func.overloadIndex = i;
         func.returnType = returnType;
         func.parameters = parameters;
-        func.visibilityStr = __traits(getVisibility, overload);
         func.linkageStr = __traits(getLinkage, overload);
         ret ~= func;
     }}
@@ -222,6 +220,9 @@ abstract class Member {
     string fullyQualifiedName;
     string moduleName;
     string parent;
+    string visibilityStr;
+
+    abstract string aliasMixin() @safe pure scope const;
 
     final string identifier() @safe pure scope const {
         import std.string: split;
@@ -232,8 +233,15 @@ abstract class Member {
         return `static import ` ~ moduleName ~ `;`;
     }
 
-    abstract string aliasMixin() @safe pure scope const;
-    // abstract Visibility visibility() @safe pure scope const;
+    final Visibility visibility() @safe pure scope const {
+        switch(visibilityStr) with(Visibility) {
+            default: throw new Exception("Unknown visibility " ~ visibilityStr ~ " " ~ typeid(this).toString);
+                static foreach(vis; ["public", "private", "protected", "export", "package"]) {
+                case vis: return mixin(vis ~ "_");
+            }
+       }
+    }
+
     // abstract Linkage linkage() @safe pure scope const;
 }
 
@@ -297,21 +305,11 @@ class Function: Member {
     size_t overloadIndex;
     Type returnType;
     Parameter[] parameters;
-    string visibilityStr;
     string linkageStr;
 
     override string aliasMixin() @safe pure scope const {
         import std.conv: text;
         return text(`__traits(getOverloads, `,  this.parent,  `, "`,  this.identifier,  `")[`, overloadIndex, `]`);
-    }
-
-    Visibility visibility() @safe pure scope const {
-        switch(visibilityStr) with(Visibility) {
-            default: throw new Exception("Unknown visibility " ~ visibilityStr);
-                static foreach(vis; ["public", "private", "protected", "export", "package"]) {
-                case vis: return mixin(vis ~ "_");
-            }
-       }
     }
 
     Linkage linkage() @safe pure scope const {
