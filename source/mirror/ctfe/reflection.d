@@ -28,10 +28,8 @@ module mirror.ctfe.reflection;
   * Resolve inconsistency between module-level variables having FQNs
     and aggregate-level ones not.
 
-  * Make sure everything that can be reflected on can be accessed by
-    its symbol, so that all traits work. That is: have
-    `mixin(foo.symbolMixin)` always work (it doesn't right now for
-    methods).
+  * Refactor aggregate so it uses the same code as a module. Aggregates
+    can also have types defined within them.
 
   * Fix default values.
 */
@@ -42,7 +40,7 @@ Module module_(string moduleName)() {
     import std.algorithm: countUntil;
 
     Module mod;
-    mod.identifier = moduleName;
+    mod.fullyQualifiedName = moduleName;
 
     mixin(`static import `, moduleName, `;`);
     alias module_ = mixin(moduleName);
@@ -135,15 +133,12 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
 
     Function[] ret;
 
-    // FIXME
-    //static assert(__traits(identifier, symbol) == memberName);
-
     static foreach(i, overload; __traits(getOverloads, parent, memberName)) {{
 
         static if(is(typeof(overload) R == return))
             enum returnType = Type(__traits(fullyQualifiedName, R));
         else
-            static assert(false, "Cannot get return type of " ~ __traits(identifier, overload));
+            static assert(false, "Cannot get return type of " ~ __traits(fullyQualifiedName, overload));
 
         Parameter[] parameters;
         static if(is(typeof(overload) Ps == __parameters)) {
@@ -174,7 +169,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
                 );
             }}
         } else
-            static assert(false, "Cannot get parameters of " ~ __traits(identifier, overload));
+            static assert(false, "Cannot get parameters of " ~ __traits(fullyQualifiedName, overload));
 
         ret ~= Function(
             moduleName!parent,
@@ -230,7 +225,7 @@ private auto phobosPSC(in string[] storageClasses) @safe pure nothrow {
 }
 
 struct Module {
-    string identifier;
+    string fullyQualifiedName;
     Function[] functionsByOverload;
     OverloadSet[] functionsBySymbol;
     Aggregate[] aggregates;     /// only the ones defined in the module.
