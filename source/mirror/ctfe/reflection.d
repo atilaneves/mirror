@@ -12,8 +12,6 @@ module mirror.ctfe.reflection;
 
   * Add static constructors to the module struct.
 
-  * Add unit tests to the module struct.
-
   * When doing aggregates, include function return types and
     parameters, see the old `functions.allAggregates` test.
 
@@ -44,6 +42,7 @@ private T reflect(alias parent, T)() {
     Function[] functionsByOverload;
     OverloadSet[] functionsBySymbol;
     Aggregate[] aggregates;
+    UnitTest[] unitTests;
 
     static foreach(memberName; __traits(allMembers, parent)) {{
 
@@ -78,6 +77,15 @@ private T reflect(alias parent, T)() {
         ret.aggregates = aggregates;
     ret.functionsByOverload = functionsByOverload;
     ret.functionsBySymbol = functionsBySymbol;
+
+    static foreach(i, ut; __traits(getUnitTests, parent)) {
+        ret.unitTests ~= UnitTest(
+            __traits(fullyQualifiedName, ut),
+            __traits(fullyQualifiedName, parent),
+            i,
+        );
+    }
+
 
     return ret;
 }
@@ -200,6 +208,7 @@ struct Module {
     Aggregate[] aggregates;     /// only the ones defined in the module.
     Aggregate[] allAggregates;  /// includes all function return types.
     Variable[] variables;
+    UnitTest[] unitTests;
 }
 
 struct OverloadSet {
@@ -231,7 +240,7 @@ struct Function {
         return "static import " ~ this.moduleName ~ ";";
     }
 
-    string symbolMixin() @safe pure nothrow scope const {
+    string aliasMixin() @safe pure nothrow scope const {
         import std.conv: text;
         return text(`__traits(getOverloads, `,  this.parent,  `, "`,  this.identifier,  `")[`, overloadIndex, `]`);
     }
@@ -306,6 +315,7 @@ struct Aggregate {
     Variable[] fields;
     Function[] functionsByOverload;
     OverloadSet[] functionsBySymbol;
+    UnitTest[] unitTests;
 
     static Kind toKind(T)() {
         with(Kind) {
@@ -349,4 +359,20 @@ string moduleName(T)(auto ref T obj) {
 string identifier(T)(auto ref T obj) {
     import std.string: split, join;
     return obj.fullyQualifiedName.split(".")[$-1];
+}
+
+
+struct UnitTest {
+    string fullyQualifiedName;
+    string parent;
+    size_t index;
+
+    string importMixin() @safe pure nothrow scope const {
+        return "static import " ~ this.moduleName ~ ";";
+    }
+
+    string aliasMixin() @safe pure nothrow scope const {
+        import std.conv: text;
+        return text(`__traits(getUnitTests, `, parent, `)[`, index, `]`);
+    }
 }

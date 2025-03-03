@@ -18,7 +18,7 @@ import std.traits: PSC = ParameterStorageClass;
     enum addd_0 = mod.functionsByOverload[0];
 
     mixin(addd_0.importMixin);
-    alias addd_0Sym = mixin(addd_0.symbolMixin);
+    alias addd_0Sym = mixin(addd_0.aliasMixin);
     static assert(is(typeof(&addd_0Sym) == int function(int, int) @safe @nogc pure nothrow));
 
     addd_0Sym(1, 2).should == 4;
@@ -31,7 +31,7 @@ import std.traits: PSC = ParameterStorageClass;
     enum addd_1 = mod.functionsByOverload[1];
 
     mixin(addd_1.importMixin);
-    alias addd_1Sym = mixin(addd_1.symbolMixin);
+    alias addd_1Sym = mixin(addd_1.aliasMixin);
     static assert(is(typeof(&addd_1Sym) == double function(double, double) @safe @nogc pure nothrow));
 
     addd_1Sym(1, 2).should == 5;
@@ -45,8 +45,8 @@ import std.traits: PSC = ParameterStorageClass;
     static assert(addd.identifier == "addd");
 
     mixin(addd.importMixin);
-    alias addd_0Sym = mixin(addd.overloads[0].symbolMixin);
-    alias addd_1Sym = mixin(addd.overloads[1].symbolMixin);
+    alias addd_0Sym = mixin(addd.overloads[0].aliasMixin);
+    alias addd_1Sym = mixin(addd.overloads[1].aliasMixin);
 
     static assert(is(typeof(&addd_0Sym) == int function(int, int) @safe @nogc pure nothrow));
     static assert(is(typeof(&addd_1Sym) == double function(double, double) @safe @nogc pure nothrow));

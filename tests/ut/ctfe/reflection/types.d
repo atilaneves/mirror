@@ -117,10 +117,10 @@ import ut.ctfe.reflection;
     enum withPrefix1Info = str.functionsByOverload[1];
     mixin(withPrefix0Info.importMixin);
 
-    alias withPrefix0 = mixin(withPrefix0Info.symbolMixin);
+    alias withPrefix0 = mixin(withPrefix0Info.aliasMixin);
     static assert(is(typeof(&withPrefix0) == typeof(&__traits(getOverloads, modules.types.String, "withPrefix")[0])));
 
-    alias withPrefix1 = mixin(withPrefix1Info.symbolMixin);
+    alias withPrefix1 = mixin(withPrefix1Info.aliasMixin);
     static assert(is(typeof(&withPrefix1) == typeof(&__traits(getOverloads, modules.types.String, "withPrefix")[1])));
 
     str.functionsBySymbol.map!(a => a.identifier).should == ["withPrefix"];
