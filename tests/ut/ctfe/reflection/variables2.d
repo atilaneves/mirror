@@ -1,8 +1,7 @@
 module ut.ctfe.reflection.variables2;
 
 
-import ut;
-import mirror.ctfe.reflection2;
+import ut.ctfe.reflection;
 
 
 @("variables")

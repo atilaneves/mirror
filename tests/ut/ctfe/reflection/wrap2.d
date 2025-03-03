@@ -1,8 +1,7 @@
 module ut.ctfe.reflection.wrap2;
 
 
-import ut;
-import mirror.ctfe.reflection2;
+import ut.ctfe.reflection;
 
 
 @("blub.add1")

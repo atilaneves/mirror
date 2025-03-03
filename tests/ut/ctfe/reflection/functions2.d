@@ -1,8 +1,7 @@
 module ut.ctfe.reflection.functions2;
 
 
-import ut;
-import mirror.ctfe.reflection2;
+import ut.ctfe.reflection;
 import std.traits: PSC = ParameterStorageClass;
 
 
