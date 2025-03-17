@@ -68,3 +68,10 @@ import ut.ctfe.reflection;
     static struct S { @disable this(this); }
     type!S.isCopyable.should == false;
 }
+
+@("isPOD")
+@safe pure unittest {
+    type!int.isPOD.should == true;
+    static struct S { ~this() { } }
+    type!S.isPOD.should== false;
+}
