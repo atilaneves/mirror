@@ -113,3 +113,13 @@ import ut.ctfe.reflection;
     }
     type!S.aliasThis.should == ["var"];
 }
+
+@("pointerBitmap")
+@safe pure unittest {
+    type!int.pointerBitmap.should == [int.sizeof, 0];
+    struct S {
+        long i;
+        string s;
+    }
+    type!S.pointerBitmap.should == [S.sizeof, 4];
+}

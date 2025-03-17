@@ -341,6 +341,7 @@ struct Type {
     bool hasMoveConstructor;
     bool hasPostblit;
     string[] aliasThis;
+    size_t[] pointerBitmap;
 }
 
 Type type(T)() {
@@ -357,7 +358,9 @@ Type type(T)() {
     static foreach(trait; boolTraits) {
         mixin(`ret.`, trait, ` = __traits(`, trait, `, T);`);
     }
+
     ret.aliasThis = [ __traits(getAliasThis, T) ];
+    ret.pointerBitmap = __traits(getPointerBitmap, T);
 
     return ret;
 }
