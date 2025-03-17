@@ -332,6 +332,7 @@ struct Type {
     bool isUnsigned;
     bool isStaticArray;
     bool isAssociativeArray;
+    bool isAbstractClass;
 }
 
 Type type(T)() {
@@ -340,7 +341,7 @@ Type type(T)() {
 
     enum isTraits = [
         "Arithmetic", "Floating", "Integral", "Scalar", "Unsigned", "StaticArray",
-        "AssociativeArray",
+        "AssociativeArray", "AbstractClass",
     ];
     static foreach(trait; isTraits) {{
         enum name = "is" ~ trait;

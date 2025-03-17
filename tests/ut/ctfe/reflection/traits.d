@@ -47,3 +47,9 @@ import ut.ctfe.reflection;
     type!int.isAssociativeArray.should == false;
     type!(int[string]).isAssociativeArray.should == true;
 }
+
+@safe pure unittest {
+    type!int.isAbstractClass.should == false;
+    static abstract class C {}
+    type!C.isAbstractClass.should == true;
+}
