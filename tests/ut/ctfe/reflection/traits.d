@@ -23,3 +23,9 @@ import ut.ctfe.reflection;
     type!int.isIntegral.should == true;
     type!float.isIntegral.should == false;
 }
+
+@("isScalar")
+@safe pure unittest {
+    type!int.isScalar.should == true;
+    type!(int[4]).isScalar.should == false;
+}
