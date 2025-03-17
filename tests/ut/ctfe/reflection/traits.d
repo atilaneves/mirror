@@ -88,3 +88,11 @@ import ut.ctfe.reflection;
     struct S { this(ref const(S)) {} }
     type!S.hasCopyConstructor.should == true;
 }
+
+@ShouldFail
+@("hasMoveConstructor")
+@safe pure unittest {
+    type!int.hasMoveConstructor.should == false;
+    struct S { this(S s) {} }
+    type!S.hasMoveConstructor.should == true;
+}

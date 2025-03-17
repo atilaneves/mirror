@@ -338,6 +338,7 @@ struct Type {
     bool isPOD;
     bool isZeroInit;
     bool hasCopyConstructor;
+    bool hasMoveConstructor;
 }
 
 Type type(T)() {
@@ -348,6 +349,7 @@ Type type(T)() {
         "isArithmetic", "isFloating", "isIntegral", "isScalar", "isUnsigned", "isStaticArray",
         "isAssociativeArray", "isAbstractClass", "isFinalClass", "isCopyable", "isPOD",
         "isZeroInit", "hasCopyConstructor",
+        //"hasMoveConstructor", ???
     ];
     static foreach(trait; boolTraits) {
         mixin(`ret.`, trait, ` = __traits(`, trait, `, T);`);
