@@ -180,6 +180,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         func.isStatic = __traits(isStaticFunction, overload);
         func.isReturnOnStack = __traits(isReturnOnStack, overload);
         func.variadicStyle = mixin(`Function.VariadicStyle.`, __traits(getFunctionVariadicStyle, overload));
+        func.attributes = [ __traits(getFunctionAttributes, overload) ];
 
         ret ~= func;
     }}
@@ -342,6 +343,7 @@ class Function: Member {
     bool isStatic;
     bool isReturnOnStack;
     VariadicStyle variadicStyle;
+    string[] attributes;
 
     override string aliasMixin() @safe pure scope const {
         import std.conv: text;

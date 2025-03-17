@@ -267,3 +267,19 @@ import ut.ctfe.reflection;
         typesafe.variadicStyle.should == Function.VariadicStyle.typesafe;
     }
 }
+
+@("function.attributes")
+@safe pure unittest {
+    static immutable mod = module_!"modules.traits"();
+    const struct_ = mod.aggregates[0];
+    {
+        const disabled = struct_.functionsByOverload[0];
+        disabled.fullyQualifiedName.should == "modules.traits.Struct.disabled";
+        disabled.attributes.should == ["@system"];
+    }
+    {
+        const notDisabled = struct_.functionsByOverload[1];
+        notDisabled.fullyQualifiedName.should == "modules.traits.Struct.notDisabled";
+        notDisabled.attributes.dup.should ~ ["@safe", "@nogc", "pure", "nothrow", "const"];
+    }
+}

@@ -2,7 +2,7 @@ module modules.traits;
 
 struct Struct {
     @disable void disabled() {}
-    int notDisabled() { return 42; }
+    int notDisabled() @safe @nogc pure nothrow const { return 42; }
     static struct ReturnStruct {
         int[20] ints;
     }
