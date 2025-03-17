@@ -81,3 +81,10 @@ import ut.ctfe.reflection;
     type!int.isZeroInit.should == true;
     type!char.isZeroInit.should == false;
 }
+
+@("hasCopyConstructor")
+@safe pure unittest {
+    type!int.hasCopyConstructor.should == false;
+    struct S { this(ref const(S)) {} }
+    type!S.hasCopyConstructor.should == true;
+}

@@ -337,21 +337,21 @@ struct Type {
     bool isCopyable;
     bool isPOD;
     bool isZeroInit;
+    bool hasCopyConstructor;
 }
 
 Type type(T)() {
     Type ret;
     ret.fullyQualifiedName = __traits(fullyQualifiedName, T);
 
-    enum isTraits = [
-        "Arithmetic", "Floating", "Integral", "Scalar", "Unsigned", "StaticArray",
-        "AssociativeArray", "AbstractClass", "FinalClass", "Copyable", "POD",
-        "ZeroInit",
+    enum boolTraits = [
+        "isArithmetic", "isFloating", "isIntegral", "isScalar", "isUnsigned", "isStaticArray",
+        "isAssociativeArray", "isAbstractClass", "isFinalClass", "isCopyable", "isPOD",
+        "isZeroInit", "hasCopyConstructor",
     ];
-    static foreach(trait; isTraits) {{
-        enum name = "is" ~ trait;
-        mixin(`ret.`, name, ` = __traits(`, name, `, T);`);
-    }}
+    static foreach(trait; boolTraits) {
+        mixin(`ret.`, trait, ` = __traits(`, trait, `, T);`);
+    }
 
     return ret;
 }
