@@ -59,7 +59,7 @@ private auto reflect(alias container, T)() {
         // the first part only works for aggregates and isSymbolVariable only works for modules
         else static if((is(typeof(container.init)) && !is(TypeOf!member == function)) || isSymbolVariable!member) {
             auto var = newMember!(container, memberName, Variable);
-            var.type = Type(__traits(fullyQualifiedName, typeof(member)));
+            var.type = type!(typeof(member));
 
             variables ~= var;
         }
@@ -130,7 +130,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
     static foreach(i, overload; __traits(getOverloads, parent, memberName)) {{
 
         static if(is(typeof(overload) R == return))
-            enum returnType = Type(__traits(fullyQualifiedName, R));
+            enum returnType = type!R;
         else
             static assert(false, "Cannot get return type of " ~ __traits(fullyQualifiedName, overload));
 
@@ -156,7 +156,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
                 }
 
                 parameters ~= Parameter(
-                    Type(__traits(fullyQualifiedName, Ps[p])),
+                    type!(Ps[p]),
                     paramIdentifier,
                     phobosPSC([__traits(getParameterStorageClasses, overload, p)]),
                     default_,
@@ -325,6 +325,14 @@ class Function: Member {
 
 struct Type {
     string fullyQualifiedName;
+    bool isArithmetic;
+}
+
+Type type(T)() {
+    Type ret;
+    ret.fullyQualifiedName = __traits(fullyQualifiedName, T);
+    ret.isArithmetic = __traits(isArithmetic, T);
+    return ret;
 }
 
 
