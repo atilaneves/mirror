@@ -123,3 +123,23 @@ import ut.ctfe.reflection;
     }
     type!S.pointerBitmap.should == [S.sizeof, 4];
 }
+
+@("classInstanceSize")
+@safe pure unittest {
+    type!int.classInstanceSize.should == 0;
+    class C {
+        int i;
+        string s;
+    }
+    type!C.classInstanceSize.should == 48;
+}
+
+@("classInstanceAlignment")
+@safe pure unittest {
+    type!int.classInstanceAlignment.should == 0;
+    class C {
+        int i;
+        string s;
+    }
+    type!C.classInstanceAlignment.should == 8;
+}

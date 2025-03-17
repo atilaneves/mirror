@@ -342,6 +342,8 @@ struct Type {
     bool hasPostblit;
     string[] aliasThis;
     size_t[] pointerBitmap;
+    size_t classInstanceSize;
+    size_t classInstanceAlignment;
 }
 
 Type type(T)() {
@@ -361,6 +363,11 @@ Type type(T)() {
 
     ret.aliasThis = [ __traits(getAliasThis, T) ];
     ret.pointerBitmap = __traits(getPointerBitmap, T);
+
+    static if(is(T == class)) {
+        ret.classInstanceSize = __traits(classInstanceSize, T);
+        ret.classInstanceAlignment = __traits(classInstanceAlignment, T);
+    }
 
     return ret;
 }
