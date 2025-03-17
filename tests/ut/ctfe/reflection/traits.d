@@ -35,3 +35,9 @@ import ut.ctfe.reflection;
     type!int.isUnsigned.should == false;
     type!uint.isUnsigned.should == true;
 }
+
+@("isStaticArray")
+@safe pure unittest {
+    type!int.isStaticArray.should == false;
+    type!(int[4]).isStaticArray.should == true;
+}
