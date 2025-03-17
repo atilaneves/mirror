@@ -61,3 +61,10 @@ import ut.ctfe.reflection;
     static final class C {}
     type!C.isFinalClass.should == true;
 }
+
+@("isCopyable")
+@safe pure unittest {
+    type!int.isCopyable.should == true;
+    static struct S { @disable this(this); }
+    type!S.isCopyable.should == false;
+}
