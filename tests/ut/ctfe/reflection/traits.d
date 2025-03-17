@@ -96,3 +96,10 @@ import ut.ctfe.reflection;
     struct S { this(S s) {} }
     type!S.hasMoveConstructor.should == true;
 }
+
+@("hasPostblit")
+@safe pure unittest {
+    type!int.hasPostblit.should == false;
+    struct S { this(this) {} }
+    type!S.hasPostblit.should == true;
+}
