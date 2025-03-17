@@ -143,3 +143,16 @@ import ut.ctfe.reflection;
     }
     type!C.classInstanceAlignment.should == 8;
 }
+
+
+@("isDisabled")
+@safe pure unittest {
+    static immutable mod = module_!"modules.traits"();
+    const struct_ = mod.aggregates[0];
+    const disabled = struct_.functionsByOverload[0];
+    disabled.fullyQualifiedName.should == "modules.traits.Struct.disabled";
+    disabled.isDisabled.should == true;
+    const notDisabled = struct_.functionsByOverload[1];
+    notDisabled.fullyQualifiedName.should == "modules.traits.Struct.notDisabled";
+    notDisabled.isDisabled.should == false;
+}

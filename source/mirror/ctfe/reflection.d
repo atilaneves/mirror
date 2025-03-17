@@ -171,6 +171,8 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         func.overloadIndex = i;
         func.returnType = returnType;
         func.parameters = parameters;
+        func.isDisabled = __traits(isDisabled, overload);
+
         ret ~= func;
     }}
 
@@ -315,6 +317,7 @@ class Function: Member {
     size_t overloadIndex;
     Type returnType;
     Parameter[] parameters;
+    bool isDisabled;
 
     override string aliasMixin() @safe pure scope const {
         import std.conv: text;
@@ -362,7 +365,8 @@ Type type(T)() {
     }
 
     ret.aliasThis = [ __traits(getAliasThis, T) ];
-    ret.pointerBitmap = __traits(getPointerBitmap, T);
+    static if(__traits(compiles, __traits(getPointerBitmap, T)))
+        ret.pointerBitmap = __traits(getPointerBitmap, T);
 
     static if(is(T == class)) {
         ret.classInstanceSize = __traits(classInstanceSize, T);
