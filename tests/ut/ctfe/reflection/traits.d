@@ -165,3 +165,17 @@ import ut.ctfe.reflection;
     bar.fullyQualifiedName.should == "modules.traits.Class.bar";
     bar.virtualIndex.should == 6;
 }
+
+@("isVirtualMethod")
+@safe pure unittest {
+    static immutable mod = module_!"modules.traits"();
+    const struct_ = mod.aggregates[0];
+    const disabled = struct_.functionsByOverload[0];
+    disabled.fullyQualifiedName.should == "modules.traits.Struct.disabled";
+    disabled.isVirtualMethod.should == false;
+
+    const class_ = mod.aggregates[1];
+    const bar = class_.functionsByOverload[1];
+    bar.fullyQualifiedName.should == "modules.traits.Class.bar";
+    bar.isVirtualMethod.should == true;
+}
