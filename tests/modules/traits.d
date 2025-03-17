@@ -2,7 +2,11 @@ module modules.traits;
 
 struct Struct {
     @disable void disabled() {}
-    void notDisabled() {}
+    int notDisabled() { return 42; }
+    static struct ReturnStruct {
+        int[20] ints;
+    }
+    ReturnStruct returnStruct() { return ReturnStruct(); }
 }
 
 class Class: Base {

@@ -223,3 +223,16 @@ import ut.ctfe.reflection;
     stc.fullyQualifiedName.should == "modules.traits.Class.static_";
     stc.isStatic.should == true;
 }
+
+@("isReturnOnStack")
+@safe pure unittest {
+    static immutable mod = module_!"modules.traits"();
+    const struct_ = mod.aggregates[0];
+    const notDisabled = struct_.functionsByOverload[1];
+    notDisabled.fullyQualifiedName.should == "modules.traits.Struct.notDisabled";
+    notDisabled.isReturnOnStack.should == false;
+
+    const returnStruct = struct_.functionsByOverload[2];
+    returnStruct.fullyQualifiedName.should == "modules.traits.Struct.returnStruct";
+    returnStruct.isReturnOnStack.should == true;
+}
