@@ -156,3 +156,12 @@ import ut.ctfe.reflection;
     notDisabled.fullyQualifiedName.should == "modules.traits.Struct.notDisabled";
     notDisabled.isDisabled.should == false;
 }
+
+@("virtualIndex")
+@safe pure unittest {
+    static immutable mod = module_!"modules.traits"();
+    const class_ = mod.aggregates[1];
+    const bar = class_.functionsByOverload[1];
+    bar.fullyQualifiedName.should == "modules.traits.Class.bar";
+    bar.virtualIndex.should == 6;
+}

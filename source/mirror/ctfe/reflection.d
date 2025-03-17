@@ -172,6 +172,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         func.returnType = returnType;
         func.parameters = parameters;
         func.isDisabled = __traits(isDisabled, overload);
+        func.virtualIndex = __traits(getVirtualIndex, overload);
 
         ret ~= func;
     }}
@@ -318,6 +319,7 @@ class Function: Member {
     Type returnType;
     Parameter[] parameters;
     bool isDisabled;
+    size_t virtualIndex;
 
     override string aliasMixin() @safe pure scope const {
         import std.conv: text;
