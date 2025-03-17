@@ -17,3 +17,9 @@ import ut.ctfe.reflection;
     type!int.isFloating.should == false;
     type!float.isFloating.should == true;
 }
+
+@("isIntegral")
+@safe pure unittest {
+    type!int.isIntegral.should == true;
+    type!float.isIntegral.should == false;
+}

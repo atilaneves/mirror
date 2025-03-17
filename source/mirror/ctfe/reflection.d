@@ -327,6 +327,7 @@ struct Type {
     string fullyQualifiedName;
     bool isArithmetic;
     bool isFloating;
+    bool isIntegral;
 }
 
 Type type(T)() {
@@ -334,6 +335,7 @@ Type type(T)() {
     ret.fullyQualifiedName = __traits(fullyQualifiedName, T);
     ret.isArithmetic = __traits(isArithmetic, T);
     ret.isFloating   = __traits(isFloating  , T);
+    ret.isIntegral   = __traits(isIntegral  , T);
     return ret;
 }
 
