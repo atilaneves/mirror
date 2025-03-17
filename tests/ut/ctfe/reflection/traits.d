@@ -103,3 +103,13 @@ import ut.ctfe.reflection;
     struct S { this(this) {} }
     type!S.hasPostblit.should == true;
 }
+
+@("aliasThis")
+@safe pure unittest {
+    type!int.aliasThis.shouldBeEmpty;
+    struct S {
+        string var;
+        alias var this;
+    }
+    type!S.aliasThis.should == ["var"];
+}

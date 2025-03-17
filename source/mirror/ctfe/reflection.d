@@ -340,6 +340,7 @@ struct Type {
     bool hasCopyConstructor;
     bool hasMoveConstructor;
     bool hasPostblit;
+    string[] aliasThis;
 }
 
 Type type(T)() {
@@ -356,6 +357,7 @@ Type type(T)() {
     static foreach(trait; boolTraits) {
         mixin(`ret.`, trait, ` = __traits(`, trait, `, T);`);
     }
+    ret.aliasThis = [ __traits(getAliasThis, T) ];
 
     return ret;
 }
