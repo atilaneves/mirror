@@ -326,12 +326,14 @@ class Function: Member {
 struct Type {
     string fullyQualifiedName;
     bool isArithmetic;
+    bool isFloating;
 }
 
 Type type(T)() {
     Type ret;
     ret.fullyQualifiedName = __traits(fullyQualifiedName, T);
     ret.isArithmetic = __traits(isArithmetic, T);
+    ret.isFloating   = __traits(isFloating  , T);
     return ret;
 }
 

@@ -11,3 +11,9 @@ import ut.ctfe.reflection;
     static struct Struct {}
     type!Struct.isArithmetic.should == false;
 }
+
+@("isFloating")
+@safe pure unittest {
+    type!int.isFloating.should == false;
+    type!float.isFloating.should == true;
+}
