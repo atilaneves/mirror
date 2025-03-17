@@ -48,8 +48,16 @@ import ut.ctfe.reflection;
     type!(int[string]).isAssociativeArray.should == true;
 }
 
+@("isAbstractClass")
 @safe pure unittest {
     type!int.isAbstractClass.should == false;
     static abstract class C {}
     type!C.isAbstractClass.should == true;
+}
+
+@("isFinalClass")
+@safe pure unittest {
+    type!int.isFinalClass.should == false;
+    static final class C {}
+    type!C.isFinalClass.should == true;
 }
