@@ -41,3 +41,9 @@ import ut.ctfe.reflection;
     type!int.isStaticArray.should == false;
     type!(int[4]).isStaticArray.should == true;
 }
+
+@("isAssociativeArray")
+@safe pure unittest {
+    type!int.isAssociativeArray.should == false;
+    type!(int[string]).isAssociativeArray.should == true;
+}
