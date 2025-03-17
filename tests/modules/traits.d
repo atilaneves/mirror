@@ -11,6 +11,7 @@ class Class: Base {
     abstract void abstract_();
     final void final_() {}
     override void overrideThis() {}
+    static void static_() {}
 }
 
 class Base {

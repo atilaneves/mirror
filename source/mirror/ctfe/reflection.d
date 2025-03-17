@@ -177,6 +177,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         func.isAbstract = __traits(isAbstractFunction, overload);
         func.isFinal = __traits(isFinalFunction, overload);
         func.isOverride = __traits(isOverrideFunction, overload);
+        func.isStatic = __traits(isStaticFunction, overload);
 
         ret ~= func;
     }}
@@ -328,6 +329,7 @@ class Function: Member {
     bool isAbstract;
     bool isFinal;
     bool isOverride;
+    bool isStatic;
 
     override string aliasMixin() @safe pure scope const {
         import std.conv: text;

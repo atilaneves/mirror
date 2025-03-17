@@ -209,3 +209,17 @@ import ut.ctfe.reflection;
     ovr.fullyQualifiedName.should == "modules.traits.Class.overrideThis";
     ovr.isOverride.should == true;
 }
+
+@("isStatic")
+@safe pure unittest {
+    static immutable mod = module_!"modules.traits"();
+    const class_ = mod.aggregates[1];
+
+    const abs = class_.functionsByOverload[2];
+    abs.fullyQualifiedName.should == "modules.traits.Class.abstract_";
+    abs.isStatic.should == false;
+
+    const stc = class_.functionsByOverload[5];
+    stc.fullyQualifiedName.should == "modules.traits.Class.static_";
+    stc.isStatic.should == true;
+}
