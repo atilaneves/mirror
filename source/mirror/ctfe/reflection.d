@@ -59,7 +59,7 @@ private auto reflect(alias container, T)() {
         // the first part only works for aggregates and isSymbolVariable only works for modules
         else static if((is(typeof(container.init)) && !is(TypeOf!member == function)) || isSymbolVariable!member) {
             auto var = newMember!(container, memberName, Variable);
-            var.type = Type(__traits(fullyQualifiedName, typeof(member)));
+            var.type = type!(typeof(member));
 
             variables ~= var;
         }
@@ -130,7 +130,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
     static foreach(i, overload; __traits(getOverloads, parent, memberName)) {{
 
         static if(is(typeof(overload) R == return))
-            enum returnType = Type(__traits(fullyQualifiedName, R));
+            enum returnType = type!R;
         else
             static assert(false, "Cannot get return type of " ~ __traits(fullyQualifiedName, overload));
 
@@ -156,7 +156,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
                 }
 
                 parameters ~= Parameter(
-                    Type(__traits(fullyQualifiedName, Ps[p])),
+                    type!(Ps[p]),
                     paramIdentifier,
                     phobosPSC([__traits(getParameterStorageClasses, overload, p)]),
                     default_,
@@ -171,6 +171,17 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         func.overloadIndex = i;
         func.returnType = returnType;
         func.parameters = parameters;
+        func.isDisabled = __traits(isDisabled, overload);
+        func.virtualIndex = __traits(getVirtualIndex, overload);
+        func.isVirtualMethod = __traits(isVirtualMethod, overload);
+        func.isAbstract = __traits(isAbstractFunction, overload);
+        func.isFinal = __traits(isFinalFunction, overload);
+        func.isOverride = __traits(isOverrideFunction, overload);
+        func.isStatic = __traits(isStaticFunction, overload);
+        func.isReturnOnStack = __traits(isReturnOnStack, overload);
+        func.variadicStyle = mixin(`Function.VariadicStyle.`, __traits(getFunctionVariadicStyle, overload));
+        func.attributes = [ __traits(getFunctionAttributes, overload) ];
+
         ret ~= func;
     }}
 
@@ -312,9 +323,27 @@ struct OverloadSet {
 }
 
 class Function: Member {
+
+    enum VariadicStyle {
+        none,
+        stdarg,
+        argptr,
+        typesafe,
+    }
+
     size_t overloadIndex;
     Type returnType;
     Parameter[] parameters;
+    bool isDisabled;
+    size_t virtualIndex;
+    bool isVirtualMethod;
+    bool isAbstract;
+    bool isFinal;
+    bool isOverride;
+    bool isStatic;
+    bool isReturnOnStack;
+    VariadicStyle variadicStyle;
+    string[] attributes;
 
     override string aliasMixin() @safe pure scope const {
         import std.conv: text;
@@ -325,6 +354,52 @@ class Function: Member {
 
 struct Type {
     string fullyQualifiedName;
+    bool isArithmetic;
+    bool isFloating;
+    bool isIntegral;
+    bool isScalar;
+    bool isUnsigned;
+    bool isStaticArray;
+    bool isAssociativeArray;
+    bool isAbstractClass;
+    bool isFinalClass;
+    bool isCopyable;
+    bool isPOD;
+    bool isZeroInit;
+    bool hasCopyConstructor;
+    bool hasMoveConstructor;
+    bool hasPostblit;
+    string[] aliasThis;
+    size_t[] pointerBitmap;
+    size_t classInstanceSize;
+    size_t classInstanceAlignment;
+}
+
+Type type(T)() {
+    Type ret;
+    ret.fullyQualifiedName = __traits(fullyQualifiedName, T);
+
+    enum boolTraits = [
+        "isArithmetic", "isFloating", "isIntegral", "isScalar", "isUnsigned", "isStaticArray",
+        "isAssociativeArray", "isAbstractClass", "isFinalClass", "isCopyable", "isPOD",
+        "isZeroInit", "hasCopyConstructor",
+        //"hasMoveConstructor", ???
+        "hasPostblit",
+    ];
+    static foreach(trait; boolTraits) {
+        mixin(`ret.`, trait, ` = __traits(`, trait, `, T);`);
+    }
+
+    ret.aliasThis = [ __traits(getAliasThis, T) ];
+    static if(__traits(compiles, __traits(getPointerBitmap, T)))
+        ret.pointerBitmap = __traits(getPointerBitmap, T);
+
+    static if(is(T == class)) {
+        ret.classInstanceSize = __traits(classInstanceSize, T);
+        ret.classInstanceAlignment = __traits(classInstanceAlignment, T);
+    }
+
+    return ret;
 }
 
 
