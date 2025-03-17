@@ -8,4 +8,6 @@ struct Struct {
 class Class {
     void foo() {}
     void bar() {}
+    abstract void abstract_();
+    final void final_();
 }

@@ -179,3 +179,19 @@ import ut.ctfe.reflection;
     bar.fullyQualifiedName.should == "modules.traits.Class.bar";
     bar.isVirtualMethod.should == true;
 }
+
+@("isFinalAbstract")
+@safe pure unittest {
+    static immutable mod = module_!"modules.traits"();
+    const class_ = mod.aggregates[1];
+
+    const abs = class_.functionsByOverload[2];
+    abs.fullyQualifiedName.should == "modules.traits.Class.abstract_";
+    abs.isAbstract.should == true;
+    abs.isFinal.should == false;
+
+    const fin = class_.functionsByOverload[3];
+    fin.fullyQualifiedName.should == "modules.traits.Class.final_";
+    fin.isAbstract.should == false;
+    fin.isFinal.should == true;
+}
