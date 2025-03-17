@@ -5,9 +5,14 @@ struct Struct {
     void notDisabled() {}
 }
 
-class Class {
+class Class: Base {
     void foo() {}
     void bar() {}
     abstract void abstract_();
-    final void final_();
+    final void final_() {}
+    override void overrideThis() {}
+}
+
+class Base {
+    void overrideThis() {}
 }

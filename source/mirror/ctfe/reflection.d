@@ -176,6 +176,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         func.isVirtualMethod = __traits(isVirtualMethod, overload);
         func.isAbstract = __traits(isAbstractFunction, overload);
         func.isFinal = __traits(isFinalFunction, overload);
+        func.isOverride = __traits(isOverrideFunction, overload);
 
         ret ~= func;
     }}
@@ -326,6 +327,7 @@ class Function: Member {
     bool isVirtualMethod;
     bool isAbstract;
     bool isFinal;
+    bool isOverride;
 
     override string aliasMixin() @safe pure scope const {
         import std.conv: text;

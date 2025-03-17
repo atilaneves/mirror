@@ -163,7 +163,7 @@ import ut.ctfe.reflection;
     const class_ = mod.aggregates[1];
     const bar = class_.functionsByOverload[1];
     bar.fullyQualifiedName.should == "modules.traits.Class.bar";
-    bar.virtualIndex.should == 6;
+    bar.virtualIndex.should == 7;
 }
 
 @("isVirtualMethod")
@@ -194,4 +194,18 @@ import ut.ctfe.reflection;
     fin.fullyQualifiedName.should == "modules.traits.Class.final_";
     fin.isAbstract.should == false;
     fin.isFinal.should == true;
+}
+
+@("isOverride")
+@safe pure unittest {
+    static immutable mod = module_!"modules.traits"();
+    const class_ = mod.aggregates[1];
+
+    const abs = class_.functionsByOverload[2];
+    abs.fullyQualifiedName.should == "modules.traits.Class.abstract_";
+    abs.isOverride.should == false;
+
+    const ovr = class_.functionsByOverload[4];
+    ovr.fullyQualifiedName.should == "modules.traits.Class.overrideThis";
+    ovr.isOverride.should == true;
 }
