@@ -75,3 +75,9 @@ import ut.ctfe.reflection;
     static struct S { ~this() { } }
     type!S.isPOD.should== false;
 }
+
+@("isZeroInit")
+@safe pure unittest {
+    type!int.isZeroInit.should == true;
+    type!char.isZeroInit.should == false;
+}
