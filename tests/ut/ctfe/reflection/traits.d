@@ -236,3 +236,34 @@ import ut.ctfe.reflection;
     returnStruct.fullyQualifiedName.should == "modules.traits.Struct.returnStruct";
     returnStruct.isReturnOnStack.should == true;
 }
+
+@("isReturnOnStack")
+@safe pure unittest {
+    import mirror.ctfe.reflection: Function;
+
+    static immutable mod = module_!"modules.traits"();
+    const struct_ = mod.aggregates[0];
+    {
+        const notDisabled = struct_.functionsByOverload[1];
+        notDisabled.fullyQualifiedName.should == "modules.traits.Struct.notDisabled";
+        notDisabled.variadicStyle.should == Function.VariadicStyle.none;
+    }
+
+    {
+        const stdarg = struct_.functionsByOverload[3];
+        stdarg.fullyQualifiedName.should == "modules.traits.Struct.stdarg";
+        stdarg.variadicStyle.should == Function.VariadicStyle.stdarg;
+    }
+
+    {
+        const argptr = struct_.functionsByOverload[4];
+        argptr.fullyQualifiedName.should == "modules.traits.Struct.argptr";
+        argptr.variadicStyle.should == Function.VariadicStyle.argptr;
+    }
+
+    {
+        const typesafe = struct_.functionsByOverload[5];
+        typesafe.fullyQualifiedName.should == "modules.traits.Struct.typesafe";
+        typesafe.variadicStyle.should == Function.VariadicStyle.typesafe;
+    }
+}

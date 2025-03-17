@@ -179,6 +179,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         func.isOverride = __traits(isOverrideFunction, overload);
         func.isStatic = __traits(isStaticFunction, overload);
         func.isReturnOnStack = __traits(isReturnOnStack, overload);
+        func.variadicStyle = mixin(`Function.VariadicStyle.`, __traits(getFunctionVariadicStyle, overload));
 
         ret ~= func;
     }}
@@ -321,6 +322,14 @@ struct OverloadSet {
 }
 
 class Function: Member {
+
+    enum VariadicStyle {
+        none,
+        stdarg,
+        argptr,
+        typesafe,
+    }
+
     size_t overloadIndex;
     Type returnType;
     Parameter[] parameters;
@@ -332,6 +341,7 @@ class Function: Member {
     bool isOverride;
     bool isStatic;
     bool isReturnOnStack;
+    VariadicStyle variadicStyle;
 
     override string aliasMixin() @safe pure scope const {
         import std.conv: text;

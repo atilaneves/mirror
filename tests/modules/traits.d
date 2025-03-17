@@ -7,6 +7,10 @@ struct Struct {
         int[20] ints;
     }
     ReturnStruct returnStruct() { return ReturnStruct(); }
+    import core.stdc.stdarg; // annoying editor error otherwise
+    extern(C) void stdarg(int, ...) {}
+    void argptr(...) {}
+    void typesafe(int[]...) {}
 }
 
 class Class: Base {
