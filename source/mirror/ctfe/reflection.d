@@ -329,13 +329,14 @@ struct Type {
     bool isFloating;
     bool isIntegral;
     bool isScalar;
+    bool isUnsigned;
 }
 
 Type type(T)() {
     Type ret;
     ret.fullyQualifiedName = __traits(fullyQualifiedName, T);
 
-    enum isTraits = ["Arithmetic", "Floating", "Integral", "Scalar"];
+    enum isTraits = ["Arithmetic", "Floating", "Integral", "Scalar", "Unsigned"];
     static foreach(trait; isTraits) {{
         enum name = "is" ~ trait;
         mixin(`ret.`, name, ` = __traits(`, name, `, T);`);

@@ -29,3 +29,9 @@ import ut.ctfe.reflection;
     type!int.isScalar.should == true;
     type!(int[4]).isScalar.should == false;
 }
+
+@("isUnsigned")
+@safe pure unittest {
+    type!int.isUnsigned.should == false;
+    type!uint.isUnsigned.should == true;
+}
