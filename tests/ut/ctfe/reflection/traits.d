@@ -283,13 +283,3 @@ import ut.ctfe.reflection;
         notDisabled.attributes.dup.should ~ ["@safe", "@nogc", "pure", "nothrow", "const"];
     }
 }
-
-@ShouldFail("isRef/isOut/isLazy only works inside a function")
-@("isRef")
-@safe pure unittest {
-    static immutable mod = module_!"modules.traits"();
-    const fun = mod.functionsByOverload[0];
-    fun.fullyQualifiedName.should == "modules.traits.fun";
-    fun.parameters[0].isRef.should == false;
-    fun.parameters[0].isRef.should == true;
-}
