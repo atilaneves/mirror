@@ -69,6 +69,7 @@ private auto reflect(alias container, T)() {
 
     static if(__traits(hasMember, T, "kind"))
         ret.kind = Aggregate.toKind!container;
+
     ret.variables ~= variables;
     ret.aggregates = aggregates;
     ret.functionsByOverload = functionsByOverload;
@@ -102,6 +103,12 @@ private string newMemberImpl() @safe pure {
         ret.visibilityStr = __traits(getVisibility, member);
         static if(__traits(compiles, __traits(getLinkage, member)))
             ret.linkageStr = __traits(getLinkage, member);
+        static if(__traits(compiles, __traits(isNested, member)))
+        ret.isNested = __traits(isNested, member);
+        ret.isFuture = __traits(isFuture, member);
+        ret.isDeprecated = __traits(isDeprecated, member);
+        ret.isTemplate = __traits(isTemplate, member);
+        ret.isModule = __traits(isModule, member);
         return ret;
     };
 }
@@ -232,6 +239,11 @@ abstract class Member {
     string parent;
     string visibilityStr;
     string linkageStr;
+    bool isNested;
+    bool isFuture;
+    bool isDeprecated;
+    bool isTemplate;
+    bool isModule;
 
     abstract string aliasMixin() @safe pure scope const;
 

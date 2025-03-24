@@ -26,5 +26,5 @@ class Base {
     void overrideThis() {}
 }
 
-void fun(int x, ref int y) {
-}
+@__future int theFuture;
+deprecated("cos I said so") int theDeprecated;
