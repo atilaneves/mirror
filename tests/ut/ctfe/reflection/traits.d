@@ -237,7 +237,7 @@ import ut.ctfe.reflection;
     returnStruct.isReturnOnStack.should == true;
 }
 
-@("isReturnOnStack")
+@("variadicStyle")
 @safe pure unittest {
     import mirror.ctfe.reflection: Function;
 
