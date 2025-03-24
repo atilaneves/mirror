@@ -283,3 +283,26 @@ import ut.ctfe.reflection;
         notDisabled.attributes.dup.should ~ ["@safe", "@nogc", "pure", "nothrow", "const"];
     }
 }
+
+@("isFuture")
+@safe pure unittest {
+    static immutable mod = module_!"modules.traits"();
+    {
+        const struct_ = mod.aggregates[0];
+        struct_.isFuture.should == false;
+    }
+
+    {
+        const theFuture = mod.variables[0];
+        theFuture.fullyQualifiedName.should == "modules.traits.theFuture";
+        theFuture.isFuture.should == true;
+    }
+}
+
+@("isDeprecated")
+@safe pure unittest {
+    static immutable mod = module_!"modules.traits"();
+    mod.isModule.should == true;
+    const struct_ = mod.aggregates[0];
+    struct_.isModule.should == false;
+}
