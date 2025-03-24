@@ -306,3 +306,11 @@ import ut.ctfe.reflection;
     const struct_ = mod.aggregates[0];
     struct_.isModule.should == false;
 }
+
+@("location")
+@safe pure unittest {
+    import modules.traits: modulesTraitsFile;
+    static immutable mod = module_!"modules.traits"();
+    const struct_ = mod.aggregates[0];
+    struct_.location.should == Location(modulesTraitsFile, 3, 1);
+}

@@ -28,3 +28,5 @@ class Base {
 
 @__future int theFuture;
 deprecated("cos I said so") int theDeprecated;
+
+enum modulesTraitsFile = __FILE__;

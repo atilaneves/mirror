@@ -109,6 +109,10 @@ private string newMemberImpl() @safe pure {
         ret.isDeprecated = __traits(isDeprecated, member);
         ret.isTemplate = __traits(isTemplate, member);
         ret.isModule = __traits(isModule, member);
+        static if(__traits(compiles, __traits(getLocation, member))) {
+            enum loc = __traits(getLocation, member);
+            ret.location = Location(loc[0], loc[1], loc[2]);
+        }
         return ret;
     };
 }
@@ -244,6 +248,7 @@ abstract class Member {
     bool isDeprecated;
     bool isTemplate;
     bool isModule;
+    Location location;
 
     abstract string aliasMixin() @safe pure scope const;
 
@@ -488,4 +493,11 @@ class UnitTest: Member {
         import std.conv: text;
         return text(`__traits(getUnitTests, `, parent, `)[`, index, `]`);
     }
+}
+
+
+struct Location {
+    string file;
+    size_t line;
+    size_t column;
 }
