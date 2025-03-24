@@ -25,3 +25,6 @@ class Class: Base {
 class Base {
     void overrideThis() {}
 }
+
+void fun(int x, ref int y) {
+}

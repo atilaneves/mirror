@@ -160,6 +160,7 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
                     paramIdentifier,
                     phobosPSC([__traits(getParameterStorageClasses, overload, p)]),
                     default_,
+                    __traits(isRef, Ps[p .. p+1]),
                 );
             }}
         } else
@@ -410,6 +411,7 @@ struct Parameter {
     string identifier;
     PSC storageClass;
     string default_;
+    bool isRef;
 }
 
 enum Visibility {
