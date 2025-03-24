@@ -302,6 +302,21 @@ import ut.ctfe.reflection;
 @("isDeprecated")
 @safe pure unittest {
     static immutable mod = module_!"modules.traits"();
+    {
+        const struct_ = mod.aggregates[0];
+        struct_.isDeprecated.should == false;
+    }
+
+    {
+        const theDeprecated = mod.variables[1];
+        theDeprecated.fullyQualifiedName.should == "modules.traits.theDeprecated";
+        theDeprecated.isDeprecated.should == true;
+    }
+}
+
+@("isModule")
+@safe pure unittest {
+    static immutable mod = module_!"modules.traits"();
     mod.isModule.should == true;
     const struct_ = mod.aggregates[0];
     struct_.isModule.should == false;
