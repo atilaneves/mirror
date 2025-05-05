@@ -329,3 +329,20 @@ import ut.ctfe.reflection;
     const struct_ = mod.aggregates[0];
     struct_.location.should == Location(modulesTraitsFile, 3, 1);
 }
+
+@("UDAs")
+@trusted /*should == */ unittest {
+    static import modules.traits;
+    static immutable mod = module_!"modules.traits";
+    const var = mod.variables[3];
+    var.fullyQualifiedName.should == "modules.traits.intWithUDAs";
+    var.UDAs.should == [
+        new ValueUDA(42),
+        new ValueUDA("a string"),
+        new ValueUDA(modules.traits.Struct()),
+        TypeUDA.create!(modules.traits.Struct),
+        TypeUDA.create!(modules.traits.Class),
+        SymbolUDA.create!(modules.traits.twice),
+        TypeUDA.create!(typeof(&modules.traits.twice)),
+    ];
+}
