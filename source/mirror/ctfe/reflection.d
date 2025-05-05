@@ -57,7 +57,9 @@ private auto reflect(alias container, T)() {
         } else static if(is(member) && isUDT!member)
             aggregates ~= reflect!(member, Aggregate);
         // the first part only works for aggregates and isSymbolVariable only works for modules
-        else static if((is(typeof(container.init)) && !is(TypeOf!member == function)) || isSymbolVariable!member) {
+        else static if((is(typeof(container.init)) && !is(TypeOf!member == function)) ||
+                       isSymbolVariable!member)
+        {
             auto var = newMember!(container, memberName, Variable);
             var.type = type!(typeof(member));
 
@@ -113,6 +115,17 @@ private string newMemberImpl() @safe pure {
             enum loc = __traits(getLocation, member);
             ret.location = Location(loc[0], loc[1], loc[2]);
         }
+
+        static foreach(uda; __traits(getAttributes, member)) {
+            static if(is(uda)) {
+                ret.UDAs ~= TypeUDA.create!uda;
+            } else static if(__traits(compiles, uda.init)) {
+                ret.UDAs ~= new ValueUDA(uda);
+            } else {
+                ret.UDAs ~= SymbolUDA.create!uda;
+            }
+        }
+
         return ret;
     };
 }
@@ -249,6 +262,7 @@ abstract class Member {
     bool isTemplate;
     bool isModule;
     Location location;
+    UDA[] UDAs;
 
     abstract string aliasMixin() @safe pure scope const;
 
@@ -390,9 +404,13 @@ struct Type {
     size_t[] pointerBitmap;
     size_t classInstanceSize;
     size_t classInstanceAlignment;
+
+    string toString() @safe pure scope const {
+        return fullyQualifiedName.idup;
+    }
 }
 
-Type type(T)() {
+auto type(T)() {
     Type ret;
     ret.fullyQualifiedName = __traits(fullyQualifiedName, T);
 
@@ -500,4 +518,75 @@ struct Location {
     string file;
     size_t line;
     size_t column;
+}
+
+class UDA {
+    override string toString() @safe pure scope const {
+        assert(0);
+    }
+}
+
+class ValueUDA: UDA {
+    Type type;
+    string value;
+
+    this(T)(T value) {
+        import std.conv: text;
+        this.type = .type!T;
+        this.value = value.text;
+    }
+
+    override string toString() @safe pure scope const {
+        import std.conv: text;
+        return text(`ValueUDA(`, type, `, `, value, `)`);
+    }
+
+    override bool opEquals(Object other) @safe pure scope const {
+        auto otherValue = cast(ValueUDA) other;
+        if(!otherValue) return false;
+        return type == otherValue.type && value == otherValue.value;
+    }
+}
+
+class TypeUDA: UDA {
+    Type type;
+
+    static create(T)() {
+        auto ret = new TypeUDA;
+        ret.type = .type!T;
+        return ret;
+    }
+
+    override string toString() @safe pure scope const {
+        import std.conv: text;
+        return text(`TypeUDA(`, type, `)`);
+    }
+
+    override bool opEquals(Object other) @safe pure scope const {
+        auto otherType = cast(TypeUDA) other;
+        if(!otherType) return false;
+        return type == otherType.type;
+    }
+}
+
+class SymbolUDA: UDA {
+    string symbol;
+
+    static create(alias S)() {
+        import std.traits: fullyQualifiedName;
+        auto ret = new SymbolUDA;
+        ret.symbol = fullyQualifiedName!S;
+        return ret;
+    }
+
+    override string toString() @safe pure scope const {
+        import std.conv: text;
+        return text(`SymbolUDA(`, symbol, `)`);
+    }
+
+    override bool opEquals(Object other) @safe pure scope const {
+        auto otherSymbol = cast(SymbolUDA) other;
+        if(!otherSymbol) return false;
+        return symbol == otherSymbol.symbol;
+    }
 }
