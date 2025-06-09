@@ -653,13 +653,25 @@ template Caller(alias F) {
 
     import std.variant: Variant;
     import std.typecons: Tuple;
-    import std.traits: Parameters, ReturnType;
+    import std.traits: Parameters, ReturnType, fullyQualifiedName;
+    import std.conv: text;
 
     Tuple!(Parameters!F) args;
 
     Variant impl(Variant[] variantArgs) {
+
+        if(variantArgs.length != Parameters!F.length)
+            throw new Exception(
+                text("Cannot call `", fullyQualifiedName!F, "` with ",
+                     variantArgs.length, " arguments. Expected: ", Parameters!F.length));
+
         static foreach(i; 0 .. args.length) {
-            args[i] = variantArgs[i].get!(Parameters!F[i]);
+            try
+                args[i] = variantArgs[i].get!(Parameters!F[i]);
+            catch(Exception)
+                throw new Exception(
+                    text("Expected argument #", i, " of `", fullyQualifiedName!F,
+                         "` to be `", fullyQualifiedName!(Parameters!F[i]), "`, got: `", variantArgs[i], "`"));
         }
 
         static helper() {

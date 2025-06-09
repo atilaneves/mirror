@@ -49,7 +49,7 @@ import std.traits: PSC = ParameterStorageClass;
     addd_0([Variant(2), Variant(3)]).get!int.should == 6;
 }
 
-@("functionsByOverload.call.rt.call.addd.0")
+@("functionsByOverload.call.rt.call.ok.addd.0")
 @system unittest {
     import std.variant: Variant;
 
@@ -58,6 +58,20 @@ import std.traits: PSC = ParameterStorageClass;
 
     addd_0.call!int(1, 2).should == 4;
     addd_0.call!int(2, 3).should == 6;
+}
+
+@("functionsByOverload.call.rt.call.oops.addd.0")
+@system unittest {
+    import std.variant: Variant;
+
+    const mod = module_!"modules.functions"();
+    const addd_0 = mod.functionsByOverload[0];
+
+    addd_0.call!int(1, 2, 3).shouldThrowWithMessage(
+        "Cannot call `modules.functions.addd` with 3 arguments. Expected: 2");
+
+    addd_0.call!int(1, "foo").shouldThrowWithMessage(
+        "Expected argument #1 of `modules.functions.addd` to be `int`, got: `foo`");
 }
 
 
