@@ -206,8 +206,10 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         func.variadicStyle = mixin(`Function.VariadicStyle.`, __traits(getFunctionVariadicStyle, overload));
         func.attributes = [ __traits(getFunctionAttributes, overload) ];
 
-        static if(__traits(compiles, () @safe { void* p = &overload; }))
+        static if(__traits(compiles, () @safe { void* p = &overload; })) {
             func.pointerFunc = () @safe { return &overload; };
+            func.caller = &Caller!overload.impl;
+        }
 
         ret ~= func;
     }}
@@ -373,6 +375,8 @@ struct OverloadSet {
 
 class Function: Member {
 
+    import std.variant: Variant;
+
     enum VariadicStyle {
         none,
         stdarg,
@@ -395,6 +399,8 @@ class Function: Member {
     string[] attributes;
     alias PointerFunc = void* delegate() @safe @nogc nothrow pure;
     PointerFunc pointerFunc;
+    alias Caller = Variant function(Variant[]);
+    Caller caller;
 
     override string aliasMixin() @safe pure scope const {
         import std.conv: text;
@@ -625,3 +631,28 @@ mixin template registerModule(string moduleName = __MODULE__) {
 // shared immutable seems silly but otherwise there's a copy per
 // thread.
 shared immutable(Module)[] allModuleInfos;
+
+
+template Caller(alias F) {
+
+    import std.variant: Variant;
+    import std.typecons: Tuple;
+    import std.traits: Parameters, ReturnType;
+
+    Tuple!(Parameters!F) args;
+
+    Variant impl(Variant[] variantArgs) {
+        static foreach(i; 0 .. args.length) {
+            args[i] = variantArgs[i].get!(Parameters!F[i]);
+        }
+
+        static helper() {
+            return F(args.expand);
+        }
+        static if(is(ReturnType!F == void)) {
+            helper;
+            return Variant();
+        } else
+            return Variant(helper);
+    }
+}

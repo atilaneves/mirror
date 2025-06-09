@@ -49,6 +49,18 @@ import std.traits: PSC = ParameterStorageClass;
     funPtr(2, 3).should == 6;
 }
 
+@("functionsByOverload.call.rt.caller.addd.0")
+@system unittest {
+    import std.variant: Variant;
+
+    const mod = module_!"modules.functions"();
+    const addd_0 = mod.functionsByOverload[0];
+
+    addd_0.caller([Variant(1), Variant(2)]).get!int.should == 4;
+    addd_0.caller([Variant(2), Variant(3)]).get!int.should == 6;
+}
+
+
 @("functionsBySymbol.call.addd")
 @safe pure unittest {
     static immutable mod = module_!"modules.functions"();
