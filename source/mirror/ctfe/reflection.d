@@ -10,18 +10,18 @@ module mirror.ctfe.reflection;
 /*
   TODO:
 
-  * All built-in traits.
-
-  * Add static constructors to the module struct.
-
-  * When doing aggregates, include function return types and
-    parameters, see the old `functions.allAggregates` test.
-
   * Add types to test structs/classes/etc.
 
   * Add enums to test structs/classes/etc.
 
   * Fix default values.
+
+  * Add static constructors to the module struct. This is going to be
+    hard to test since by definition all of them will have already run
+    before main.
+
+  * When doing aggregates, include function return types and
+    parameters, see the old `functions.allAggregates` test.
 */
 
 
