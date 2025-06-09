@@ -608,8 +608,13 @@ class SymbolUDA: UDA {
 
 
 mixin template registerModule(string moduleName = __MODULE__) {
+
     immutable mirror.ctfe.reflection.Module gModuleInfo;
+
     shared static this() @safe nothrow {
         gModuleInfo = module_!(moduleName);
+        allModuleInfos ~= gModuleInfo;
     }
 }
+
+immutable(Module)[] allModuleInfos;
