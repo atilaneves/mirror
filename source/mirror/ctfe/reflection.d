@@ -207,7 +207,6 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         func.attributes = [ __traits(getFunctionAttributes, overload) ];
 
         static if(__traits(compiles, () @safe { void* p = &overload; })) {
-            func.pointerFunc = () @safe { return &overload; };
             func.caller = &Caller!overload.impl;
         }
 
@@ -397,14 +396,16 @@ class Function: Member {
     bool isReturnOnStack;
     VariadicStyle variadicStyle;
     string[] attributes;
-    alias PointerFunc = void* delegate() @safe @nogc nothrow pure;
-    PointerFunc pointerFunc;
     alias Caller = Variant function(Variant[]);
     Caller caller;
 
     override string aliasMixin() @safe pure scope const {
         import std.conv: text;
         return text(`__traits(getOverloads, `,  this.parent,  `, "`,  this.identifier,  `")[`, overloadIndex, `]`);
+    }
+
+    Variant opCall(Variant[] args) const {
+        return caller(args);
     }
 }
 
