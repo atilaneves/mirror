@@ -314,6 +314,21 @@ class Module: Container {
     override string aliasMixin() @safe pure scope const {
         return fullyQualifiedName;
     }
+
+    override string toString() @safe pure scope const  {
+        import std.conv: text;
+        return text(
+            `Module(`,
+            fullyQualifiedName, `, `,
+            functionsByOverload, `, `,
+            functionsBySymbol, `, `,
+            aggregates, `, `,
+            allAggregates, `, `,
+            variables, `, `,
+            unitTests, `, `,
+            `)`
+        );
+    }
 }
 
 class Aggregate: Container {
@@ -590,3 +605,18 @@ class SymbolUDA: UDA {
         return symbol == otherSymbol.symbol;
     }
 }
+
+
+mixin template registerModule(string moduleName = __MODULE__) {
+
+    immutable mirror.ctfe.reflection.Module gModuleInfo;
+
+    shared static this() @safe nothrow {
+        gModuleInfo = module_!(moduleName);
+        allModuleInfos ~= gModuleInfo;
+    }
+}
+
+// shared immutable seems silly but otherwise there's a copy per
+// thread.
+shared immutable(Module)[] allModuleInfos;
