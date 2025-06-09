@@ -9,6 +9,7 @@ mixin runTestsMain!(
     "ut.ctfe.reflection.wrap",
     "ut.ctfe.reflection.extra",
     "ut.ctfe.reflection.traits",
+    "ut.ctfe.reflection.runtime",
     "ut.rtti.oop",
     "ut.rtti.any",
     "ut.meta.traits",

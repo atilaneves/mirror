@@ -314,6 +314,21 @@ class Module: Container {
     override string aliasMixin() @safe pure scope const {
         return fullyQualifiedName;
     }
+
+    override string toString() @safe pure scope const  {
+        import std.conv: text;
+        return text(
+            `Module(`,
+            fullyQualifiedName, `, `,
+            functionsByOverload, `, `,
+            functionsBySymbol, `, `,
+            aggregates, `, `,
+            allAggregates, `, `,
+            variables, `, `,
+            unitTests, `, `,
+            `)`
+        );
+    }
 }
 
 class Aggregate: Container {
@@ -588,5 +603,13 @@ class SymbolUDA: UDA {
         auto otherSymbol = cast(SymbolUDA) other;
         if(!otherSymbol) return false;
         return symbol == otherSymbol.symbol;
+    }
+}
+
+
+mixin template registerModule(string moduleName = __MODULE__) {
+    immutable mirror.ctfe.reflection.Module gModuleInfo;
+    shared static this() @safe nothrow {
+        gModuleInfo = module_!(moduleName);
     }
 }
