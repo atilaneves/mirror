@@ -5,9 +5,12 @@ import ut;
 import mirror.rtti;
 
 
-@("types.int")
+@("types.fundamental")
 @safe unittest {
-    auto extended = types!int;
+    with(types!(int, double)) {
+        rtti(42).name.should == "int";
+        rtti(33.3).name.should == "double";
+    }
 }
 
 @("rtti.null.object")
@@ -37,20 +40,5 @@ import mirror.rtti;
             "Cannot get RTTI for unregistered type " ~
             prefix ~ "Class"
             );
-    }
-}
-
-
-@("typesVar")
-@safe unittest {
-
-    static struct Namespace {
-        static immutable mirror.rtti.Types _types;
-        mixin typesVar!(_types, int, double);
-    }
-
-    with(Namespace._types) {
-        rtti(42).name.should == "int";
-        rtti(33.3).name.should == "double";
     }
 }
