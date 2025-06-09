@@ -8,10 +8,12 @@ jobs:
       matrix:
         os:
           - ubuntu-24.04
-          - windows-2022
-          #- macos-12
+          - windows-2025
+          #- macos-13
         dc:
+          - dmd-2.111.0
           - dmd-2.109.1
+          - ldc-1.40.1
           - ldc-1.40.0
 
     runs-on: ${{ matrix.os }}
