@@ -404,9 +404,24 @@ class Function: Member {
         return text(`__traits(getOverloads, `,  this.parent,  `, "`,  this.identifier,  `")[`, overloadIndex, `]`);
     }
 
-    Variant opCall(Variant[] args) const {
+    final Variant opCall(Variant[] args) const {
         return caller(args);
     }
+
+    final R call(R = void, A...)(A args) const {
+        Variant[A.length] variants;
+        static foreach(i; 0 .. A.length) variants[i] = args[i];
+
+        auto helper() {
+            return opCall(variants[]);
+        }
+
+        static if(is(R == void))
+            helper;
+        else
+            return helper.get!R;
+    }
+
 }
 
 

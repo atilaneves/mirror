@@ -38,7 +38,7 @@ import std.traits: PSC = ParameterStorageClass;
     addd_1Sym(2, 3).should == 7;
 }
 
-@("functionsByOverload.call.rt.addd.0")
+@("functionsByOverload.call.rt.opCall.addd.0")
 @system unittest {
     import std.variant: Variant;
 
@@ -47,6 +47,17 @@ import std.traits: PSC = ParameterStorageClass;
 
     addd_0([Variant(1), Variant(2)]).get!int.should == 4;
     addd_0([Variant(2), Variant(3)]).get!int.should == 6;
+}
+
+@("functionsByOverload.call.rt.call.addd.0")
+@system unittest {
+    import std.variant: Variant;
+
+    const mod = module_!"modules.functions"();
+    const addd_0 = mod.functionsByOverload[0];
+
+    addd_0.call!int(1, 2).should == 4;
+    addd_0.call!int(2, 3).should == 6;
 }
 
 
