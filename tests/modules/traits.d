@@ -25,3 +25,15 @@ class Class: Base {
 class Base {
     void overrideThis() {}
 }
+
+@__future int theFuture;
+deprecated("cos I said so") int theDeprecated;
+
+enum modulesTraitsFile = __FILE__;
+
+@(42, "a string", Struct(), Struct, Class, twice, typeof(&twice))
+int intWithUDAs;
+
+int twice(int i) {
+    return i * 2;
+}

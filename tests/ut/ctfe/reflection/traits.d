@@ -237,7 +237,7 @@ import ut.ctfe.reflection;
     returnStruct.isReturnOnStack.should == true;
 }
 
-@("isReturnOnStack")
+@("variadicStyle")
 @safe pure unittest {
     import mirror.ctfe.reflection: Function;
 
@@ -282,4 +282,67 @@ import ut.ctfe.reflection;
         notDisabled.fullyQualifiedName.should == "modules.traits.Struct.notDisabled";
         notDisabled.attributes.dup.should ~ ["@safe", "@nogc", "pure", "nothrow", "const"];
     }
+}
+
+@("isFuture")
+@safe pure unittest {
+    static immutable mod = module_!"modules.traits"();
+    {
+        const struct_ = mod.aggregates[0];
+        struct_.isFuture.should == false;
+    }
+
+    {
+        const theFuture = mod.variables[0];
+        theFuture.fullyQualifiedName.should == "modules.traits.theFuture";
+        theFuture.isFuture.should == true;
+    }
+}
+
+@("isDeprecated")
+@safe pure unittest {
+    static immutable mod = module_!"modules.traits"();
+    {
+        const struct_ = mod.aggregates[0];
+        struct_.isDeprecated.should == false;
+    }
+
+    {
+        const theDeprecated = mod.variables[1];
+        theDeprecated.fullyQualifiedName.should == "modules.traits.theDeprecated";
+        theDeprecated.isDeprecated.should == true;
+    }
+}
+
+@("isModule")
+@safe pure unittest {
+    static immutable mod = module_!"modules.traits"();
+    mod.isModule.should == true;
+    const struct_ = mod.aggregates[0];
+    struct_.isModule.should == false;
+}
+
+@("location")
+@safe pure unittest {
+    import modules.traits: modulesTraitsFile;
+    static immutable mod = module_!"modules.traits"();
+    const struct_ = mod.aggregates[0];
+    struct_.location.should == Location(modulesTraitsFile, 3, 1);
+}
+
+@("UDAs")
+@trusted /*should == */ unittest {
+    static import modules.traits;
+    static immutable mod = module_!"modules.traits";
+    const var = mod.variables[3];
+    var.fullyQualifiedName.should == "modules.traits.intWithUDAs";
+    var.UDAs.should == [
+        new ValueUDA(42),
+        new ValueUDA("a string"),
+        new ValueUDA(modules.traits.Struct()),
+        TypeUDA.create!(modules.traits.Struct),
+        TypeUDA.create!(modules.traits.Class),
+        SymbolUDA.create!(modules.traits.twice),
+        TypeUDA.create!(typeof(&modules.traits.twice)),
+    ];
 }

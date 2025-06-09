@@ -19,6 +19,7 @@ configuration "unittest" {
     sourcePaths "tests"
     importPaths "tests"
 
+    buildRequirements "silenceDeprecations"
     dflags "-preview=dip1000" "-preview=dip1008"
     dependency "unit-threaded" version="*"
 }
