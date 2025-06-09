@@ -5,16 +5,6 @@ module mirror.rtti;
 
 
 /**
-   Initialise a `Types` variable (module-level, static struct
-   variable, ...) with runtime type information for the given types.
- */
-mixin template typesVar(alias symbol, T...) {
-    shared static this() nothrow {
-        symbol = cast(typeof(symbol)) types!T;
-    }
-}
-
-/**
    Extend runtime type information for the given types.
  */
 Types types(T...)() {
