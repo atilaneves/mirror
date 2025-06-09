@@ -206,6 +206,9 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         func.variadicStyle = mixin(`Function.VariadicStyle.`, __traits(getFunctionVariadicStyle, overload));
         func.attributes = [ __traits(getFunctionAttributes, overload) ];
 
+        static if(__traits(compiles, () @safe { void* p = &overload; }))
+            func.pointerFunc = () @safe { return &overload; };
+
         ret ~= func;
     }}
 
@@ -390,6 +393,8 @@ class Function: Member {
     bool isReturnOnStack;
     VariadicStyle variadicStyle;
     string[] attributes;
+    alias PointerFunc = void* delegate() @safe @nogc nothrow pure;
+    PointerFunc pointerFunc;
 
     override string aliasMixin() @safe pure scope const {
         import std.conv: text;

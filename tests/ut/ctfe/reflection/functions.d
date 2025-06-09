@@ -12,7 +12,7 @@ import std.traits: PSC = ParameterStorageClass;
 }
 
 
-@("functionsByOverload.call.addd.0")
+@("functionsByOverload.call.ct.addd.0")
 @safe pure unittest {
     static immutable mod = module_!"modules.functions"();
     static immutable addd_0 = mod.functionsByOverload[0];
@@ -25,7 +25,7 @@ import std.traits: PSC = ParameterStorageClass;
     addd_0Sym(2, 3).should == 6;
 }
 
-@("functionsByOverload.call.addd.1")
+@("functionsByOverload.call.ct.addd.1")
 @safe pure unittest {
     static immutable mod = module_!"modules.functions"();
     static immutable addd_1 = mod.functionsByOverload[1];
@@ -36,6 +36,17 @@ import std.traits: PSC = ParameterStorageClass;
 
     addd_1Sym(1, 2).should == 5;
     addd_1Sym(2, 3).should == 7;
+}
+
+@("functionsByOverload.call.rt.pointer.addd.0")
+@safe pure unittest {
+    const mod = module_!"modules.functions"();
+    const addd_0 = mod.functionsByOverload[0];
+    auto funPtr = () @trusted {
+        return cast(int function(int, int) @safe @nogc pure nothrow) addd_0.pointerFunc();
+    }();
+    funPtr(1, 2).should == 4;
+    funPtr(2, 3).should == 6;
 }
 
 @("functionsBySymbol.call.addd")
