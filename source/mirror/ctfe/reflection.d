@@ -617,4 +617,6 @@ mixin template registerModule(string moduleName = __MODULE__) {
     }
 }
 
-immutable(Module)[] allModuleInfos;
+// shared immutable seems silly but otherwise there's a copy per
+// thread.
+shared immutable(Module)[] allModuleInfos;
