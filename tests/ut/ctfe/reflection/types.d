@@ -168,3 +168,39 @@ import ut.ctfe.reflection;
         withPrefix1(&str, [Variant("quux")]).get!string.should == "quuxfoo";
     }();
 }
+
+@("methods.call.variant")
+@safe unittest {
+    import std.algorithm: find;
+    import std.variant: Variant;
+    static import modules.types;
+
+    const mod = module_!"modules.types";
+    const info = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.String")[0];
+    const withPrefix0 = info.functionsByOverload[0];
+    const withPrefix1 = info.functionsByOverload[1];
+
+    auto str = modules.types.String("foo");
+    () @trusted {
+        withPrefix0(&str).get!string.should == "pre_foo";
+        withPrefix1(&str, [Variant("quux")]).get!string.should == "quuxfoo";
+    }();
+}
+
+@("methods.call.template")
+@safe unittest {
+    import std.algorithm: find;
+    import std.variant: Variant;
+    static import modules.types;
+
+    const mod = module_!"modules.types";
+    const info = mod.aggregates[].find!(a => a.fullyQualifiedName == "modules.types.String")[0];
+    const withPrefix0 = info.functionsByOverload[0];
+    const withPrefix1 = info.functionsByOverload[1];
+
+    auto str = modules.types.String("foo");
+    () @trusted {
+        withPrefix0.methodCall!string(&str).should == "pre_foo";
+        withPrefix1.methodCall!string(&str, "quux").should == "quuxfoo";
+    }();
+}

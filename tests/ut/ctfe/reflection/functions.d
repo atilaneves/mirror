@@ -56,8 +56,8 @@ import std.traits: PSC = ParameterStorageClass;
     const mod = module_!"modules.functions"();
     const addd_0 = mod.functionsByOverload[0];
 
-    addd_0.call!int(1, 2).should == 4;
-    addd_0.call!int(2, 3).should == 6;
+    addd_0.funCall!int(1, 2).should == 4;
+    addd_0.funCall!int(2, 3).should == 6;
 }
 
 @("functionsByOverload.call.rt.call.oops.addd.0")
@@ -67,10 +67,10 @@ import std.traits: PSC = ParameterStorageClass;
     const mod = module_!"modules.functions"();
     const addd_0 = mod.functionsByOverload[0];
 
-    addd_0.call!int(1, 2, 3).shouldThrowWithMessage(
+    addd_0.funCall!int(1, 2, 3).shouldThrowWithMessage(
         "Cannot call `modules.functions.addd` with 3 arguments. Expected: 2");
 
-    addd_0.call!int(1, "foo").shouldThrowWithMessage(
+    addd_0.funCall!int(1, "foo").shouldThrowWithMessage(
         "Expected argument #1 of `modules.functions.addd` to be `int`, got: `foo`");
 }
 

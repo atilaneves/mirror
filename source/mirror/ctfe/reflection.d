@@ -413,12 +413,13 @@ class Function: Member {
     }
 
     final Variant opCall(void* context, Variant[] args = []) const
+        in(context !is null)
         in(caller !is null)
     {
         return caller(context, args);
     }
 
-    final R call(R = void, A...)(A args) const {
+    final R funCall(R = void, A...)(A args) const {
         Variant[A.length] variants;
         static foreach(i; 0 .. A.length) variants[i] = args[i];
 
@@ -432,6 +433,19 @@ class Function: Member {
             return helper.get!R;
     }
 
+    final R methodCall(R = void, A...)(void* context, A args) const {
+        Variant[A.length] variants;
+        static foreach(i; 0 .. A.length) variants[i] = args[i];
+
+        auto helper() {
+            return opCall(context, variants[]);
+        }
+
+        static if(is(R == void))
+            helper;
+        else
+            return helper.get!R;
+    }
 }
 
 
