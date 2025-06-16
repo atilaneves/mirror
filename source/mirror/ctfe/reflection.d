@@ -206,6 +206,12 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         func.variadicStyle = mixin(`Function.VariadicStyle.`, __traits(getFunctionVariadicStyle, overload));
         func.attributes = [ __traits(getFunctionAttributes, overload) ];
 
+        static if(__traits(compiles, () @safe { void* p = &overload; }))
+            func.caller = &Caller!overload.impl;
+        else static if(!__traits(isModule, __traits(parent, overload)) &&
+                       !__traits(isAbstractFunction, overload))
+            func.caller = &Caller!overload.impl;
+
         ret ~= func;
     }}
 
@@ -370,6 +376,8 @@ struct OverloadSet {
 
 class Function: Member {
 
+    import std.variant: Variant;
+
     enum VariadicStyle {
         none,
         stdarg,
@@ -390,10 +398,53 @@ class Function: Member {
     bool isReturnOnStack;
     VariadicStyle variadicStyle;
     string[] attributes;
+    alias Caller = Variant function(void*, Variant[]);
+    Caller caller;
 
     override string aliasMixin() @safe pure scope const {
         import std.conv: text;
         return text(`__traits(getOverloads, `,  this.parent,  `, "`,  this.identifier,  `")[`, overloadIndex, `]`);
+    }
+
+    final Variant opCall(Variant[] args = []) const
+        in(caller !is null)
+    {
+        return caller(null, args);
+    }
+
+    final Variant opCall(void* context, Variant[] args = []) const
+        in(context !is null)
+        in(caller !is null)
+    {
+        return caller(context, args);
+    }
+
+    final R funCall(R = void, A...)(A args) const {
+        Variant[A.length] variants;
+        static foreach(i; 0 .. A.length) variants[i] = args[i];
+
+        auto helper() {
+            return opCall(variants[]);
+        }
+
+        static if(is(R == void))
+            helper;
+        else
+            return helper.get!R;
+    }
+
+    final R methodCall(R = void, A...)(void* context, A args) const {
+        Variant[A.length] variants;
+        static foreach(i; 0 .. A.length) variants[i] = args[i];
+
+        auto helper() {
+            return opCall(context, variants[]);
+        }
+
+        static if(is(R == void))
+            helper;
+        else
+            return helper.get!R;
     }
 }
 
@@ -620,3 +671,58 @@ mixin template registerModule(string moduleName = __MODULE__) {
 // shared immutable seems silly but otherwise there's a copy per
 // thread.
 shared immutable(Module)[] allModuleInfos;
+
+
+template Caller(alias F) {
+
+    import std.variant: Variant;
+    import std.typecons: Tuple;
+    import std.traits: Parameters, ReturnType, fullyQualifiedName, Unqual;
+    import std.conv: text;
+    import std.string: replace;
+    import std.functional: toDelegate;
+    import std.meta: staticMap;
+
+    Tuple!(staticMap!(Unqual, Parameters!F)) args;
+
+    enum isFreeFunction = __traits(isModule, __traits(parent, F));
+    static if(isFreeFunction)
+        alias FuncPtr = typeof(&F);
+    else
+        alias FuncPtr = typeof(toDelegate(&F));
+
+    Variant impl(void* context, Variant[] variantArgs) {
+
+        FuncPtr fptr;
+
+        static if(isFreeFunction)
+            fptr = &F;
+        else {
+            fptr.funcptr = &F;
+            fptr.ptr = context;
+        }
+
+        if(variantArgs.length != Parameters!F.length)
+            throw new Exception(
+                text("Cannot call `", fullyQualifiedName!F, "` with ",
+                     variantArgs.length, " arguments. Expected: ", Parameters!F.length));
+
+        static foreach(i; 0 .. args.length) {
+            try
+                args[i] = variantArgs[i].get!(Parameters!F[i]);
+            catch(Exception)
+                throw new Exception(
+                    text("Expected argument #", i, " of `", fullyQualifiedName!F,
+                         "` to be `", fullyQualifiedName!(Parameters!F[i]), "`, got: `", variantArgs[i], "`"));
+        }
+
+        auto helper() {
+            return fptr(args.expand);
+        }
+        static if(is(ReturnType!F == void)) {
+            helper;
+            return Variant();
+        } else
+            return Variant(helper);
+    }
+}

@@ -35,7 +35,7 @@ class AbstractClass {
 }
 
 class MiddleClass: AbstractClass {
-    string baz(string s);
+    abstract string baz(string s);
 }
 
 class LeafClass: MiddleClass, Interface {

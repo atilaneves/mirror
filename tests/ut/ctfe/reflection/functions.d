@@ -12,7 +12,7 @@ import std.traits: PSC = ParameterStorageClass;
 }
 
 
-@("functionsByOverload.call.addd.0")
+@("functionsByOverload.call.ct.addd.0")
 @safe pure unittest {
     static immutable mod = module_!"modules.functions"();
     static immutable addd_0 = mod.functionsByOverload[0];
@@ -25,7 +25,7 @@ import std.traits: PSC = ParameterStorageClass;
     addd_0Sym(2, 3).should == 6;
 }
 
-@("functionsByOverload.call.addd.1")
+@("functionsByOverload.call.ct.addd.1")
 @safe pure unittest {
     static immutable mod = module_!"modules.functions"();
     static immutable addd_1 = mod.functionsByOverload[1];
@@ -37,6 +37,43 @@ import std.traits: PSC = ParameterStorageClass;
     addd_1Sym(1, 2).should == 5;
     addd_1Sym(2, 3).should == 7;
 }
+
+@("functionsByOverload.call.rt.opCall.addd.0")
+@system unittest {
+    import std.variant: Variant;
+
+    const mod = module_!"modules.functions"();
+    const addd_0 = mod.functionsByOverload[0];
+
+    addd_0([Variant(1), Variant(2)]).get!int.should == 4;
+    addd_0([Variant(2), Variant(3)]).get!int.should == 6;
+}
+
+@("functionsByOverload.call.rt.call.ok.addd.0")
+@system unittest {
+    import std.variant: Variant;
+
+    const mod = module_!"modules.functions"();
+    const addd_0 = mod.functionsByOverload[0];
+
+    addd_0.funCall!int(1, 2).should == 4;
+    addd_0.funCall!int(2, 3).should == 6;
+}
+
+@("functionsByOverload.call.rt.call.oops.addd.0")
+@system unittest {
+    import std.variant: Variant;
+
+    const mod = module_!"modules.functions"();
+    const addd_0 = mod.functionsByOverload[0];
+
+    addd_0.funCall!int(1, 2, 3).shouldThrowWithMessage(
+        "Cannot call `modules.functions.addd` with 3 arguments. Expected: 2");
+
+    addd_0.funCall!int(1, "foo").shouldThrowWithMessage(
+        "Expected argument #1 of `modules.functions.addd` to be `int`, got: `foo`");
+}
+
 
 @("functionsBySymbol.call.addd")
 @safe pure unittest {
