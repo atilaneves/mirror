@@ -206,9 +206,11 @@ private Function[] overloads(alias parent, alias symbol, string memberName)() {
         func.variadicStyle = mixin(`Function.VariadicStyle.`, __traits(getFunctionVariadicStyle, overload));
         func.attributes = [ __traits(getFunctionAttributes, overload) ];
 
-        static if(__traits(compiles, () @safe { void* p = &overload; })) {
+        static if(__traits(compiles, () @safe { void* p = &overload; }))
             func.caller = &Caller!overload.impl;
-        }
+        else static if(!__traits(isModule, __traits(parent, overload)) &&
+                       !__traits(isAbstractFunction, overload))
+            func.caller = &Caller!overload.impl;
 
         ret ~= func;
     }}
@@ -396,7 +398,7 @@ class Function: Member {
     bool isReturnOnStack;
     VariadicStyle variadicStyle;
     string[] attributes;
-    alias Caller = Variant function(Variant[]);
+    alias Caller = Variant function(void*, Variant[]);
     Caller caller;
 
     override string aliasMixin() @safe pure scope const {
@@ -404,8 +406,16 @@ class Function: Member {
         return text(`__traits(getOverloads, `,  this.parent,  `, "`,  this.identifier,  `")[`, overloadIndex, `]`);
     }
 
-    final Variant opCall(Variant[] args) const {
-        return caller(args);
+    final Variant opCall(Variant[] args = []) const
+        in(caller !is null)
+    {
+        return caller(null, args);
+    }
+
+    final Variant opCall(void* context, Variant[] args = []) const
+        in(caller !is null)
+    {
+        return caller(context, args);
     }
 
     final R call(R = void, A...)(A args) const {
@@ -653,12 +663,30 @@ template Caller(alias F) {
 
     import std.variant: Variant;
     import std.typecons: Tuple;
-    import std.traits: Parameters, ReturnType, fullyQualifiedName;
+    import std.traits: Parameters, ReturnType, fullyQualifiedName, Unqual;
     import std.conv: text;
+    import std.string: replace;
+    import std.functional: toDelegate;
+    import std.meta: staticMap;
 
-    Tuple!(Parameters!F) args;
+    Tuple!(staticMap!(Unqual, Parameters!F)) args;
 
-    Variant impl(Variant[] variantArgs) {
+    enum isFreeFunction = __traits(isModule, __traits(parent, F));
+    static if(isFreeFunction)
+        alias FuncPtr = typeof(&F);
+    else
+        alias FuncPtr = typeof(toDelegate(&F));
+
+    Variant impl(void* context, Variant[] variantArgs) {
+
+        FuncPtr fptr;
+
+        static if(isFreeFunction)
+            fptr = &F;
+        else {
+            fptr.funcptr = &F;
+            fptr.ptr = context;
+        }
 
         if(variantArgs.length != Parameters!F.length)
             throw new Exception(
@@ -674,8 +702,8 @@ template Caller(alias F) {
                          "` to be `", fullyQualifiedName!(Parameters!F[i]), "`, got: `", variantArgs[i], "`"));
         }
 
-        static helper() {
-            return F(args.expand);
+        auto helper() {
+            return fptr(args.expand);
         }
         static if(is(ReturnType!F == void)) {
             helper;
