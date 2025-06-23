@@ -1,15 +1,6 @@
 module python;
 
-#include "Python.h"
-
-
-enum MethodArgs {
-    Var = METH_VARARGS,
-    Keywords = METH_KEYWORDS,
-    Static = METH_STATIC,
-    None = METH_NOARGS,
-    O = METH_O,
-}
+#include "python3.11/Python.h"
 
 
 auto pyModuleCreate(PyModuleDef* moduleDef) @nogc nothrow {
