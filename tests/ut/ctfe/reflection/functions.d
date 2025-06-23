@@ -71,7 +71,8 @@ import std.traits: PSC = ParameterStorageClass;
         "Cannot call `modules.functions.addd` with 3 arguments. Expected: 2");
 
     addd_0.funCall!int(1, "foo").shouldThrowWithMessage(
-        "Expected argument #1 of `modules.functions.addd` to be `int`, got: `foo`");
+        "Expected argument #1 of `modules.functions.addd` to be `int`, got: `foo`: `immutable(char)[]`\n" ~
+        "Exception: Variant: attempting to use incompatible types immutable(char)[] and int");
 }
 
 

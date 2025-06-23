@@ -710,10 +710,15 @@ template Caller(alias F) {
         static foreach(i; 0 .. args.length) {
             try
                 args[i] = variantArgs[i].get!(Parameters!F[i]);
-            catch(Exception)
+            catch(Exception e)
                 throw new Exception(
-                    text("Expected argument #", i, " of `", fullyQualifiedName!F,
-                         "` to be `", fullyQualifiedName!(Parameters!F[i]), "`, got: `", variantArgs[i], "`"));
+                    text(
+                        "Expected argument #", i, " of `", fullyQualifiedName!F,
+                        "` to be `", fullyQualifiedName!(Parameters!F[i]),
+                        "`, got: `", variantArgs[i], "`: `", variantArgs[i].type, "`",
+                        "\nException: ", e.msg,
+                        )
+                    );
         }
 
         auto helper() {
