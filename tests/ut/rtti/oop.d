@@ -297,6 +297,7 @@ private void shouldEqual(
         double d;
         const int const_;
         immutable int immutable_;
+        private int private_ = 19;
         this(int i, double d) { this.i = i; this.d = d; this.const_ = 77; this.immutable_ = 42; }
     }
 
@@ -308,6 +309,9 @@ private void shouldEqual(
 
         type.field("i").set(obj, 77);
         type.field("i").get!int(obj).should == 77;
+
+        type.field("private_").set(obj, 0).shouldThrowWithMessage("Cannot get private member");
+        (cast(Class) obj).private_.should == 19;
 
         type.field("const_").set(obj, 0).shouldThrowWithMessage("Cannot set const member 'const_'");
         type.field("immutable_").set(obj, 0).shouldThrowWithMessage("Cannot set immutable member 'immutable_'");
