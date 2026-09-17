@@ -213,23 +213,25 @@ private class FieldImpl(P, F, string member): Field {
 
 private:
 
-    ref getMember(O)(O obj) const {
+    import std.traits: CopyTypeQualifiers;
+    enum memberProtection = __traits(getProtection, __traits(getMember, P, member));
 
-        import mirror.trait_enums: Protection;
-        import std.traits: Unqual, fullyQualifiedName, CopyTypeQualifiers;
-        import std.algorithm: among;
+    ref CopyTypeQualifiers!(O, F) getMember(O)(O obj) const {
 
-        if(!protection.among(Protection.export_, Protection.public_))
+        import std.traits: fullyQualifiedName;
+
+        static if(memberProtection != "public" && memberProtection != "export")
             throw new Exception("Cannot get private member");
+        else {
+            auto rightType = cast(CopyTypeQualifiers!(O, P)) obj;
+            if(rightType is null)
+                throw new Exception(
+                    "Cannot call get!" ~
+                    fullyQualifiedName!F ~ " since not of type " ~
+                    fullyQualifiedName!P);
 
-        auto rightType = cast(CopyTypeQualifiers!(O, P)) obj;
-        if(rightType is null)
-            throw new Exception(
-                "Cannot call get!" ~
-                fullyQualifiedName!F ~ " since not of type " ~
-                fullyQualifiedName!P);
-
-        return __traits(getMember, rightType, member);
+            return __traits(getMember, rightType, member);
+        }
     }
 }
 
